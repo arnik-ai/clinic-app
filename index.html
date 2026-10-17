@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>مینی‌اپ کلینیک زیبایی</title>
+<!-- Telegram Mini App bridge: must load before the app script. -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,800&family=Vazirmatn:wght@400;600;800;900&display=swap">
+<style>
+/* Layout: one small, airy column; four big pastel tiles; everything else lives in sheets.
+   Deliberately one light, pastel look: it stays light even when Telegram is in dark mode. */
+:root {
+  color-scheme: light;
+  --bg1: #FFFFFF; --bg2: #FFFFFF; --bg3: #FFFFFF; --bg4: #FFFFFF;
+  --glass: #FFFFFF; --glass-line: #E9E4F7;
+  --ink: #2A2D43; --ink2: #7B7F97;
+  --mint-a: #EAFBF7; --mint-b: #D2F4EC; --mint-d: #17806F; --mint-line: #ABE7DA;
+  --lilac-a: #F4F0FF; --lilac-b: #E4DBFF; --lilac-d: #6A4FD0; --lilac-line: #CFC0FF;
+  --peach-a: #EEF6FF; --peach-b: #D6E9FF; --peach-d: #2F6FC4; --peach-line: #B3D4FF;
+  --sky-a: #FFF9E3; --sky-b: #FFEFBF; --sky-d: #8F6200; --sky-line: #FFDC85;
+  --mint: var(--mint-b); --lilac: var(--lilac-b); --peach: var(--peach-b); --sky: var(--sky-b);
+  --brand: #7C5CF0; --brand-2: #5B8DEF;
+  --err: #D44A3F;
+  --shadow: 0 6px 18px rgba(106, 79, 208, 0.08);
+  --font: "Vazirmatn", "Segoe UI", Tahoma, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0; color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.65; direction: rtl;
+  background: var(--bg1);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-tap-highlight-color: transparent;
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--lilac-d); outline-offset: 2px; }
+.app { max-width: 460px; margin: 0 auto; padding-block: 14px 110px; }
+.glass { background: var(--glass); border: 1.5px solid var(--glass-line); border-radius: 22px; box-shadow: var(--shadow); }
+.hint { color: var(--ink2); font-size: 14px; }
+.num { font-variant-numeric: tabular-nums; }
+.ltr { direction: ltr; unicode-bidi: isolate; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; gap: 10px; align-items: center; }
+
+/* top */
+.top { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.top h1 { margin: 0; font-size: 19px; font-weight: 900; flex: 1; min-width: 0; }
+.round { width: 42px; height: 42px; border-radius: 15px; border: 1px solid var(--glass-line); background: var(--glass); display: grid; place-items: center; flex-shrink: 0; box-shadow: var(--shadow); }
+
+/* home */
+.hero { display: flex; align-items: center; gap: 12px; padding: 16px 18px; background: linear-gradient(135deg, #FFFFFF 40%, var(--lilac-a)); border-color: var(--lilac-line); }
+.welcome { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 800; font-size: 36px; line-height: 1.1; direction: ltr; text-align: right;
+  background: linear-gradient(90deg, #4FA3F7, #7C5CF0); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: 4px; }
+.mascot { width: 62px; height: 62px; flex-shrink: 0; transform-origin: 50% 100%; animation: sway 3.2s ease-in-out infinite; }
+@keyframes sway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+.hero b { font-size: 19px; font-weight: 900; display: block; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 800; background: var(--peach-a); color: var(--peach-d); border: 1.5px solid var(--peach-line); }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.tile {
+  border: 0; border-radius: 26px; padding: 16px 14px 14px; text-align: start; display: flex; flex-direction: column; gap: 4px;
+  min-height: 150px; box-shadow: var(--shadow); position: relative; overflow: hidden;
+  transition: transform 0.18s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.tile:active { transform: scale(0.95); }
+.tile svg { width: 60px; height: 60px; margin-bottom: auto; filter: drop-shadow(0 4px 6px rgba(60, 40, 120, 0.12)); }
+.tile b { font-size: 18.5px; font-weight: 900; }
+.tile span { font-size: 13.5px; font-weight: 700; opacity: 0.85; }
+.t-mint { background: linear-gradient(160deg, var(--mint-a), var(--mint-b)); color: var(--mint-d); border: 2px solid var(--mint-line); }
+.t-lilac { background: linear-gradient(160deg, var(--lilac-a), var(--lilac-b)); color: var(--lilac-d); border: 2px solid var(--lilac-line); }
+.t-peach { background: linear-gradient(160deg, var(--peach-a), var(--peach-b)); color: var(--peach-d); border: 2px solid var(--peach-line); }
+.t-sky { background: linear-gradient(160deg, var(--sky-a), var(--sky-b)); color: var(--sky-d); border: 2px solid var(--sky-line); }
+.tile { box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.9); }
+.tile.t-mint, .tile.t-lilac, .tile.t-peach, .tile.t-sky { border-width: 2px; }
+.mini { display: flex; gap: 10px; margin-top: 12px; }
+.mini button { flex: 1; border: 2px solid var(--peach-line); background: var(--glass); border-radius: 18px; padding: 12px; font-weight: 800; display: flex; align-items: center; gap: 8px; justify-content: center; box-shadow: var(--shadow); font-size: 13.5px; }
+
+/* lists, chips, forms */
+.item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 0; width: 100%; text-align: start; background: transparent; border-top: 1px solid var(--glass-line); }
+.item:first-child { border-top: 0; }
+.item .dot { width: 38px; height: 38px; border-radius: 13px; display: grid; place-items: center; font-weight: 900; font-size: 13px; flex-shrink: 0; }
+.item b { display: block; font-size: 16px; font-weight: 800; }
+.item .price { margin-inline-start: auto; font-weight: 900; font-size: 13.5px; white-space: nowrap; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1.5px solid var(--glass-line); background: var(--glass); border-radius: 999px; padding: 9px 16px; min-height: 44px; font-weight: 800; font-size: 14.5px; }
+.chip[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+.input { width: 100%; border: 1.5px solid var(--glass-line); background: #FFFFFF; border-radius: 16px; padding: 13px 14px; min-height: 50px; outline: none; }
+.input:focus { border-color: var(--brand); }
+.label { font-weight: 800; font-size: 13px; margin-bottom: 6px; display: block; }
+.err { color: var(--err); font-size: 12.5px; font-weight: 800; }
+.btn { border: 0; border-radius: 16px; padding: 12px 14px; font-weight: 900; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #fff; }
+.btn.soft { background: #FFFFFF; color: var(--ink); border: 1.5px solid var(--glass-line); }
+.seg { display: flex; padding: 4px; gap: 4px; border-radius: 16px; background: var(--lilac-a); border: 1.5px solid var(--lilac-line); }
+.seg button { flex: 1; border: 0; border-radius: 12px; padding: 10px; font-weight: 800; background: transparent; color: var(--ink2); }
+.seg button[aria-pressed="true"] { background: #FFFFFF; color: var(--lilac-d); box-shadow: 0 2px 8px rgba(106, 79, 208, 0.15); }
+select.input { appearance: none; -webkit-appearance: none; padding-inline-start: 38px;
+  background: #FFFFFF url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237C5CF0' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat left 14px center; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* calendar: 2026 booking style; squircle days with the free seats under each number */
+.datebtn { display: flex; align-items: center; gap: 12px; text-align: start; font-weight: 800; min-height: 62px; padding-block: 9px; }
+.datebtn .ic { width: 40px; height: 40px; border-radius: 13px; background: var(--lilac-a); border: 1.5px solid var(--lilac-line); display: grid; place-items: center; flex-shrink: 0; }
+.datebtn .ic svg { width: 22px; height: 22px; }
+.datebtn .v { display: flex; flex-direction: column; line-height: 1.35; min-width: 0; }
+.datebtn .v small { font-size: 12px; font-weight: 700; color: var(--ink2); }
+.datebtn .ph { color: var(--ink2); font-weight: 700; }
+.datebtn .chev { margin-inline-start: auto; color: var(--lilac-d); display: grid; }
+.cal-title { text-align: center; margin: 0 0 12px; }
+.cal-title b { display: block; font-size: 18px; font-weight: 900; }
+.calcard { background: #FFFFFF; border: 1.5px solid var(--glass-line); border-radius: 24px; padding: 12px 8px 10px; box-shadow: var(--shadow); overflow: hidden; }
+.cal-head { display: flex; align-items: center; gap: 10px; margin: 0 4px 6px; }
+.cal-head .m { flex: 1; text-align: center; line-height: 1.25; }
+.cal-head .m b { display: block; font-size: 20px; font-weight: 900; }
+.cal-head .m span { font-size: 12.5px; font-weight: 700; color: var(--ink2); }
+.navb { width: 40px; height: 40px; border-radius: 14px; border: 1.5px solid var(--lilac-line); background: var(--lilac-a); color: var(--lilac-d); display: grid; place-items: center; padding: 0; }
+.navb svg { width: 18px; height: 18px; }
+.navb:disabled { opacity: 0.35; }
+.flip svg { transform: scaleX(-1); }
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); }
+.cal .wd { text-align: center; font-size: 12px; font-weight: 800; color: var(--ink2); padding: 6px 0 8px; margin-bottom: 4px; border-bottom: 1.5px dashed var(--glass-line); }
+.cal .wd.fri { color: #E0706A; }
+.cd { position: relative; height: 52px; margin: 2px; padding: 0; border: 1.5px solid transparent; border-radius: 14px; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--ink); transition: transform 0.15s, background 0.2s; }
+.cd .n { font-size: 16px; font-weight: 900; line-height: 1.25; }
+.cd .s { font-size: 9.5px; font-weight: 800; line-height: 1.2; color: var(--mint-d); }
+.cd:disabled { cursor: default; }
+.cd:disabled .n { color: #CFCEDB; }
+.cd.fri:disabled .n { color: #F2BEBA; }
+.cd.av { background: #FFFFFF; border-color: var(--glass-line); }
+.cd.av:active { transform: scale(0.94); }
+.cd.low .s { color: #D9822B; }
+.cd.full { background: #F6F5FA; }
+.cd.full .n { color: #B9B8C8; text-decoration: line-through; }
+.cd.full .s { color: #B9B8C8; }
+.cd.pat { background: var(--lilac-a); border-color: var(--lilac-line); }
+.cd.pat .n, .cd.pat .s { color: var(--lilac-d); }
+.cd.today { border: 2px solid #FFDC85; }
+.cd.on { background: linear-gradient(135deg, var(--brand), var(--brand-2)); border-color: transparent; box-shadow: 0 8px 18px rgba(124, 92, 240, 0.35); transform: scale(1.04); }
+.cd.on .n, .cd.on .s { color: #FFFFFF; }
+.cal.in-next { animation: inNext 0.28s ease; }
+.cal.in-prev { animation: inPrev 0.28s ease; }
+@keyframes inNext { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: none; } }
+@keyframes inPrev { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+.legend { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; padding-top: 10px; border-top: 1.5px dashed var(--glass-line); font-size: 12px; font-weight: 700; color: var(--ink2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.lg { width: 12px; height: 12px; border-radius: 4px; display: inline-block; border: 1.5px solid var(--glass-line); background: #FFFFFF; }
+.lg.full { background: #ECEBF3; border-color: #ECEBF3; }
+.lg.today { border: 2px solid #FFDC85; }
+.lg.on { background: linear-gradient(135deg, var(--brand), var(--brand-2)); border-color: transparent; }
+.lg.pat { background: var(--lilac-a); border-color: var(--lilac-line); }
+.slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.slot { position: relative; border: 1.5px solid var(--glass-line); background: #FFFFFF; border-radius: 18px; display: flex; flex-direction: column; align-items: center; transition: transform 0.15s, box-shadow 0.2s; }
+.slot { padding: 12px 4px 10px; gap: 1px; }
+.slot svg { width: 32px; height: 32px; margin-bottom: 4px; }
+.slot b { font-size: 15px; font-weight: 900; }
+.slot span { font-size: 11.5px; font-weight: 700; color: var(--ink2); white-space: nowrap; }
+.slot.on { border-color: var(--brand); background: var(--lilac-a); box-shadow: 0 6px 16px rgba(124, 92, 240, 0.18); }
+.slot.on span { color: var(--lilac-d); }
+.slot:active { transform: scale(0.96); }
+.tk { position: absolute; top: -6px; inset-inline-end: -6px; width: 20px; height: 20px; border-radius: 50%; background: #2DBE8C; border: 2px solid #FFFFFF; display: grid; place-items: center; animation: pop 0.3s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.btn:disabled { opacity: 0.5; }
+
+/* drawers: crowded parts fold away */
+.acc { background: #FFFFFF; border: 1.5px solid var(--glass-line); border-radius: 22px; box-shadow: var(--shadow); overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; }
+.acc[open] { border-color: var(--lilac-line); box-shadow: 0 10px 26px rgba(106, 79, 208, 0.12); }
+.acc > summary { list-style: none; display: flex; align-items: center; gap: 12px; padding: 14px; cursor: pointer; min-height: 66px; }
+.acc > summary::-webkit-details-marker { display: none; }
+.acc > summary b { font-size: 16.5px; font-weight: 900; }
+.acc[open] > summary { background: linear-gradient(180deg, var(--lilac-a), #FFFFFF); border-bottom: 1.5px dashed var(--glass-line); }
+.acc .badge { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; flex-shrink: 0; }
+.acc .badge svg { width: 26px; height: 26px; }
+.acc .cnt { margin-inline-start: auto; font-size: 12px; font-weight: 800; color: var(--lilac-d); background: var(--lilac-a); border: 1.5px solid var(--lilac-line); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+.acc .chev { margin-inline-start: auto; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: #FFFFFF; border: 1.5px solid var(--lilac-line); color: var(--lilac-d); transition: transform 0.25s, background 0.2s; flex-shrink: 0; }
+.acc .cnt + .chev { margin-inline-start: 0; }
+.acc[open] .chev { transform: rotate(180deg); background: var(--brand); border-color: var(--brand); color: #FFFFFF; }
+.acc[open] > :not(summary) { animation: accIn 0.25s ease; }
+@keyframes accIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.acc .item { border-top: 1.5px dashed var(--glass-line); }
+.acc .item:first-child { border-top: 0; }
+.acc .item .price { background: var(--mint-a); border: 1.5px solid var(--mint-line); color: var(--mint-d); padding: 3px 10px; border-radius: 999px; font-size: 12.5px; }
+.faq { padding: 4px; }
+.faq details { border-radius: 16px; transition: background 0.2s; }
+.faq details + details { margin-top: 2px; }
+.faq details[open] { background: var(--lilac-a); }
+.faq summary { list-style: none; display: flex; gap: 10px; align-items: center; padding: 11px 10px; font-weight: 800; cursor: pointer; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq .qm { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; background: var(--sky-a); border: 1.5px solid var(--sky-line); color: var(--sky-d); font-weight: 900; }
+.faq details[open] .qm { background: var(--brand); border-color: var(--brand); color: #FFFFFF; }
+.faq summary .chev { margin-inline-start: auto; color: var(--lilac-d); transition: transform 0.25s; display: grid; }
+.faq details[open] summary .chev { transform: rotate(180deg); }
+.faq .ans { margin: 0 10px 10px; padding: 12px 14px; background: #FFFFFF; border-radius: 14px; border-inline-start: 3px solid var(--brand); animation: accIn 0.25s ease; }
+/* course picker sheet: replaces the phone's plain dropdown */
+.pick-h { font-size: 13px; font-weight: 800; color: var(--ink2); margin: 0 6px 6px; }
+.picks { padding: 4px; }
+.pick { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px; border: 0; background: transparent; border-radius: 16px; text-align: start; transition: background 0.2s, transform 0.15s; }
+.pick + .pick { margin-top: 2px; }
+.pick .dot, .datebtn .dot { width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; font-weight: 900; flex-shrink: 0; }
+.pick .v { display: flex; flex-direction: column; line-height: 1.35; flex: 1; min-width: 0; }
+.pick .v b { font-size: 15.5px; font-weight: 800; }
+.pick .v small { font-size: 12.5px; font-weight: 700; color: var(--ink2); }
+.pick .radio { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--lilac-line); flex-shrink: 0; transition: border 0.15s; }
+.pick.on { background: var(--lilac-a); }
+.pick.on .radio { border: 7px solid var(--brand); }
+.pick:active { transform: scale(0.98); }
+.big { font-size: 26px; font-weight: 900; }
+
+/* test */
+.bar { height: 8px; border-radius: 4px; background: var(--glass); overflow: hidden; }
+.bar > div { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--brand), var(--lilac-d)); transition: width 0.3s ease; }
+.q { font-size: 20px; font-weight: 800; direction: ltr; text-align: left; padding: 22px 18px; }
+.opt { border: 1.5px solid var(--glass-line); background: var(--glass); border-radius: 18px; padding: 14px 16px; font-weight: 800; direction: ltr; text-align: left; width: 100%; transition: transform 0.15s; }
+.opt:active { transform: scale(0.97); }
+
+/* sheet, main button, toast */
+.mainbar { position: fixed; inset: auto 0 0; z-index: 8; padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.mainbar button { display: block; width: 100%; max-width: 460px; margin: 0 auto; border: 0; border-radius: 18px; padding: 15px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #fff; font-weight: 900; font-size: 16px; box-shadow: 0 10px 24px rgba(124, 92, 240, 0.32); }
+.sheet-wrap { position: fixed; inset: 0; z-index: 20; background: rgba(20, 18, 40, 0.35); display: flex; align-items: flex-end; justify-content: center; }
+.sheet { width: 100%; max-width: 500px; max-height: 90%; overflow: auto; background: #FFFFFF; border-radius: 28px 28px 0 0; padding: 10px 18px calc(20px + env(safe-area-inset-bottom, 0px)); animation: up 0.28s cubic-bezier(0.2, 0.9, 0.3, 1); }
+@keyframes up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.grab { width: 44px; height: 5px; border-radius: 3px; background: var(--ink2); opacity: 0.3; margin: 2px auto 12px; }
+.toast { position: fixed; inset-inline: 16px; bottom: calc(88px + env(safe-area-inset-bottom, 0px)); z-index: 30; max-width: 428px; margin: 0 auto; background: #1E2233; color: #fff; border-radius: 16px; padding: 12px 14px; font-size: 13.5px; font-weight: 700; }
+.done { text-align: center; padding: 28px 18px; }
+.done .ok { width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 12px; background: var(--brand); animation: pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1); }
+@keyframes pop { from { transform: scale(0.3); } to { transform: scale(1); } }
+.ribbon { max-width: 460px; margin: 10px auto 0; text-align: center; font-size: 12px; font-weight: 800; color: var(--lilac-d); }
+@media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; transition: none !important; } }
+
+/* ── café ── */
+.cup .steam path { animation: steam 2.4s ease-in-out infinite; opacity: 0; }
+.cup .steam path:nth-child(2) { animation-delay: 0.8s; }
+.cup .steam path:nth-child(3) { animation-delay: 1.6s; }
+@keyframes steam { 0% { opacity: 0; transform: translateY(6px); } 40% { opacity: 0.9; } 100% { opacity: 0; transform: translateY(-8px); } }
+.pill.off { background: #F4F3F9; color: var(--ink2); border-color: var(--glass-line); }
+textarea.input { resize: none; line-height: 1.7; }
+.cats { position: sticky; top: 0; z-index: 5; display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px 10px; margin: 0 -2px 4px; background: #FFFFFF; scrollbar-width: none; }
+.cats::-webkit-scrollbar { display: none; }
+.cat { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--glass-line); background: #FFFFFF; border-radius: 999px; padding: 8px 14px; font-weight: 800; font-size: 14px; }
+.cat svg { width: 20px; height: 20px; }
+.cat[aria-pressed="true"] { background: var(--lilac-a); border-color: var(--brand); color: var(--lilac-d); box-shadow: 0 4px 12px rgba(124, 92, 240, 0.15); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.food { background: #FFFFFF; border: 1.5px solid var(--glass-line); border-radius: 22px; overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+.food .ph { position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; border: 0; padding: 0; background: var(--lilac-a); }
+.food .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tag { position: absolute; top: 8px; inset-inline-start: 8px; background: rgba(255, 255, 255, 0.94); color: var(--lilac-d); border: 1.5px solid var(--lilac-line); font-size: 11.5px; font-weight: 900; padding: 1px 9px; border-radius: 999px; }
+.food .fb { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.food .fb b { font-size: 15.5px; font-weight: 900; }
+.food .fb .hint { font-size: 12px; line-height: 1.5; }
+.food .act { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; margin-top: auto; padding-top: 8px; }
+.pr { font-weight: 900; font-size: 13.5px; }
+.add { width: 36px; height: 36px; border-radius: 12px; border: 0; padding: 0; background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #FFFFFF; display: grid; place-items: center; box-shadow: 0 6px 14px rgba(124, 92, 240, 0.3); flex-shrink: 0; }
+.add:active { transform: scale(0.92); }
+.stp { display: inline-flex; align-items: center; gap: 2px; background: var(--lilac-a); border: 1.5px solid var(--lilac-line); border-radius: 12px; padding: 2px; }
+.stp button { width: 26px; height: 28px; border: 0; border-radius: 9px; background: #FFFFFF; color: var(--lilac-d); font-weight: 900; font-size: 17px; display: grid; place-items: center; padding: 0; }
+.stp b { min-width: 18px; text-align: center; font-weight: 900; color: var(--lilac-d); }
+.stp.big button { width: 40px; height: 40px; font-size: 20px; border-radius: 11px; }
+.stp.big b { min-width: 34px; font-size: 17px; }
+.seg button small { display: block; font-size: 11px; font-weight: 700; opacity: 0.8; }
+.hero-img { width: 100%; height: 210px; border-radius: 20px; overflow: hidden; margin-bottom: 12px; background: var(--lilac-a); }
+.hero-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.line { display: flex; align-items: center; gap: 12px; padding: 10px 12px; }
+.line + .line { border-top: 1.5px dashed var(--glass-line); }
+.line img { width: 56px; height: 56px; border-radius: 14px; object-fit: cover; flex-shrink: 0; }
+.line .v { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.45; }
+.line .v b { font-size: 15px; font-weight: 800; }
+.line .v small { font-size: 12px; color: var(--ink2); font-weight: 700; }
+.sum .row { justify-content: space-between; padding: 3px 0; }
+.sum .total { border-top: 1.5px dashed var(--glass-line); margin-top: 6px; padding-top: 10px; }
+.empty { text-align: center; padding: 30px 18px; }
+.empty > svg { width: 92px; height: 92px; margin-bottom: 6px; }
+.step { display: flex; gap: 12px; align-items: flex-start; position: relative; padding-bottom: 20px; }
+.step:last-child { padding-bottom: 0; }
+.step .b { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; background: #F4F3F9; color: #B9B8C8; border: 2px solid #ECEBF3; position: relative; z-index: 1; }
+.step:not(:last-child)::before { content: ""; position: absolute; top: 36px; bottom: 0; inset-inline-start: 17px; width: 2px; background: #ECEBF3; }
+.step.done .b { background: var(--mint-b); border-color: var(--mint-line); color: var(--mint-d); }
+.step.done:not(:last-child)::before { background: var(--mint-line); }
+.step.now .b { background: linear-gradient(135deg, var(--brand), var(--brand-2)); border-color: transparent; color: #FFFFFF; animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 5px rgba(124, 92, 240, 0.18); } 50% { box-shadow: 0 0 0 10px rgba(124, 92, 240, 0.05); } }
+.step .t { display: flex; flex-direction: column; line-height: 1.5; padding-top: 4px; }
+.step .t b { font-size: 15.5px; font-weight: 900; }
+.step:not(.done):not(.now) .t b { color: var(--ink2); }
+.pay-wait { text-align: center; padding: 34px 10px; }
+.spin { width: 54px; height: 54px; border-radius: 50%; border: 5px solid var(--lilac-b); border-top-color: var(--brand); margin: 0 auto 14px; animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── salon ── */
+.mini button svg { width: 22px; height: 22px; flex-shrink: 0; }
+.cd:disabled .s { color: #C9C8D6; }
+.rate { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 800; color: var(--sky-d); }
+.rate svg { width: 13px; height: 13px; }
+.info-line { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 700; color: var(--ink2); }
+.info-line svg { flex-shrink: 0; }
+.wiz { display: flex; gap: 6px; margin-bottom: 14px; }
+.wiz button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 0; border: 0; background: none; font-size: 11.5px; font-weight: 800; color: var(--ink2); }
+.wiz i { display: block; width: 100%; height: 6px; border-radius: 3px; background: var(--glass-line); }
+.wiz .on { color: var(--lilac-d); }
+.wiz .on i { background: linear-gradient(90deg, var(--brand), var(--brand-2)); }
+.wiz button:disabled { cursor: default; opacity: 0.7; }
+.hcolors { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.hc { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 0; border: 0; background: none; font-size: 12.5px; font-weight: 800; }
+.hc i { display: block; width: 56px; height: 56px; border-radius: 50%; border: 3px solid #FFFFFF; box-shadow: 0 0 0 2px var(--glass-line); transition: box-shadow 0.15s; }
+.hc[aria-pressed="true"] i { box-shadow: 0 0 0 3px var(--brand); }
+.hc[aria-pressed="true"] { color: var(--lilac-d); }
+.upl { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 18px; border: 2px dashed var(--lilac-line); background: var(--lilac-a); color: var(--lilac-d); font-weight: 800; cursor: pointer; }
+.upl input { display: none; }
+.upl img { width: 54px; height: 54px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
+.upl > svg { flex-shrink: 0; }
+.stys { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+.sty { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 14px 8px 12px; border-radius: 20px; border: 1.5px solid var(--glass-line); background: #FFFFFF; text-align: center; transition: transform 0.15s; }
+.sty:active { transform: scale(0.96); }
+.sty .av { width: 54px; height: 54px; margin-bottom: 4px; border-radius: 50%; display: grid; place-items: center; font-weight: 900; font-size: 21px; }
+.sty .av svg { width: 26px; height: 26px; }
+.sty b { font-size: 15px; font-weight: 900; }
+.sty small { font-size: 11.5px; font-weight: 700; line-height: 1.4; color: var(--ink2); }
+.sty[aria-pressed="true"] { border-color: var(--brand); background: var(--lilac-a); box-shadow: 0 6px 16px rgba(124, 92, 240, 0.18); }
+.tslots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.ts { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 10px 4px 8px; border-radius: 16px; border: 1.5px solid var(--glass-line); background: #FFFFFF; font-weight: 900; font-size: 16px; transition: transform 0.15s; }
+.ts:active { transform: scale(0.96); }
+.ts svg { width: 22px; height: 22px; margin-bottom: 2px; }
+.ts small { font-size: 11px; font-weight: 800; color: var(--mint-d); white-space: nowrap; }
+.ts.full { background: #F6F5FA; color: #B9B8C8; }
+.ts.full small { color: #B9B8C8; }
+.ts:disabled { opacity: 0.45; cursor: default; }
+.ts:disabled small { color: var(--ink2); }
+.ts.on { border-color: var(--brand); background: var(--lilac-a); box-shadow: 0 6px 16px rgba(124, 92, 240, 0.18); }
+.ts.on small { color: var(--lilac-d); }
+.when { display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 10px 12px; border-radius: 14px; background: var(--sky-a); border: 1.5px solid var(--sky-line); font-weight: 800; color: var(--sky-d); }
+.when svg { width: 22px; height: 22px; flex-shrink: 0; }
+.nextap { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 12px; padding: 12px 14px; border-radius: 20px; text-align: start; background: linear-gradient(135deg, var(--mint-a), var(--mint-b)); border: 2px solid var(--mint-line); box-shadow: var(--shadow); }
+.nextap .v { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.45; }
+.nextap .v b { font-size: 15px; font-weight: 900; }
+.nextap .v small { font-size: 12.5px; font-weight: 800; color: var(--mint-d); }
+.nextap > svg { width: 30px; height: 30px; flex-shrink: 0; }
+.tgmsg { max-width: 310px; padding: 12px 14px; border-radius: 18px 18px 18px 6px; background: #FFFFFF; border: 1.5px solid var(--glass-line); box-shadow: var(--shadow); line-height: 1.7; }
+.tgbtns { display: flex; gap: 8px; margin-top: 10px; }
+.tgbtns span { flex: 1; padding: 8px; text-align: center; border-radius: 12px; background: var(--lilac-a); color: var(--lilac-d); font-weight: 800; }
+
+/* ── beauty clinic ── */
+.pick .dot svg, .sic svg { width: 24px; height: 24px; }
+.sic { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; flex-shrink: 0; }
+.fr { color: var(--mint-d); font-weight: 900; }
+.sty .off { color: var(--sky-d); font-weight: 800; }
+.sec { display: flex; align-items: center; gap: 8px; margin: 18px 4px 10px; font-size: 14.5px; font-weight: 900; }
+.sec svg { color: var(--lilac-d); flex-shrink: 0; }
+.sec .cnt { font-size: 12px; font-weight: 800; color: var(--lilac-d); background: var(--lilac-a); border: 1.5px solid var(--lilac-line); border-radius: 999px; padding: 0 9px; }
+.ap { padding: 14px 16px; margin-bottom: 12px; }
+.tglabel { margin: 12px 4px 6px; font-size: 12px; font-weight: 800; color: var(--ink2); }
+
+/* consult: a small chat with the clinic's advisor */
+.agent { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-color: var(--mint-line); }
+.agent .av { width: 46px; height: 46px; border-radius: 15px; display: grid; place-items: center; flex-shrink: 0; }
+.agent .av svg { width: 28px; height: 28px; }
+.agent .v { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.45; }
+.agent .v b { font-size: 16px; font-weight: 900; }
+.agent .v small { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--mint-d); }
+.agent .v small svg { flex-shrink: 0; }
+.live { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--mint-d); }
+.live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #2DBE8C; box-shadow: 0 0 0 3px var(--mint-b); }
+.chat { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.bub { max-width: 86%; padding: 10px 14px; font-size: 15px; line-height: 1.75; animation: accIn 0.25s ease; }
+.bub.me { align-self: flex-start; background: var(--mint-a); border: 1.5px solid var(--mint-line); border-radius: 18px 18px 6px 18px; }
+.bub.bot { align-self: flex-end; background: #FFFFFF; border: 1.5px solid var(--glass-line); border-radius: 18px 18px 18px 6px; box-shadow: var(--shadow); }
+.src { display: flex; width: fit-content; align-items: center; gap: 5px; margin-top: 8px; padding: 1px 10px 1px 8px; border-radius: 999px; background: var(--lilac-a); border: 1.5px solid var(--lilac-line); color: var(--lilac-d); font-size: 11.5px; font-weight: 800; line-height: 1.8; }
+.src svg { width: 13px; height: 13px; flex-shrink: 0; }
+.typing { display: flex; align-items: center; gap: 5px; padding: 15px 16px; }
+.typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--lilac-line); animation: dot 1s ease-in-out infinite; }
+.typing i:nth-child(2) { animation-delay: 0.15s; }
+.typing i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes dot { 0%, 100% { transform: none; background: var(--lilac-line); } 50% { transform: translateY(-4px); background: var(--brand); } }
+.qchips { margin-top: 12px; }
+.qchips .chip { min-height: 38px; padding: 6px 13px; font-size: 13.5px; background: var(--lilac-a); border-color: var(--lilac-line); color: var(--lilac-d); }
+.acc.more { margin-top: 10px; }
+.acc.more > summary { min-height: 56px; padding: 10px 14px; }
+.acc.more > summary b { font-size: 15px; }
+.acc.more .qchips { margin: 0; padding: 12px 14px 14px; }
+.send { width: 50px; height: 50px; padding: 0; flex-shrink: 0; }
+.cta { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; padding: 14px; border-radius: 22px; background: linear-gradient(135deg, var(--mint-a), var(--peach-a)); border: 2px solid var(--mint-line); box-shadow: var(--shadow); }
+.cta .row > svg { width: 46px; height: 46px; flex-shrink: 0; }
+.cta .v { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.5; }
+.cta .v b { font-size: 15.5px; font-weight: 900; }
+.cta .v small { font-size: 12.5px; font-weight: 700; color: var(--ink2); }
+.cta .btn { width: 100%; padding: 13px; }
+
+/* care: aftercare messages as a timeline */
+.care { padding: 14px 16px; margin-bottom: 12px; }
+.tl { margin-top: 16px; }
+.tl .step .b svg { width: 18px; height: 18px; }
+.tl .step .t { flex: 1; min-width: 0; padding-top: 2px; }
+.tl .step .t b { font-size: 14.5px; font-weight: 800; line-height: 1.65; }
+.tl .dl { font-size: 12px; font-weight: 800; color: var(--mint-d); line-height: 1.5; }
+.tl .step.now .dl { color: var(--lilac-d); }
+.tl .step:not(.done):not(.now) .dl { color: var(--ink2); }
+.tl .step.call .b { background: var(--sky-a); border-color: var(--sky-line); color: var(--sky-d); }
+.tl .step.call .dl { color: var(--sky-d); }
+.qr { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.qr .btn { padding: 8px 14px; font-size: 13.5px; border-radius: 12px; }
+.qr .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+.reply { display: inline-flex; align-items: center; gap: 5px; align-self: flex-start; margin-top: 6px; padding: 3px 12px; border-radius: 14px 14px 4px 14px; background: var(--mint-a); border: 1.5px solid var(--mint-line); color: var(--mint-d); font-size: 13px; font-weight: 800; }
+.reply svg { width: 14px; height: 14px; flex-shrink: 0; }
+.soon + .soon { margin-top: 16px; padding-top: 14px; border-top: 1.5px dashed var(--glass-line); }
+.soon > b { display: block; font-size: 14.5px; font-weight: 900; }
+.soon .tl { margin-top: 12px; }
+</style>
+
+<div class="ribbon">نسخه‌ی آزمایشی ۱ · اطلاعات نمونه</div>
+<div class="app" id="app"><div class="hint" style="text-align:center;padding:40px 0">در حال باز شدن…</div></div>
+<div id="mainbar"></div>
+<div id="overlay"></div>
+<script>
+/* Shows any script error on the page, so a screenshot tells us what went wrong. */
+window.addEventListener("error", function (e) {
+  var box = document.createElement("div");
+  box.setAttribute("style", "margin:12px auto;max-width:460px;padding:12px 14px;border-radius:14px;background:#FCE6E2;color:#B3261E;font:12px/1.5 monospace;direction:ltr;text-align:left");
+  box.textContent = "Error: " + e.message + " (line " + e.lineno + ")";
+  document.body.appendChild(box);
+});
+</script>
+
+<script>
+/* ── Telegram bridge: real calls inside Telegram, friendly stand-ins in a browser ── */
+const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+if (tg) { tg.ready(); tg.expand(); try { tg.disableVerticalSwipes(); } catch (e) {} }
+const IN_TG = Boolean(tg && tg.initData);
+/* Preview: forms show their success screen but send nothing to the bot yet. */
+const PREVIEW = true;
+/* sendData only works when the app was opened from a keyboard button (no query_id then). */
+const CAN_SEND = !PREVIEW && IN_TG && typeof tg.sendData === "function" && !(tg.initDataUnsafe && tg.initDataUnsafe.query_id);
+const haptic = (k) => { try { k === "ok" ? tg.HapticFeedback.notificationOccurred("success") : tg.HapticFeedback.impactOccurred(k || "light"); } catch (e) {} };
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem("clinic:" + k)); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem("clinic:" + k, JSON.stringify(v)); } catch (e) {} try { tg && tg.CloudStorage && tg.CloudStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+};
+const firstName = () => (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name) || "";
+
+/* ── helpers ── */
+const $ = (s) => document.querySelector(s);
+const fa = (v) => String(v).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[d]);
+const money = (n) => Math.round(n / 1000) * 1000;
+const toman = (n) => money(n).toLocaleString("fa-IR");
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const faDate = (d) => new Intl.DateTimeFormat("fa-IR-u-ca-persian", { weekday: "long", day: "numeric", month: "long" }).format(d);
+const DAY = 86400000;
+const left = (end) => Math.ceil((end - Date.now()) / DAY);
+
+/* ── cute two-tone icons ── */
+const ICON = {
+  book: `<svg viewBox="0 0 64 64"><defs><linearGradient id="gB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8BE8D6"/><stop offset="1" stop-color="#2FB49B"/></linearGradient></defs><rect x="12" y="8" width="40" height="48" rx="10" fill="url(#gB)"/><rect x="12" y="8" width="9" height="48" rx="4.5" fill="#0B5C4E" opacity=".12"/><rect x="15" y="45" width="37" height="11" rx="5.5" fill="#fff"/><rect x="26" y="19" width="12" height="4" rx="2" fill="#fff"/><rect x="26" y="27" width="8" height="4" rx="2" fill="#fff" opacity=".65"/><path d="M41 8h7v16l-3.5-2.6L41 24z" fill="#FFC857"/></svg>`,
+  target: `<svg viewBox="0 0 64 64"><defs><linearGradient id="gT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#CDBEFF"/><stop offset="1" stop-color="#7C5CF0"/></linearGradient></defs><circle cx="30" cy="35" r="22" fill="url(#gT)"/><circle cx="30" cy="35" r="15" fill="#fff"/><circle cx="30" cy="35" r="8.5" fill="url(#gT)"/><circle cx="30" cy="35" r="3" fill="#fff"/><path d="M30 35 50 15" stroke="#3E2E86" stroke-width="3.5" stroke-linecap="round"/><path d="M46 8.5l8.5 1.8-1.8 8.5-6.2-4.1z" fill="#FFC857"/></svg>`,
+  pen: `<svg viewBox="0 0 64 64"><defs><linearGradient id="gP" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#B9DAFF"/><stop offset="1" stop-color="#4C8FEA"/></linearGradient></defs><rect x="12" y="10" width="38" height="47" rx="10" fill="url(#gP)"/><rect x="18" y="18" width="26" height="33" rx="6" fill="#fff"/><rect x="23" y="6" width="16" height="9" rx="4.5" fill="#FFD36E"/><path d="M24 34.5l5 5 9.5-10" stroke="#4C8FEA" stroke-width="3.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  chat: `<svg viewBox="0 0 64 64"><defs><linearGradient id="gC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE59A"/><stop offset="1" stop-color="#FFB224"/></linearGradient></defs><path d="M44 38c6.6 0 12 3.8 12 8.6 0 2.4-1.3 4.6-3.5 6.2L54 58l-5.6-2.7c-1.4.3-2.9.4-4.4.4-6.6 0-12-3.8-12-8.6" fill="#C9B8FF"/><path d="M8 28c0-10 9.8-17.5 22-17.5S52 18 52 28 42.2 45.5 30 45.5c-3 0-5.8-.4-8.4-1.2L11 49l3-8.6C10.2 37.2 8 32.8 8 28z" fill="url(#gC)"/><circle cx="21" cy="28" r="3.3" fill="#fff"/><circle cx="30" cy="28" r="3.3" fill="#fff"/><circle cx="39" cy="28" r="3.3" fill="#fff"/></svg>`,
+  gift: `<svg viewBox="0 0 24 24" width="22" height="22"><rect x="3.5" y="10" width="17" height="10.5" rx="2.6" fill="#B9DAFF"/><rect x="2.5" y="6.8" width="19" height="4.6" rx="2" fill="#4C8FEA"/><rect x="10.8" y="6.8" width="2.4" height="13.7" fill="#FFD36E"/><path d="M12 6.8C9.6 2.8 5.6 4.4 7.6 6.8M12 6.8c2.4-4 6.4-2.4 4.4 0" fill="none" stroke="#4C8FEA" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  cal: `<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="4" fill="#E4DBFF"/><path d="M3 9a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v1H3z" fill="#7C5CF0"/><rect x="7" y="3" width="2.2" height="5" rx="1.1" fill="#3E2E86"/><rect x="14.8" y="3" width="2.2" height="5" rx="1.1" fill="#3E2E86"/><circle cx="12" cy="15.5" r="2.3" fill="#4C8FEA"/></svg>`,
+  sun: `<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="7" fill="#FFC857"/><path d="M16 3v3M16 26v3M3 16h3M26 16h3M6.8 6.8l2.1 2.1M23.1 23.1l2.1 2.1M6.8 25.2l2.1-2.1M23.1 8.9l2.1-2.1" stroke="#FFB224" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+  sunset: `<svg viewBox="0 0 32 32"><path d="M7 22a9 9 0 0 1 18 0z" fill="#FFB38A"/><path d="M4 22h24M9 26.5h14" stroke="#F08A4B" stroke-width="2.4" stroke-linecap="round"/><path d="M16 5v4M7.5 9.5l2.2 2.2M24.5 9.5l-2.2 2.2" stroke="#FFB224" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+  moon: `<svg viewBox="0 0 32 32"><path d="M20 5a11 11 0 1 0 7 19.5A9.5 9.5 0 0 1 20 5z" fill="#9F86FF"/><circle cx="24.5" cy="8.5" r="1.7" fill="#FFC857"/><circle cx="28" cy="14" r="1.1" fill="#FFC857"/></svg>`,
+  tick: `<span class="tk"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>`,
+  chev: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
+  cap: `<svg viewBox="0 0 24 24"><path d="M12 4 2 9l10 5 10-5z" fill="currentColor"/><path d="M6 11.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5l-6 3z" fill="currentColor" opacity=".55"/></svg>`,
+  talk: `<svg viewBox="0 0 24 24"><path d="M3 10c0-3.6 3.6-6 8-6s8 2.4 8 6-3.6 6-8 6c-1 0-2-.1-2.9-.4L4 17l1.1-3C3.8 13 3 11.6 3 10z" fill="currentColor"/><path d="M20.5 12.5c.3.6.5 1.2.5 1.9 0 1-.4 1.9-1.1 2.6l.6 2.5-2.6-1.2c-.6.1-1.2.2-1.9.2-1.7 0-3.2-.5-4.3-1.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity=".55"/></svg>`,
+  medal: `<svg viewBox="0 0 24 24"><path d="M7 2h4l2 5H9zM17 2h-4l-2 5h4z" fill="currentColor" opacity=".55"/><circle cx="12" cy="14.5" r="6.5" fill="currentColor"/><path d="m12 11 1.1 2.2 2.4.3-1.8 1.7.5 2.4-2.2-1.2-2.2 1.2.5-2.4-1.8-1.7 2.4-.3z" fill="#fff"/></svg>`,
+  phone: `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg>`,
+  back: `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`,
+  mascot: `<svg class="mascot" viewBox="0 0 64 64"><path d="M32 34C32 20 22 14 12 16c0 10 8 18 20 18z" fill="#6FD3A3"/><path d="M32 34c0-12 9-18 20-17 0 10-8 17-20 17z" fill="#9BE7C3"/><path d="M32 34v6" stroke="#3FA878" stroke-width="3" stroke-linecap="round"/><ellipse cx="32" cy="50" rx="17" ry="12" fill="#FFD2BC"/><circle cx="26" cy="49" r="2.4" fill="#1E2233"/><circle cx="38" cy="49" r="2.4" fill="#1E2233"/><path d="M28 54q4 3 8 0" stroke="#1E2233" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="22" cy="53" r="2.2" fill="#FFC2A8" opacity=".7"/><circle cx="42" cy="53" r="2.2" fill="#FFC2A8" opacity=".7"/></svg>`,
+};
+
+
+/* ── clinic icons (added to the shared set) ── */
+Object.assign(ICON, {
+  consultI: `<svg viewBox="0 0 64 64"><defs><linearGradient id="gCsl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8BE8D6"/><stop offset="1" stop-color="#2FB49B"/></linearGradient></defs><path d="M5 26c0-9.9 9.8-17.5 22-17.5S49 16.1 49 26 39.2 43.5 27 43.5c-3 0-5.8-.4-8.4-1.2L8 47l3-8.6C7.2 35.2 5 30.8 5 26z" fill="url(#gCsl)"/><rect x="16" y="20" width="22" height="4.4" rx="2.2" fill="#fff"/><rect x="16" y="28.5" width="13" height="4.4" rx="2.2" fill="#fff" opacity=".7"/><rect x="37" y="31" width="21" height="26" rx="5.5" fill="#fff" stroke="#17806F" stroke-width="2.6"/><path d="M42.5 39.5h10M42.5 44.5h10M42.5 49.5h6" stroke="#2FB49B" stroke-width="2.4" stroke-linecap="round"/><path d="M55 3l1.6 4.4L61 9l-4.4 1.6L55 15l-1.6-4.4L49 9l4.4-1.6z" fill="#FFC857"/></svg>`,
+  doctorI: `<svg viewBox="0 0 64 64"><defs><linearGradient id="gDoc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#CDBEFF"/><stop offset="1" stop-color="#7C5CF0"/></linearGradient></defs><rect x="6" y="12" width="46" height="44" rx="11" fill="url(#gDoc)"/><rect x="15" y="7" width="5" height="11" rx="2.5" fill="#3E2E86"/><rect x="38" y="7" width="5" height="11" rx="2.5" fill="#3E2E86"/><rect x="12" y="22" width="34" height="28" rx="7" fill="#fff"/><path d="M29 28.5v15M21.5 36h15" stroke="#7C5CF0" stroke-width="5.2" stroke-linecap="round"/><circle cx="50" cy="50" r="10.5" fill="#8BE8D6" stroke="#fff" stroke-width="3"/><path d="M50 45v5.5l3.4 2.2" stroke="#17806F" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  careI: `<svg viewBox="0 0 64 64"><defs><linearGradient id="gCare" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE59A"/><stop offset="1" stop-color="#FFB224"/></linearGradient></defs><path d="M30 57C17 48.5 6 40 6 28 6 20.3 12 14 19.5 14c4.4 0 8.1 2.1 10.5 5.4C32.4 16.1 36.1 14 40.5 14 48 14 54 20.3 54 28c0 12-11 20.5-24 29z" fill="url(#gCare)"/><path d="M13 33h9l3.5-7.5 6 14.5 3.5-7H47" stroke="#fff" stroke-width="3.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M54 2l1.6 4.4L60 8l-4.4 1.6L54 14l-1.6-4.4L48 8l4.4-1.6z" fill="#7C5CF0"/><circle cx="60" cy="19" r="2.2" fill="#8BE8D6"/></svg>`,
+  tariffI: `<svg viewBox="0 0 64 64"><defs><linearGradient id="gTrf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#B9DAFF"/><stop offset="1" stop-color="#4C8FEA"/></linearGradient></defs><path d="M6 12a5 5 0 0 1 5-5h18.6a5 5 0 0 1 3.5 1.5l18.4 18.4a5 5 0 0 1 0 7.1L33 52.5a5 5 0 0 1-7.1 0L7.5 34.1A5 5 0 0 1 6 30.6z" fill="url(#gTrf)"/><circle cx="18" cy="19" r="4.6" fill="#fff"/><path d="M22 35l9-9M26.5 43l13-13" stroke="#fff" stroke-width="3.6" stroke-linecap="round" opacity=".85"/><circle cx="49" cy="49" r="11.5" fill="#FFC857" stroke="#fff" stroke-width="3"/><path d="M45.4 45.2a3.7 3.7 0 1 1 5.2 3.4c-1.1.5-1.6 1.2-1.6 2.3v.5" stroke="#fff" stroke-width="2.8" fill="none" stroke-linecap="round"/><circle cx="49" cy="55" r="1.8" fill="#fff"/></svg>`,
+  serum: `<svg class="mascot" viewBox="0 0 64 64"><defs><linearGradient id="gSrm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#B9DAFF"/><stop offset="1" stop-color="#7C5CF0"/></linearGradient></defs><ellipse cx="32" cy="60" rx="15" ry="3" fill="#E4DBFF"/><rect x="26.5" y="2.5" width="11" height="13" rx="5.5" fill="#3E2E86"/><rect x="23" y="13" width="18" height="9" rx="3.5" fill="#6A4FD0"/><rect x="15" y="20" width="34" height="38" rx="12" fill="url(#gSrm)"/><rect x="20" y="33" width="24" height="17" rx="5.5" fill="#fff"/><path d="M32 36.2s4.2 4.4 4.2 7a4.2 4.2 0 0 1-8.4 0c0-2.6 4.2-7 4.2-7z" fill="#5FD0B8"/><rect x="19.5" y="24.5" width="4" height="6.5" rx="2" fill="#fff" opacity=".6"/><path d="M54 5l1.6 4.4L60 11l-4.4 1.6L54 17l-1.6-4.4L48 11l4.4-1.6z" fill="#FFC857"/><path d="M8 27l1.1 2.9 2.9 1.1-2.9 1.1L8 35l-1.1-2.9L4 31l2.9-1.1z" fill="#8BE8D6"/></svg>`,
+  consultS: `<svg viewBox="0 0 24 24"><path d="M2.5 11.5c0-4 3.6-7 8-7s8 3 8 7-3.6 7-8 7c-1 0-2-.15-2.9-.45L3.5 19.5l1.1-3.3c-1.3-1.3-2.1-2.9-2.1-4.7z" fill="#8BE8D6"/><path d="M7.5 10.5h6M7.5 13.5h4" stroke="#17806F" stroke-width="1.8" stroke-linecap="round"/><path d="M19.5 1.5l.9 2.3 2.3.9-2.3.9-.9 2.3-.9-2.3-2.3-.9 2.3-.9z" fill="#FFC857"/></svg>`,
+  syringe: `<svg viewBox="0 0 24 24"><g transform="rotate(-45 12 12)"><rect x="6" y="9" width="10" height="6" rx="1.6" fill="#E4DBFF" stroke="#6A4FD0" stroke-width="1.5"/><rect x="6.8" y="11.2" width="5.2" height="3" rx="1" fill="#B9A6FF"/><path d="M16 12h3.2M19.2 9.4v5.2M2.2 12H6" stroke="#6A4FD0" stroke-width="1.8" stroke-linecap="round"/><path d="M9 9v2M11.5 9v2M14 9v2" stroke="#6A4FD0" stroke-width="1.2" stroke-linecap="round"/></g><path d="M19.5 15.5l.8 1.9 1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8z" fill="#FFC857"/></svg>`,
+  fillerI: `<svg viewBox="0 0 24 24"><path d="M10.5 2.5s6.8 7.2 6.8 11.6a6.8 6.8 0 0 1-13.6 0c0-4.4 6.8-11.6 6.8-11.6z" fill="#9CC8FF"/><path d="M7.4 14.4a3.1 3.1 0 0 0 3.1 3.1" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M19.5 2l.9 2.3 2.3.9-2.3.9-.9 2.3-.9-2.3-2.3-.9 2.3-.9z" fill="#FFC857"/><circle cx="20.5" cy="11" r="1.3" fill="#7C5CF0"/></svg>`,
+  laserI: `<svg viewBox="0 0 24 24"><rect x="6" y="1.5" width="10" height="10" rx="3.4" fill="#FFC857"/><rect x="8.6" y="4" width="4.8" height="2.4" rx="1.2" fill="#fff" opacity=".7"/><rect x="8.5" y="10.5" width="5" height="3.2" rx="1.2" fill="#E89A10"/><path d="M11 14.8v3.4" stroke="#FFB224" stroke-width="2.4" stroke-linecap="round"/><path d="M7.4 16.6l-1.6 1M14.6 16.6l1.6 1" stroke="#FFB224" stroke-width="1.7" stroke-linecap="round"/><path d="M2 21.3c3-1.7 6-1.7 9 0s6 1.7 9 0" stroke="#2FB49B" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M20 2.5l.8 1.9 1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8z" fill="#7C5CF0"/></svg>`,
+  cleanI: `<svg viewBox="0 0 24 24"><circle cx="9.5" cy="14" r="6.2" fill="#ABE7DA"/><circle cx="16.8" cy="7.6" r="4.3" fill="#8BE8D6"/><circle cx="18.4" cy="17.6" r="2.7" fill="#EAFBF7" stroke="#2FB49B" stroke-width="1.3"/><path d="M6.3 12.6a3.3 3.3 0 0 1 3.1-2.5" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><path d="M15 6.2a1.9 1.9 0 0 1 1.7-1.1" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`,
+  mesoI: `<svg viewBox="0 0 24 24"><rect x="6.5" y="2" width="9" height="3.2" rx="1.3" fill="#6A4FD0"/><path d="M7.8 5.2h6.4v3l2.3 2.6v8.7a2.5 2.5 0 0 1-2.5 2.5H8a2.5 2.5 0 0 1-2.5-2.5v-8.7l2.3-2.6z" fill="#F4F0FF" stroke="#6A4FD0" stroke-width="1.4" stroke-linejoin="round"/><path d="M6.2 13.5h9.6v6a1.8 1.8 0 0 1-1.8 1.8H8a1.8 1.8 0 0 1-1.8-1.8z" fill="#B9A6FF"/><circle cx="20" cy="5" r="1.7" fill="#8BE8D6"/><circle cx="20.6" cy="10" r="1.2" fill="#FFC857"/></svg>`,
+  ok: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`,
+  srcI: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>`,
+  sendI: `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 7.5-7 2.5-2.5 7z"/><path d="M3 3l11 10"/></svg>`,
+  bell: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>`,
+  bellC: `<svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 9.5a6 6 0 0 1 12 0c0 5.5 2.5 7 2.5 7h-17S6 15 6 9.5z" fill="#CDBEFF"/><path d="M10 19.5a2 2 0 0 0 4 0" stroke="#6A4FD0" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="18" cy="5" r="2.6" fill="#FFC857"/></svg>`,
+  shield: `<svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2.5 20 6v6c0 5-3.4 8.6-8 9.5C7.4 20.6 4 17 4 12V6z" fill="#ABE7DA"/><path d="m8.5 12 2.5 2.5 4.5-5" stroke="#17806F" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  cardI: `<svg viewBox="0 0 24 24" width="24" height="24"><rect x="2.5" y="5" width="19" height="14" rx="3" fill="#B9A6FF"/><rect x="2.5" y="8.5" width="19" height="3" fill="#7C5CF0"/><rect x="5" y="14" width="6" height="2" rx="1" fill="#fff"/></svg>`,
+  instI: `<svg viewBox="0 0 24 24" width="22" height="22"><rect x="3" y="4" width="18" height="16" rx="3" fill="#FFDC85"/><path d="M7 9h10M7 13h5" stroke="#8F6200" stroke-width="2" stroke-linecap="round"/><circle cx="16.5" cy="15" r="2.6" fill="#8F6200"/></svg>`,
+  heartS: `<svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 20.5C6.5 17 3 13.6 3 9.4 3 6.4 5.3 4 8.2 4c1.6 0 3 .8 3.8 2 .8-1.2 2.2-2 3.8-2C18.7 4 21 6.4 21 9.4c0 4.2-3.5 7.6-9 11.1z" fill="#FFB224"/><path d="M7 10.5h2.6l1.2-2.2 1.9 4.4 1.1-2.2H17" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  heartO: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20C6.8 16.6 3.5 13.4 3.5 9.4A4.4 4.4 0 0 1 12 7.2a4.4 4.4 0 0 1 8.5 2.2c0 4-3.3 7.2-8.5 10.6z"/></svg>`,
+  chatO: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5c0-3.9 3.6-7 8-7s8 3.1 8 7-3.6 7-8 7c-1 0-1.9-.15-2.8-.4L5 19.5l1.1-3.2C4.8 15 4 13.3 4 11.5z"/></svg>`,
+  callO: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h3.5l1.8 4.5-2.3 1.4a11 11 0 0 0 6.1 6.1l1.4-2.3L20 15.5V19a1.5 1.5 0 0 1-1.6 1.5C10.6 20 4 13.4 3.5 5.6A1.5 1.5 0 0 1 5 4z"/></svg>`,
+  calO: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>`,
+  pinI: `<svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 22s7.2-6.3 7.2-12.2a7.2 7.2 0 0 0-14.4 0C4.8 15.7 12 22 12 22z" fill="#9CC8FF"/><circle cx="12" cy="9.8" r="2.9" fill="#fff"/><circle cx="19" cy="4" r="1.6" fill="#FFC857"/></svg>`,
+  spark: `<svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z" fill="#FFC857"/><circle cx="19" cy="19" r="2" fill="#B9A6FF"/></svg>`,
+});
+
+/* ── clinic data (sample; the owner changes it later) ── */
+const CLINIC = { name: "کلینیک شما", phone: "۰۲۱-۱۲۳۴۵۶۷۸", tel: "02112345678", address: "خیابان نمونه، پلاک ۱۲، طبقه‌ی دوم", hours: "شنبه تا پنجشنبه ۱۰ تا ۲۰", close: 20 * 60, deposit: 300000, instMin: 3000000, window: 30 };
+/* cat: tariff group; ses: usual number of sessions; note: one line shown when the service is picked. */
+const SERVICES = [
+  { id: "consult", t: "مشاوره‌ی رایگان", sub: "با دکتر، حضوری", price: 0, free: true, dur: 20, ses: "", cat: "skin", i: "consultS", c: "mint", note: "۲۰ دقیقه با دکتر؛ پوستت رو می‌بینه و بهترین درمان رو پیشنهاد می‌ده. هزینه‌ای نداره.", pre: "اگه دارو یا سابقه‌ی درمانی داری، با خودت بیار." },
+  { id: "botox", t: "بوتاکس", sub: "هر ناحیه · اثر ۴ تا ۶ ماه", price: 4500000, dur: 30, ses: "", cat: "inj", i: "syringe", c: "lilac", note: "پیشونی، دور چشم یا خط اخم؛ اثرش ۴ تا ۶ ماه می‌مونه و ترمیمش تا ۲ هفته رایگانه.", pre: "از ۳ روز قبل آسپرین و ویتامین E نخور." },
+  { id: "filler", t: "فیلر", sub: "هر سی‌سی · ماندگاری ۹ تا ۱۲ ماه", price: 6500000, dur: 45, ses: "", cat: "inj", i: "fillerI", c: "peach", note: "ژل هیالورونیک با برند معتبر؛ ۹ تا ۱۲ ماه می‌مونه. قسطی هم می‌شه.", pre: "از ۳ روز قبل آسپرین و امگا ۳ نخور." },
+  { id: "laser", t: "لیزر موهای زائد", sub: "هر جلسه، بسته به ناحیه", price: 1200000, from: true, dur: 45, ses: "۶ تا ۸ جلسه", cat: "laser", i: "laserI", c: "sky", note: "معمولاً ۶ تا ۸ جلسه، با فاصله‌ی ۴ تا ۶ هفته. هر جلسه از ۱٬۲۰۰٬۰۰۰ تومان، بسته به ناحیه.", pre: "ناحیه رو شب قبل با تیغ اصلاح کن؛ موم و برنزه نه." },
+  { id: "clean", t: "پاکسازی پوست", sub: "عمیق، با ماسک آرام‌بخش", price: 950000, dur: 60, ses: "ماهی یه بار", cat: "skin", i: "cleanI", c: "mint", note: "پاکسازی عمیق منافذ با ماسک آرام‌بخش؛ ماهی یه بار عالیه.", pre: "بدون آرایش بیا." },
+  { id: "meso", t: "مزوتراپی", sub: "شادابی پوست یا تقویت مو", price: 3200000, dur: 45, ses: "۴ جلسه", cat: "inj", i: "mesoI", c: "lilac", note: "۴ جلسه، هر ۲ هفته یه بار؛ برای شادابی پوست یا تقویت مو. قسطی هم می‌شه.", pre: "از ۲ روز قبل آسپرین نخور و روز نوبت آرایش نکن." },
+];
+/* off: week days the doctor is not in (0 = Saturday); skills: services they do. */
+const DOCTORS = [
+  { id: "salehi", t: "دکتر صالحی", ini: "ص", sub: "متخصص پوست", off: [5], c: "lilac", skills: ["consult", "botox", "filler", "meso", "clean"] },
+  { id: "radmehr", t: "دکتر رادمهر", ini: "ر", sub: "پزشک زیبایی", off: [0], c: "peach", skills: ["consult", "botox", "filler", "laser"] },
+  { id: "kiani", t: "دکتر کیانی", ini: "ک", sub: "متخصص پوست و لیزر", off: [3], c: "mint", skills: ["laser", "clean", "meso"] },
+];
+const SLOTS = ["۱۰:۰۰", "۱۱:۰۰", "۱۲:۰۰", "۱۴:۰۰", "۱۵:۰۰", "۱۶:۳۰", "۱۷:۳۰", "۱۸:۳۰", "۱۹:۳۰"];
+const LASER_AREAS = [["صورت کامل", 1200000], ["زیربغل", 1200000], ["دست کامل", 2400000], ["پا کامل", 3200000]];
+const WEEK = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
+const WEEKDAY = ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه"];
+const ORD = ["", "اول", "دوم", "سوم", "چهارم", "پنجم", "ششم", "هفتم", "هشتم", "نهم", "دهم"];
+/* Aftercare per treatment: a message on day 0, a check-in on day 2, then the next visit on day nd.
+   {o} / {n} become the next session's ordinal / number. */
+const CARE = {
+  laser: { d0: "تا ۴۸ ساعت آفتاب و سونا نه؛ ضدآفتاب یادت نره.", ask: "حالت چطوره؟ قرمزی کمتر شده؟", red: "هنوز قرمزه", worry: "قرمزی", nd: 28, nsvc: "laser", nt: "وقت جلسه‌ی {o}! رزرو کنیم؟", nb: "رزرو جلسه‌ی {n}" },
+  clean: { d0: "امروز آرایش نکن؛ صورتت رو فقط با آب ولرم بشور و ضدآفتاب بزن.", ask: "حالت چطوره؟ قرمزی کمتر شده؟", red: "هنوز قرمزه", worry: "قرمزی", nd: 28, nsvc: "clean", nt: "وقت پاکسازی بعدیه! رزرو کنیم؟", nb: "رزرو پاکسازی بعدی" },
+  meso: { d0: "تا ۲۴ ساعت حموم و آرایش نه؛ جای تزریق رو دست نزن.", ask: "حالت چطوره؟ قرمزی کمتر شده؟", red: "هنوز قرمزه", worry: "قرمزی", nd: 14, nsvc: "meso", nt: "وقت جلسه‌ی {o}! رزرو کنیم؟", nb: "رزرو جلسه‌ی {n}" },
+  botox: { d0: "تا ۴ ساعت دراز نکش، خم نشو و جای تزریق رو ماساژ نده.", ask: "حالت چطوره؟ کبودی یا قرمزی داری؟", red: "هنوز قرمزه", worry: "قرمزی", nd: 14, nsvc: "consult", nt: "وقت چکاپ و ترمیم رایگانه! رزرو کنیم؟", nb: "رزرو چکاپ رایگان" },
+  filler: { d0: "تا ۲۴ ساعت ورزش سنگین و سونا نه؛ کمپرس سرد بذار.", ask: "حالت چطوره؟ ورم کمتر شده؟", red: "هنوز ورم داره", worry: "ورم", nd: 14, nsvc: "consult", nt: "وقت چکاپ رایگانه! رزرو کنیم؟", nb: "رزرو چکاپ رایگان" },
+};
+/* The advisor's knowledge: the clinic's own price list and care guide. faq: also listed on the prices page. */
+const KB = [
+  { q: "بوتاکس چنده؟", a: "بوتاکس هر ناحیه ۴٫۵ میلیون تومانه (پیشونی، دور چشم یا خط اخم). اثرش ۴ تا ۶ ماه می‌مونه و ترمیمش تا ۲ هفته رایگانه.", src: "تعرفه‌ی کلینیک", k: "بوتاکس قیمت هزینه تزریق چروک پیشونی", faq: true },
+  { q: "فیلر چنده؟", a: "فیلر هر سی‌سی ۶٫۵ میلیون تومانه و ۹ تا ۱۲ ماه می‌مونه. قسطی هم می‌شه.", src: "تعرفه‌ی کلینیک", k: "فیلر قیمت هزینه ژل لب گونه" },
+  { q: "مشاوره رایگانه؟", a: "آره، مشاوره‌ی اول با دکتر رایگانه و ۲۰ دقیقه طول می‌کشه؛ حضوری، طبقه‌ی دوم. همین‌جا وقتش رو بگیر.", src: "تعرفه‌ی کلینیک", k: "مشاوره رایگان ویزیت اول هزینه", faq: true },
+  { q: "دکتر کی هست؟", a: () => DOCTORS.map((x) => `${x.t} (${x.sub}) ${WEEKDAY[x.off[0]]}‌ها نیست`).join("؛ ") + "؛ بقیه‌ی روزها ۱۰ تا ۲۰ تو کلینیکن.", src: "برنامه‌ی دکترها", k: "دکتر کی هست روز حضور شیفت صالحی رادمهر کیانی", faq: true },
+  { q: "لیزر چند جلسه‌ست؟", a: "معمولاً ۶ تا ۸ جلسه، با فاصله‌ی ۴ تا ۶ هفته. هر جلسه از ۱٬۲۰۰٬۰۰۰ تومان، بسته به ناحیه.", src: "تعرفه‌ی کلینیک", k: "لیزر جلسه چند موهای زائد فاصله قیمت", faq: true },
+  { q: "نوبت فیلرم کی بود؟", a: () => fillerAnswer(), src: "نوبت‌های تو", k: "نوبت فیلر کی بود نوبتم یادآوری تاریخ", faq: true },
+  { q: "قبل و بعد دارید؟", a: "آره؛ آلبوم قبل و بعد هر درمان رو تو مشاوره‌ی حضوری نشونت می‌دیم. به احترام حریم مراجعه‌کننده‌ها، عکس‌ها آنلاین منتشر نمی‌شن.", src: "قوانین کلینیک", k: "قبل بعد نمونه عکس کار آلبوم نتیجه", faq: true },
+  { q: "بعد لیزر چی کار کنم؟", a: "تا ۴۸ ساعت آفتاب و سونا نه؛ ضدآفتاب یادت نره. ناحیه رو اسکراب نکن و بین جلسه‌ها فقط تیغ بزن، موم و اپیلیدی نه.", src: "راهنمای مراقبت", k: "بعد لیزر مراقبت آفتاب سونا ضدآفتاب", faq: true },
+  { q: "قسطی هم می‌شه؟", a: "آره؛ درمان‌های ۳ میلیون به بالا رو می‌شه ۴ قسط بدون کارمزد داد: قسط اول موقع رزرو، بقیه ماهی یه قسط.", src: "قوانین کلینیک", k: "قسط قسطی اقساط پرداخت", faq: true },
+  { q: "قرمزی طبیعیه؟", a: "قرمزی و کمی تورم تا ۴۸ ساعت بعد از لیزر یا تزریق طبیعیه؛ کمپرس سرد کمک می‌کنه. اگه بیشتر موند، تو «مراقبت من» بگو تا دکتر خودش تماس بگیره.", src: "راهنمای مراقبت", k: "قرمزی طبیعی تورم ورم کبودی سوزش", faq: true },
+  { q: "تخفیف دارید؟", a: "مشاوره‌ی اول همیشه رایگانه. برای لیزر، پکیج ۶ جلسه‌ای ۱۵٪ تخفیف داره که تو مشاوره برات حسابش می‌کنیم.", src: "تعرفه‌ی کلینیک", k: "تخفیف آف پکیج بسته ارزان", faq: true },
+  { q: "بیعانه چقدره؟", a: "برای قطعی شدن نوبت درمان ۳۰۰ هزار تومان بیعانه می‌گیریم که از مبلغ نهایی کم می‌شه. مشاوره بیعانه نداره.", src: "قوانین کلینیک", k: "بیعانه پیش پرداخت" },
+  { q: "نوبتم رو لغو کنم؟", a: "تا ۲۴ ساعت قبل از نوبت لغو کنی، بیعانه کامل برمی‌گرده؛ از «مراقبت من» با یه لمس.", src: "قوانین کلینیک", k: "لغو کنسل نوبت برگشت پول جابه‌جایی" },
+  { q: "پاکسازی پوست چنده؟", a: "پاکسازی عمیق با ماسک آرام‌بخش ۹۵۰ هزار تومانه و حدود ۱ ساعت طول می‌کشه؛ ماهی یه بار عالیه.", src: "تعرفه‌ی کلینیک", k: "پاکسازی پوست قیمت جوش منافذ" },
+  { q: "مزوتراپی چند جلسه‌ست؟", a: "۴ جلسه، هر ۲ هفته یه بار؛ هر جلسه ۳٫۲ میلیون تومان. قسطی هم می‌شه.", src: "تعرفه‌ی کلینیک", k: "مزوتراپی مزو جلسه قیمت ریزش مو شادابی" },
+  { q: "آدرستون کجاست؟", a: "خیابان نمونه، پلاک ۱۲، طبقه‌ی دوم. شنبه تا پنجشنبه ۱۰ تا ۲۰؛ جمعه‌ها تعطیل.", src: "اطلاعات کلینیک", k: "آدرس نشانی کجاست ساعت کاری تلفن" },
+];
+
+/* ── state + router ── */
+/* First visit: one finished laser session two days ago, so «مراقبت من» shows a real aftercare plan.
+   Built at noon with setDate (the shared calendar helpers load later in the page). */
+function demoVisit() {
+  const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - 2);
+  if (d.getDay() === 5) d.setDate(d.getDate() - 1); // Fridays the clinic is closed
+  const doc = (d.getDay() + 1) % 7 === 3 ? "radmehr" : "kiani"; // Dr Kiani is off on Tuesdays
+  const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  return { appt: { id: 1, svc: "laser", doc, k, at: "۱۱:۰۰", status: "ok", pay: "dep", paid: 300000, ses: 1 }, plan: { id: 1, svc: "laser", doc, k, ses: 1, ans: "", next: "" } };
+}
+const seed = demoVisit();
+const freshBooking = () => ({ step: 1, svc: "", doc: "", k: "", at: "", ses: 1, from: "", due: "", dueT: "" });
+const state = {
+  b: freshBooking(),
+  profile: store.get("profile") || { name: "", phone: "" },
+  note: "",
+  pay: "dep",
+  appts: store.get("appts") || [seed.appt],
+  plans: store.get("plans") || [seed.plan],
+  chat: [],
+  ask: "",
+};
+/* Which drawers are open and which sheet is showing, so re-renders keep them. */
+const ui = { calM: 0, calDir: "", sheet: "", moreQ: false, soonOpen: false, pastOpen: false, cat0: true, cat1: false, cat2: false, scrollChat: false };
+document.addEventListener("toggle", (e) => { const k = e.target.dataset && e.target.dataset.drawer; if (k) ui[k] = e.target.open; }, true);
+const ROUTES = ["home", "consult", "book", "care", "prices"];
+const route = () => { const r = (location.hash || "#home").slice(1); return ROUTES.includes(r) ? r : "home"; };
+const go = (r) => { haptic("light"); location.hash === "#" + r ? render() : (location.hash = r); };
+/* Back inside the booking steps goes one step back; otherwise it leaves the page. */
+const onBack = () => {
+  if (route() === "book" && state.b.step > 1) { state.b.step -= 1; haptic("light"); render(); window.scrollTo(0, 0); return; }
+  history.length > 1 ? history.back() : go("home");
+};
+if (tg && tg.BackButton) tg.BackButton.onClick(onBack);
+window.addEventListener("hashchange", () => { closeSheet(); render(); window.scrollTo(0, 0); });
+
+function toast(t) { const el = document.createElement("div"); el.className = "toast"; el.setAttribute("role", "status"); el.textContent = t; document.body.appendChild(el); setTimeout(() => el.remove(), 3200); }
+function setMain(text, fn) {
+  if (tg && tg.MainButton) {
+    if (setMain.h) tg.MainButton.offClick(setMain.h);
+    if (!text) { tg.MainButton.hide(); return; }
+    setMain.h = () => { haptic("medium"); fn(); };
+    tg.MainButton.setParams({ text, color: getComputedStyle(document.documentElement).getPropertyValue("--brand").trim() || "#7C5CF0", text_color: "#ffffff", is_visible: true });
+    tg.MainButton.onClick(setMain.h);
+    return;
+  }
+  $("#mainbar").innerHTML = text ? `<div class="mainbar"><button id="mb" type="button">${esc(text)}</button></div>` : "";
+  if (text) $("#mb").onclick = () => { haptic("medium"); fn(); };
+}
+function sheet(html) {
+  /* Already open (a tap inside it): swap the content only, so it doesn't slide up again. */
+  const open = $("#sw .sheet");
+  if (open) { open.innerHTML = `<div class="grab"></div>${html}`; return; }
+  $("#overlay").innerHTML = `<div class="sheet-wrap" id="sw"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div></div>`;
+  $("#sw").onclick = (e) => { if (e.target.id !== "sw") return; const picker = ui.sheet; closeSheet(); if (picker) render(); };
+}
+function closeSheet() { $("#overlay").innerHTML = ""; ui.sheet = ""; }
+function topBar(title) {
+  if (tg && tg.BackButton) title ? tg.BackButton.show() : tg.BackButton.hide();
+  return `<div class="top">${title ? `<button class="round" type="button" data-act="back" aria-label="برگشت">${ICON.back}</button>` : ""}<h1>${title || CLINIC.name}</h1>
+    ${title ? "" : `<button class="round" type="button" data-act="homescreen" aria-label="آیکون روی صفحه‌ی گوشی">${ICON.phone}</button>`}</div>`;
+}
+
+/* Shamsi month calendar engine (shared with the language-school app). */
+const PF = new Intl.DateTimeFormat("en-u-ca-persian-nu-latn", { year: "numeric", month: "numeric", day: "numeric" });
+const jp = (d) => { const o = {}; for (const p of PF.formatToParts(d)) if (p.type !== "literal") o[p.type] = Number(p.value); return o; };
+const pad = (n) => String(n).padStart(2, "0");
+const dkey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const noon = (t) => { const x = new Date(t); x.setHours(12, 0, 0, 0); return x; };
+const firstOfMonth = (d) => noon(d.getTime() - (jp(d).day - 1) * DAY);
+const widx = (d) => (d.getDay() + 1) % 7; // 0 = Saturday … 6 = Friday
+function monthDays(offset, base = Date.now()) {
+  let d = firstOfMonth(noon(base));
+  for (let k = 0; k < offset; k++) d = firstOfMonth(noon(d.getTime() + 32 * DAY));
+  const out = [], m = jp(d).month;
+  for (let x = d; jp(x).month === m; x = noon(x.getTime() + DAY)) out.push(x);
+  return out;
+}
+/* Sample free seats per day (0 = full); real numbers come from the academy later. */
+const seats = (d) => (jp(d).day * 5 + jp(d).month) % 6;
+/* One month card. cell(d) → { cls, attr, sub, tick } decides how each day looks. */
+function calCard(offset, max, base, cell, legend) {
+  const days = monthDays(offset, base);
+  const fmt = (o) => new Intl.DateTimeFormat("fa-IR-u-ca-persian", o).format(days[0]);
+  const today = dkey(noon(Date.now()));
+  const dir = ui.calDir; ui.calDir = "";
+  const cells = days.map((d) => {
+    const c = cell(d), k = dkey(d);
+    return `<button type="button" class="cd ${c.cls || ""}${widx(d) === 6 ? " fri" : ""}${k === today ? " today" : ""}" ${c.attr || "disabled"} aria-pressed="${Boolean(c.tick)}" aria-label="${faDate(d)}${c.sub ? "، " + c.sub : ""}"><span class="n">${fa(jp(d).day)}</span>${c.sub ? `<span class="s">${c.sub}</span>` : ""}${c.tick ? ICON.tick : ""}</button>`;
+  }).join("");
+  return `<div class="calcard"><div class="cal-head"><button class="navb" type="button" data-nav="-1" ${offset > 0 ? "" : "disabled"} aria-label="ماه قبل">${ICON.back}</button>
+      <div class="m"><b>${fmt({ month: "long" })}</b><span>${fmt({ year: "numeric" })}</span></div>
+      <button class="navb flip" type="button" data-nav="1" ${offset < max ? "" : "disabled"} aria-label="ماه بعد">${ICON.back}</button></div>
+    <div class="cal${dir ? " in-" + dir : ""}">${WEEK.map((w, i) => `<span class="wd${i === 6 ? " fri" : ""}">${w}</span>`).join("")}${"<span></span>".repeat(widx(days[0]))}${cells}</div>
+    <div class="legend">${legend}</div></div>`;
+}
+
+/* ── helpers ── */
+const svcOf = (id) => SERVICES.find((s) => s.id === id);
+const docOf = (id) => DOCTORS.find((s) => s.id === id);
+const toDate = (k) => new Date(k + "T12:00:00");
+const today = () => dkey(noon(Date.now()));
+const latin = (s) => String(s).replace(/[۰-۹]/g, (x) => "۰۱۲۳۴۵۶۷۸۹".indexOf(x));
+const minOf = (at) => { const [h, m] = latin(at).split(":").map(Number); return h * 60 + m; };
+const durText = (m) => (m % 60 ? `${fa(m)} دقیقه` : `${fa(m / 60)} ساعت`);
+const priceText = (s) => (s.free ? "رایگان" : `${s.from ? "از " : ""}${toman(s.price)}`);
+const part = (p) => Math.ceil(p / 4 / 1000) * 1000;
+const canInst = (s) => !s.free && !s.from && s.price >= CLINIC.instMin;
+const skilled = (svc) => DOCTORS.filter((s) => s.skills.includes(svc));
+const works = (doc, d) => widx(d) !== 6 && !doc.off.includes(widx(d));
+const digits = (p) => latin(p).replace(/\D/g, "").replace(/^98/, "0");
+const appt = (id) => state.appts.find((a) => String(a.id) === String(id));
+const planOf = (id) => state.plans.find((p) => String(p.id) === String(id));
+/* Day maths at noon, so the end-of-October clock change can't shift a day. */
+const dayDiff = (k) => Math.round((toDate(k) - noon(Date.now())) / DAY);
+const addDays = (k, n) => { const d = toDate(k); d.setDate(d.getDate() + n); return dkey(d); };
+const apptTime = (a) => { const d = toDate(a.k), m = minOf(a.at); d.setHours(Math.floor(m / 60), m % 60, 0, 0); return d.getTime(); };
+const upcoming = () => state.appts.filter((a) => a.status === "ok" && apptTime(a) > Date.now()).sort((x, y) => apptTime(x) - apptTime(y));
+const relDay = (k) => { const n = dayDiff(k); return n === 0 ? "امروز" : n === 1 ? "فردا" : n === -1 ? "دیروز" : n > 0 ? `${fa(n)} روز دیگه` : `${fa(-n)} روز پیش`; };
+/* Open a calendar on the month that holds the picked day (0 = this month, 1 = next). */
+const monthOffset = (k) => (jp(toDate(k)).month === jp(noon(Date.now())).month ? 0 : 1);
+const save = () => { store.set("appts", state.appts); store.set("plans", state.plans); };
+const sic = (s) => `<span class="sic t-${s.c}">${ICON[s.i]}</span>`;
+const fill = (t, n) => t.replace("{o}", ORD[n] || fa(n)).replace("{n}", fa(n));
+/* An aftercare plan is live once its session has happened; until then it waits in a drawer. */
+const planAppt = (p) => { const a = appt(p.id); return a && a.status === "ok" ? a : null; };
+const livePlans = () => state.plans.filter((p) => planAppt(p) && apptTime(planAppt(p)) <= Date.now()).sort((x, y) => y.k.localeCompare(x.k));
+const soonPlans = () => state.plans.filter((p) => planAppt(p) && apptTime(planAppt(p)) > Date.now());
+/* Sample diary: some slots are already taken (the real diary comes from the clinic later). */
+const taken = (k, docId, at) => { let h = 17; for (const ch of k + docId + at) h = (h * 31 + ch.charCodeAt(0)) % 9973; return h % 3 === 0; };
+/* A slot is bookable when a doctor who does the service is in that day and free, the service
+   ends by closing time (20:00), it is not already past, and you have not booked it yourself. */
+function slotState(k, at, svcId, docId) {
+  const d = toDate(k), sv = svcOf(svcId);
+  const ids = (docId === "any" ? skilled(svcId) : [docOf(docId)]).filter((s) => works(s, d)).map((s) => s.id);
+  if (!ids.length) return "off";
+  if (minOf(at) + sv.dur > CLINIC.close) return "late";
+  const now = new Date();
+  if (k === today() && minOf(at) <= now.getHours() * 60 + now.getMinutes()) return "past";
+  if (state.appts.some((a) => a.status === "ok" && a.k === k && a.at === at)) return "mine";
+  return ids.some((id) => !taken(k, id, at)) ? "free" : "full";
+}
+const freeCount = (k, svcId, docId) => SLOTS.filter((at) => slotState(k, at, svcId, docId) === "free").length;
+function assignDoctor(b) {
+  if (b.doc !== "any") return docOf(b.doc);
+  const d = toDate(b.k);
+  return skilled(b.svc).find((s) => works(s, d) && !taken(b.k, s.id, b.at)) || skilled(b.svc)[0];
+}
+/* First day from k on (but not before today) that still has a free slot. */
+function firstFree(k, svcId, docId) {
+  for (let n = Math.max(0, dayDiff(k)); n <= CLINIC.window; n++) {
+    const day = addDays(today(), n);
+    if (widx(toDate(day)) !== 6 && freeCount(day, svcId, docId)) return day;
+  }
+  return "";
+}
+function fillerAnswer() {
+  const up = upcoming(), f = up.find((x) => x.svc === "filler");
+  if (f) return `نوبت فیلرت: ${faDate(toDate(f.k))}، ساعت ${f.at}، با ${docOf(f.doc).t} · طبقه‌ی دوم. روز قبل و ۲ ساعت قبلش یادآوری می‌کنیم.`;
+  if (up.length) return `نوبت فیلری برات ثبت نشده. نوبت بعدیت: ${svcOf(up[0].svc).t}، ${faDate(toDate(up[0].k))}، ساعت ${up[0].at}.`;
+  return "فعلاً نوبت فیلری برات ثبت نشده؛ از «نوبت دکتر» با چند لمس رزرو کن.";
+}
+/* Home tile: a check-in to answer or a next visit that is due counts as a care message. */
+function careTodo() {
+  const waiting = (p) => { const n = -dayDiff(p.k), nx = p.next && appt(p.next); return (n >= 2 && !p.ans) || (n >= CARE[p.svc].nd && !(nx && nx.status === "ok")); };
+  if (livePlans().some(waiting)) return "یه پیام مراقبت داری";
+  const n = upcoming().length;
+  return n ? `${fa(n)} نوبت پیش رو` : "یادآوری و پیگیری";
+}
+
+/* ── pages ── */
+function home() {
+  const n = firstName(), nx = upcoming()[0];
+  return `${topBar("")}
+    <div class="glass hero"><div style="flex:1;min-width:0"><div class="welcome">Welcome</div><b>سلام${n ? " " + esc(n) : ""}!</b><span class="hint">پوستت امروز چطوره؟</span>
+      <div style="margin-top:8px"><span class="pill">مشاوره‌ی اول رایگانه</span></div></div>${ICON.serum}</div>
+    ${nx ? `<button class="nextap" type="button" data-go="care">${ICON.doctorI}<span class="v"><small>نوبت بعدی · ${relDay(nx.k)}</small><b>${svcOf(nx.svc).t} با ${docOf(nx.doc).t}</b><small>${faDate(toDate(nx.k))} · ساعت ${nx.at}</small></span><span class="chev" style="color:var(--mint-d);display:grid">${ICON.chev}</span></button>` : ""}
+    <div class="tiles">
+      <button class="tile t-mint" type="button" data-go="consult">${ICON.consultI}<b>مشاوره‌ی آنلاین</b><span>جواب با منبع</span></button>
+      <button class="tile t-lilac" type="button" data-go="book">${ICON.doctorI}<b>نوبت دکتر</b><span>خدمت، دکتر، ساعت</span></button>
+      <button class="tile t-sky" type="button" data-go="care">${ICON.careI}<b>مراقبت من</b><span>${careTodo()}</span></button>
+      <button class="tile t-peach" type="button" data-go="prices">${ICON.tariffI}<b>تعرفه‌ها و پرسش</b><span>بوتاکس، لیزر، فیلر…</span></button>
+    </div>
+    <div class="mini"><button type="button" data-act="freeconsult">${ICON.gift}مشاوره‌ی رایگان ۲۰ دقیقه‌ای · قسطی هم می‌شه</button></div>`;
+}
+/* Online advisor: a small chat that answers from the clinic's own documents, with the source. */
+function consult() {
+  const n = firstName(), asked = state.chat.map((c) => c.q);
+  const pool = KB.filter((x) => x.faq && !asked.includes(x.q)), chips = pool.slice(0, 3), more = pool.slice(3);
+  const chip = (x) => `<button class="chip" type="button" data-q="${esc(x.q)}">${esc(x.q)}</button>`;
+  const docs = skilled("consult").map((d) => d.t).join(" یا ");
+  return `${topBar("مشاوره‌ی آنلاین")}
+    <div class="glass agent"><span class="av t-mint">${ICON.consultS}</span><div class="v"><b>مشاور کلینیک</b><small>${ICON.srcI}جواب با منبع، از اسناد خود کلینیک</small></div><span class="live">آنلاین</span></div>
+    <div class="chat" id="chat" aria-live="polite"><div class="bub bot">سلام${n ? " " + esc(n) : ""}! من مشاور کلینیکم ✨ از قیمت‌ها، دکترها و مراقبت بپرس؛ جوابم رو از تعرفه و راهنمای خود کلینیک می‌دم.</div>
+      ${state.chat.map((c) => `<div class="bub me">${esc(c.q)}</div>${c.wait ? `<div class="bub bot typing" aria-label="در حال نوشتن"><i></i><i></i><i></i></div>` : `<div class="bub bot">${esc(c.a)}${c.src ? `<span class="src">${ICON.srcI}منبع: ${c.src}</span>` : ""}</div>`}`).join("")}</div>
+    ${chips.length ? `<div class="chips qchips">${chips.map(chip).join("")}</div>` : ""}
+    ${more.length ? `<details class="acc more" data-drawer="moreQ"${ui.moreQ ? " open" : ""}><summary><div><b>سؤال‌های دیگه</b><div class="hint">پرتکرارهای مراجعه‌کننده‌ها</div></div><span class="cnt">${fa(more.length)}</span><span class="chev">${ICON.chev}</span></summary><div class="chips qchips">${more.map(chip).join("")}</div></details>` : ""}
+    <form class="row" id="cf" style="margin-top:12px"><input id="cq" class="input" placeholder="سؤالت رو بنویس…" autocomplete="off" aria-label="سؤال" style="flex:1"><button class="btn send" type="submit" aria-label="بفرست">${ICON.sendI}</button></form>
+    <div class="cta"><div class="row">${ICON.doctorI}<div class="v"><b>مشاوره‌ی رایگان با دکتر · ۲۰ دقیقه</b><small>با ${docs} · طبقه‌ی دوم</small></div></div>
+      <button class="btn" type="button" data-act="freeconsult">رزرو مشاوره‌ی رایگان</button></div>`;
+}
+function wizBar() {
+  const b = state.b, ready = [true, Boolean(b.svc), Boolean(b.svc && b.doc), Boolean(b.svc && b.doc && b.k && b.at)];
+  return `<div class="wiz">${["خدمت", "دکتر", "زمان", "تأیید"].map((t, i) => `<button type="button" class="${i + 1 <= b.step ? "on" : ""}" data-step="${i + 1}" ${ready[i] ? "" : "disabled"}><i></i>${fa(i + 1)}. ${t}</button>`).join("")}</div>`;
+}
+function step1() {
+  const b = state.b, sv = b.svc && svcOf(b.svc);
+  return `<div class="glass picks">${SERVICES.map((s) => `<button type="button" class="pick${b.svc === s.id ? " on" : ""}" data-svc="${s.id}" aria-pressed="${b.svc === s.id}"><span class="dot t-${s.c}">${ICON[s.i]}</span><span class="v"><b>${s.t}</b><small class="num">${s.free ? `<span class="fr">رایگان</span>` : priceText(s) + " تومان"} · ${durText(s.dur)}${s.ses ? " · " + s.ses : ""}</small></span><span class="radio"></span></button>`).join("")}</div>
+    ${sv ? `<div class="when">${ICON.spark}<span>${sv.note}</span></div>` : ""}`;
+}
+function step2() {
+  const b = state.b;
+  return `<div class="hint" style="margin:0 4px 10px">دکترهای «${svcOf(b.svc).t}»</div>
+    <div class="stys">${skilled(b.svc).map((s) => `<button class="sty" type="button" data-doc="${s.id}" aria-pressed="${b.doc === s.id}"><span class="av t-${s.c}">${s.ini}</span><b>${s.t}</b><small>${s.sub}</small><small class="off">${WEEKDAY[s.off[0]]}‌ها نیست</small>${b.doc === s.id ? ICON.tick : ""}</button>`).join("")}
+      <button class="sty" type="button" data-doc="any" aria-pressed="${b.doc === "any"}"><span class="av t-sky">${ICON.spark}</span><b>فرقی نداره</b><small>اولین وقت خالی</small>${b.doc === "any" ? ICON.tick : ""}</button></div>`;
+}
+function step3() {
+  const b = state.b, day = b.k ? toDate(b.k) : null, sv = svcOf(b.svc);
+  const slot = (at) => {
+    const st = slotState(b.k, at, b.svc, b.doc), h = Math.floor(minOf(at) / 60), on = b.at === at, ic = ICON[h < 13 ? "sun" : h < 17 ? "sunset" : "moon"];
+    if (st === "free") return `<button type="button" class="ts${on ? " on" : ""}" data-at="${at}" aria-pressed="${on}">${ic}<span class="num">${at}</span><small>${on ? "انتخاب شد" : "آزاد"}</small>${on ? ICON.tick : ""}</button>`;
+    if (st === "full") return `<button type="button" class="ts full" data-waitat="${at}">${ic}<span class="num">${at}</span><small>پر · لیست انتظار</small></button>`;
+    return `<button type="button" class="ts" disabled>${ic}<span class="num">${at}</span><small>${st === "late" ? "وقت کافی نیست" : st === "mine" ? "نوبت خودت" : "گذشته"}</small></button>`;
+  };
+  return `${b.due ? `<div class="when" style="margin:0 0 14px">${ICON.calO}<span>${b.dueT}: ${faDate(toDate(b.due))}</span></div>` : ""}
+    <div><span class="label">روز</span><button class="input datebtn" type="button" data-act="cal"><span class="ic">${ICON.cal}</span><span class="v">${day ? `<span>${faDate(day)}</span><small>${fa(freeCount(b.k, b.svc, b.doc))} وقت خالی · ${b.doc === "any" ? "همه‌ی دکترها" : docOf(b.doc).t}</small>` : `<span class="ph">انتخاب از تقویم</span><small>امروز تا ${fa(CLINIC.window)} روز آینده</small>`}</span><span class="chev">${ICON.chev}</span></button></div>
+    ${day ? `<div style="margin-top:14px"><span class="label">ساعت · ${sv.t} ${durText(sv.dur)} طول می‌کشه</span><div class="tslots">${SLOTS.map(slot).join("")}</div></div>` : ""}`;
+}
+function step4() {
+  const b = state.b, sv = svcOf(b.svc), dr = assignDoctor(b), p = state.profile;
+  const cost = sv.free
+    ? `<div class="glass sum" style="padding:14px 16px;margin-top:12px"><div class="row"><b>هزینه</b><span class="big fr">رایگان</span></div></div>
+      <div class="info-line" style="margin-top:10px">${ICON.bellC}یادآوری: روز قبل و ۲ ساعت قبل، همین‌جا تو تلگرام.</div>`
+    : `<div class="glass sum" style="padding:14px 16px;margin-top:12px">
+        <div class="row"><span class="hint">هزینه‌ی ${sv.from ? "هر جلسه" : "درمان"}</span><b class="num">${priceText(sv)}</b></div>
+        <div class="row"><span class="hint">بیعانه‌ی الان</span><b class="num">${toman(CLINIC.deposit)}</b></div>
+        <div class="row total"><b>باقی‌مانده در کلینیک</b><span>${sv.from ? `<span class="hint">بسته به ناحیه</span>` : `<span class="big num">${toman(sv.price - CLINIC.deposit)}</span> <span class="hint">تومان</span>`}</span></div></div>
+      ${canInst(sv) ? `<div class="info-line" style="margin-top:10px">${ICON.instI}قسطی هم می‌شه: ۴ قسط بدون کارمزد، هر قسط ${toman(part(sv.price))} تومان.</div>` : ""}
+      <div class="info-line" style="margin-top:8px">${ICON.shield}لغو تا ۲۴ ساعت قبل، بیعانه کامل برمی‌گرده.</div>`;
+  return `<div class="glass" style="padding:14px 16px"><div class="row">${sic(sv)}<div style="flex:1;min-width:0"><b>${sv.t}${b.ses > 1 ? ` · جلسه‌ی ${fa(b.ses)}` : ""}</b><div class="hint">${dr.t} · ${dr.sub} · طبقه‌ی دوم</div></div></div>
+      <div class="when">${ICON.cal}<span>${faDate(toDate(b.k))} · ساعت ${b.at} · ${durText(sv.dur)}</span></div></div>
+    <div class="glass stack" style="padding:14px 16px;margin-top:12px">
+      <div><label class="label" for="nm">نام و نام خانوادگی</label><input id="nm" class="input" autocomplete="name" value="${esc(p.name)}" placeholder="سارا رضایی"><div class="err" id="e-nm"></div></div>
+      <div><label class="label" for="ph">موبایل</label><div class="row"><input id="ph" class="input num" inputmode="tel" value="${esc(p.phone)}" placeholder="۰۹۱۲۳۴۵۶۷۸۹" style="flex:1"><button class="btn soft" type="button" data-act="contact" style="white-space:nowrap">با یه لمس</button></div><div class="err" id="e-ph"></div></div>
+      <div><label class="label" for="nt">توضیح برای دکتر <span class="hint">· اختیاری</span></label><input id="nt" class="input" value="${esc(state.note)}" placeholder="مثلاً: پوستم حساسه"></div></div>
+    ${cost}`;
+}
+function book() {
+  const s = state.b.step;
+  return `${topBar("نوبت دکتر")}${wizBar()}${s === 1 ? step1() : s === 2 ? step2() : s === 3 ? step3() : step4()}`;
+}
+/* Booking days: today up to 30 days ahead; free slots under each day, «مرخصی» when the doctor is off. */
+const dayCell = (d) => {
+  const n = Math.round((d - noon(Date.now())) / DAY), b = state.b;
+  if (n < 0 || n > CLINIC.window || widx(d) === 6) return {};
+  const team = b.doc === "any" ? skilled(b.svc) : [docOf(b.doc)];
+  if (!team.some((s) => works(s, d))) return { sub: "مرخصی" };
+  const k = dkey(d), free = freeCount(k, b.svc, b.doc), on = k === b.k, due = k === b.due && !on;
+  if (!free) return SLOTS.some((at) => slotState(k, at, b.svc, b.doc) === "full") ? { cls: "full", sub: "پر" } : {}; // today after the last slot: just inactive
+  return { cls: on ? "on" : due ? "pat" : free <= 2 ? "av low" : "av", attr: `data-bday="${k}"`, sub: due ? "موعد" : `${fa(free)} وقت`, tick: on };
+};
+function calSheet() {
+  ui.sheet = "cal";
+  const b = state.b, who = b.doc === "any" ? "همه‌ی دکترها" : docOf(b.doc).t;
+  sheet(`<div class="cal-title"><b>روز نوبت</b><span class="hint">وقت‌های خالی ${who} زیر هر روز</span></div>
+    ${calCard(ui.calM, 1, Date.now(), dayCell, `<span><i class="lg"></i>وقت خالی</span><span><i class="lg full"></i>پر یا مرخصی</span>${b.due ? `<span><i class="lg pat"></i>موعد</span>` : ""}<span><i class="lg today"></i>امروز</span>`)}
+    <button class="btn" type="button" data-act="calok" style="width:100%;padding:14px;margin-top:14px" ${b.k ? "" : "disabled"}>${b.k ? "تأیید · " + faDate(toDate(b.k)) : "یه روز رو لمس کن"}</button>`);
+}
+function next(step) {
+  const b = state.b;
+  if (step === 2 && !b.svc) { toast("اول یه خدمت انتخاب کن"); haptic("heavy"); return; }
+  if (step === 3 && !b.doc) { toast("دکتر رو انتخاب کن"); haptic("heavy"); return; }
+  if (step === 4 && !(b.k && b.at)) { toast("روز و ساعت رو انتخاب کن"); haptic("heavy"); return; }
+  b.step = step; haptic("light"); render(); window.scrollTo(0, 0);
+}
+function checkout() {
+  const p = state.profile, say = (id, t) => { $("#" + id).textContent = t; return !t; };
+  p.name = $("#nm").value.trim(); p.phone = $("#ph").value.trim(); state.note = $("#nt").value.trim(); store.set("profile", p);
+  const ok = [say("e-nm", p.name.split(/\s+/).filter(Boolean).length < 2 ? "اسم و فامیل رو با هم بنویس." : ""), say("e-ph", /^09\d{9}$/.test(digits(p.phone)) ? "" : "موبایل ۱۱ رقمیه و با ۰۹ شروع می‌شه.")].every(Boolean);
+  if (!ok) { haptic("heavy"); return; }
+  if (svcOf(state.b.svc).free) return placeAppt("free");
+  paySheet();
+}
+/* Treatments: a deposit, or four interest-free parts when the treatment costs 3 million or more. */
+function paySheet() {
+  ui.sheet = "pay";
+  const sv = svcOf(state.b.svc), inst = canInst(sv);
+  if (state.pay === "inst" && !inst) state.pay = "dep";
+  const opt = (v, ic, c, t, sub) => `<button type="button" class="pick${state.pay === v ? " on" : ""}" data-pay="${v}" aria-pressed="${state.pay === v}"><span class="dot t-${c}">${ICON[ic]}</span><span class="v"><b>${t}</b><small>${sub}</small></span><span class="radio"></span></button>`;
+  const now = state.pay === "inst" ? part(sv.price) : CLINIC.deposit;
+  sheet(`<div class="cal-title"><b>پرداخت و قطعی کردن نوبت</b><span class="hint">${sv.t} · <span class="num">${priceText(sv)}</span> تومان</span></div>
+    <div class="glass picks">${opt("dep", "cardI", "lilac", `بیعانه ${toman(CLINIC.deposit)} تومان`, "بقیه رو روز نوبت تو کلینیک بده")}${inst ? opt("inst", "instI", "sky", "۴ قسط بدون کارمزد", `امروز ${toman(part(sv.price))} و سه قسط ماهانه`) : ""}</div>
+    <div class="hint" style="margin-top:10px">درگاه امن شتاب؛ لازم نیست کارت‌به‌کارت کنی و رسیدش همین‌جا میاد.</div>
+    <button class="btn" type="button" data-act="paynow" style="width:100%;padding:14px;margin-top:14px">پرداخت ${toman(now)} تومان</button>
+    ${PREVIEW ? `<div class="hint" style="text-align:center;margin-top:8px">نسخه‌ی آزمایشی: پرداخت واقعی انجام نمی‌شه</div>` : ""}`);
+}
+function payNow() {
+  ui.sheet = "wait";
+  sheet(`<div class="pay-wait"><div class="spin"></div><b>در حال اتصال به درگاه بانک…</b><div class="hint">چند لحظه صبر کن</div></div>`);
+  setTimeout(() => { if ($("#sw .spin")) placeAppt(state.pay); }, 1400);
+}
+function done(title, sub, paid) {
+  haptic("ok");
+  $("#app").innerHTML = `${topBar(title)}<div class="glass done"><div class="ok">${ICON.check}</div><b style="font-size:18px">${title}</b><div class="hint" style="margin-top:6px">${sub}${PREVIEW ? `<br>(نسخه‌ی آزمایشی: ${paid ? "پرداخت واقعی انجام نشد" : "هنوز برای کلینیک ارسال نمی‌شه"})` : ""}</div></div>`;
+  // Telegram → app → back to Telegram: the app closes and the chat is there again.
+  if (IN_TG) setMain("برگشت به تلگرام", () => tg.close());
+  else setMain("مراقبت من", () => go("care"));
+}
+/* Booking makes the appointment and, for a treatment, its aftercare plan. */
+function placeAppt(pay) {
+  const b = state.b, sv = svcOf(b.svc), dr = assignDoctor(b);
+  const paid = sv.free ? 0 : pay === "inst" ? part(sv.price) : CLINIC.deposit;
+  const a = { id: Date.now(), svc: b.svc, doc: dr.id, k: b.k, at: b.at, status: "ok", pay: sv.free ? "free" : pay, paid, ses: b.ses };
+  if (CAN_SEND) { try { tg.sendData(JSON.stringify({ type: "clinic", ...a, name: state.profile.name, phone: digits(state.profile.phone), note: state.note })); } catch (e) {} }
+  state.appts = [a, ...state.appts].slice(0, 12);
+  if (CARE[a.svc]) state.plans = [{ id: a.id, svc: a.svc, doc: a.doc, k: a.k, ses: a.ses, ans: "", next: "" }, ...state.plans].slice(0, 8);
+  const from = b.from && planOf(b.from); if (from) from.next = a.id;
+  save();
+  state.b = freshBooking(); state.note = ""; state.pay = "dep";
+  closeSheet();
+  const where = `${faDate(toDate(a.k))} · ساعت ${a.at}<br>${dr.t} · ${dr.sub} · طبقه‌ی دوم`;
+  if (sv.free) return done("نوبت مشاوره ثبت شد!", `${where}<br>یادآوری: روز قبل و ۲ ساعت قبل، همین‌جا تو تلگرام.`, false);
+  done("نوبتت قطعی شد!", `${sv.t}${a.ses > 1 ? " · جلسه‌ی " + fa(a.ses) : ""}<br>${where}<br>${pay === "inst" ? `قسط اول ${toman(paid)} تومان پرداخت شد؛ سه قسط بعدی ماهانه.` : `بیعانه ${toman(paid)} تومان پرداخت شد.`}<br>برنامه‌ی مراقبت بعد از درمان هم تو «مراقبت من» آماده‌ست.`, true);
+}
+function apptCard(a) {
+  const sv = svcOf(a.svc), dr = docOf(a.doc);
+  const pay = a.pay === "free" ? "مشاوره رایگانه؛ پرداختی نداره." : a.pay === "inst" ? `قسط اول ${toman(a.paid)} تومان پرداخت شد · سه قسط بعدی ماهانه` : `بیعانه ${toman(a.paid)} تومان پرداخت شد · بقیه در کلینیک`;
+  return `<div class="glass ap"><div class="row">${sic(sv)}<div style="flex:1;min-width:0"><b>${sv.t}${a.ses > 1 ? " · جلسه‌ی " + fa(a.ses) : ""}</b><div class="hint">${dr.t} · ${dr.sub}</div></div><span class="pill">${a.pay === "free" ? "رایگان" : "قطعی"}</span></div>
+    <div class="when">${ICON.cal}<span>${faDate(toDate(a.k))} · ساعت ${a.at}</span><span style="margin-inline-start:auto">${relDay(a.k)}</span></div>
+    <div class="hint" style="margin-top:8px">${pay}</div>
+    ${CARE[a.svc] ? `<div class="info-line" style="margin-top:6px">${ICON.heartS}بعد از درمان، «مراقبت» قدم‌به‌قدم همراهته.</div>` : ""}
+    <div class="row" style="margin-top:10px"><button class="btn soft" type="button" data-remind="${a.id}" style="flex:1">${ICON.bell} یادآوری</button><button class="btn soft" type="button" data-cancel="${a.id}" style="flex:1">لغو نوبت</button></div></div>`;
+}
+/* Aftercare as a timeline: sent messages are ticked off, the one waiting for you pulses. n = days since the session (−1: not yet). */
+function timeline(p, n) {
+  const c = CARE[p.svc], live = n >= 0, nx = p.next && appt(p.next), booked = nx && nx.status === "ok" ? nx : null;
+  const ses = c.nsvc === p.svc ? p.ses + 1 : 0, asked = live && n >= 2, due = live && n >= c.nd;
+  const lab = (d) => `روز ${fa(d)}${!live ? "" : n === d ? " · امروز" : n < d ? ` · ${fa(d - n)} روز دیگه` : ""}`;
+  const row = (cls, ic, label, body) => `<div class="step${cls}"><span class="b">${ICON[ic]}</span><div class="t"><small class="dl">${label}</small>${body}</div></div>`;
+  let ask = `<b>${c.ask}</b>`;
+  if (asked && !p.ans) ask += `<div class="qr"><button class="btn" type="button" data-reply="${p.id}|good">${ICON.ok}خیلی بهتره</button><button class="btn soft" type="button" data-reply="${p.id}|red">${c.red}</button></div>`;
+  if (p.ans) ask += `<span class="reply">${p.ans === "good" ? "خیلی بهتره" : c.red}</span>${p.ans === "good" ? `<span class="hint" style="margin-top:4px">عالیه! مراقبت‌ها رو ادامه بده ✨</span>` : ""}`;
+  let visit = `<b>${fill(c.nt, ses)}</b>`;
+  if (booked) visit += `<span class="reply">${ICON.ok}رزرو شد · ${faDate(toDate(booked.k))}، ساعت ${booked.at}</span>`;
+  else if (live) visit += `<div class="qr"><button class="btn${due ? "" : " soft"}" type="button" data-next="${p.id}">${ICON.calO}${fill(c.nb, ses)}</button></div>`;
+  return [
+    row(live ? " done" : "", "heartO", "روز ۰ · بعد از جلسه", `<b>${c.d0}</b>`),
+    row(asked ? (p.ans || due ? " done" : " now") : "", "chatO", lab(2), ask),
+    p.ans === "red" ? row(" done call", "callO", "پیگیری دکتر", `<b>اگه ${c.worry} بمونه، دکتر خودش باهات تماس می‌گیره.</b><span class="hint">${docOf(p.doc).t} در جریانه.</span>`) : "",
+    row(booked ? " done" : due ? " now" : "", "calO", lab(c.nd), visit),
+  ].join("");
+}
+function planCard(p) {
+  const sv = svcOf(p.svc), n = -dayDiff(p.k);
+  return `<div class="glass care"><div class="row">${sic(sv)}<div style="flex:1;min-width:0"><b>${sv.t}${CARE[p.svc].nsvc === p.svc ? ` · جلسه‌ی ${fa(p.ses)}` : ""}</b><div class="hint">${docOf(p.doc).t} · ${relDay(p.k)}</div></div><span class="pill">روز ${fa(n)}</span></div>
+    <div class="tl">${timeline(p, n)}</div></div>`;
+}
+function care() {
+  const up = upcoming(), live = livePlans(), soon = soonPlans(), past = state.appts.filter((a) => !up.includes(a));
+  return `${topBar("مراقبت من")}
+    <div class="sec" style="margin-top:4px">${ICON.calO}نوبت‌های پیش رو${up.length ? `<span class="cnt">${fa(up.length)}</span>` : ""}</div>
+    ${up.length ? up.map(apptCard).join("") : `<div class="glass empty" style="padding:20px 16px;margin-bottom:12px"><b style="display:block">نوبت پیش رویی نداری</b><div class="hint" style="margin:2px 0 12px">مشاوره‌ی اول با دکتر رایگانه.</div><button class="btn" type="button" data-act="freeconsult">رزرو مشاوره‌ی رایگان</button></div>`}
+    ${live.length ? `<div class="sec">${ICON.heartO}مراقبت بعد از درمان</div>${live.map(planCard).join("")}` : ""}
+    ${soon.length ? `<details class="acc" data-drawer="soonOpen"${ui.soonOpen ? " open" : ""} style="margin-top:12px"><summary><span class="badge t-sky">${ICON.heartS}</span><div><b>مراقبت درمان‌های بعدی</b><div class="hint">از روز درمان خودکار شروع می‌شه</div></div><span class="cnt">${fa(soon.length)}</span><span class="chev">${ICON.chev}</span></summary>
+      <div style="padding:14px 16px">${soon.map((p) => `<div class="soon"><b>${svcOf(p.svc).t} · ${faDate(toDate(p.k))}</b><div class="tl">${timeline(p, -1)}</div></div>`).join("")}</div></details>` : ""}
+    ${past.length ? `<details class="acc" data-drawer="pastOpen"${ui.pastOpen ? " open" : ""} style="margin-top:12px"><summary><div><b>نوبت‌های قبلی و لغوشده</b><div class="hint">تاریخچه</div></div><span class="cnt">${fa(past.length)}</span><span class="chev">${ICON.chev}</span></summary>
+      <div>${past.map((a) => `<div class="item"><div style="flex:1;min-width:0"><b>${svcOf(a.svc).t} · ${docOf(a.doc).t}</b><span class="hint">${faDate(toDate(a.k))} · ساعت ${a.at}</span></div><span class="price">${a.status === "cancel" ? (a.refund ? "لغو · مبلغ برگشت" : "لغو شد") : "انجام شد"}</span></div>`).join("")}</div></details>` : ""}`;
+}
+function remindSheet(a) {
+  ui.sheet = "remind";
+  const sv = svcOf(a.svc), dr = docOf(a.doc), who = (state.profile.name || firstName() || "").split(" ")[0];
+  sheet(`<div class="cal-title"><b>یادآوری نوبت</b><span class="hint">روز قبل و ۲ ساعت قبل، همین پیام‌ها تو تلگرام میاد</span></div>
+    <div class="tglabel">یه روز قبل</div>
+    <div class="tgmsg"><b>${CLINIC.name}</b><div style="margin-top:4px">سلام${who ? " " + esc(who) : ""}! فردا ساعت ${a.at} نوبت ${sv.t} داری با ${dr.t} · طبقه‌ی دوم ✨</div><div class="hint" style="margin-top:4px">${sv.pre}</div><div class="tgbtns"><span>میام ✓</span><span>جابه‌جایی</span></div></div>
+    <div class="tglabel">۲ ساعت قبل</div>
+    <div class="tgmsg"><b>${CLINIC.name}</b><div style="margin-top:4px">تا ۲ ساعت دیگه منتظرتیم؛ ساعت ${a.at} · ${CLINIC.address}</div></div>
+    <button class="btn" type="button" data-act="close" style="width:100%;padding:14px;margin-top:16px">باشه</button>`);
+}
+function cancelSheet(a) {
+  ui.sheet = "cancel";
+  const sv = svcOf(a.svc), refund = a.paid > 0 && apptTime(a) - Date.now() >= 24 * 3600000, what = a.pay === "inst" ? "قسط اول" : "بیعانه";
+  const rule = !a.paid ? `${ICON.shield}<span>مشاوره رایگانه؛ لغوش هزینه‌ای نداره.</span>`
+    : refund ? `${ICON.shield}<span>بیش از ۲۴ ساعت مونده؛ ${what} (${toman(a.paid)} تومان) کامل برمی‌گرده.</span>`
+    : `<span>کمتر از ۲۴ ساعت مونده؛ طبق قوانین ${toman(CLINIC.deposit)} تومان بیعانه برنمی‌گرده.</span>`;
+  sheet(`<div class="cal-title"><b>لغو نوبت؟</b><span class="hint">${sv.t} · ${faDate(toDate(a.k))} · ساعت ${a.at}</span></div>
+    <div class="glass info-line" style="padding:14px 16px">${rule}</div>
+    <div class="hint" style="margin-top:8px">وقتت به لیست انتظار پیشنهاد می‌شه تا یکی دیگه ازش استفاده کنه.</div>
+    <div class="row" style="margin-top:14px"><button class="btn soft" type="button" data-act="close" style="flex:1">نه، بمونه</button><button class="btn" type="button" data-docancel="${a.id}" style="flex:1">بله، لغو کن</button></div>`);
+}
+/* «رزرو جلسه‌ی ۲»: same service and doctor, straight to the day and time, from the due day on. */
+function bookNext(p) {
+  const c = CARE[p.svc], svc = c.nsvc, same = svc === p.svc, doc = docOf(p.doc).skills.includes(svc) ? p.doc : "any", due = addDays(p.k, c.nd);
+  state.b = { ...freshBooking(), step: 3, svc, doc, ses: same ? p.ses + 1 : 1, from: p.id, due, dueT: same ? `موعد جلسه‌ی ${ORD[p.ses + 1] || fa(p.ses + 1)}` : "موعد چکاپ" };
+  state.b.k = firstFree(due, svc, doc);
+  haptic("light"); go("book");
+}
+const CATS = [
+  { t: "تزریقات", s: "بوتاکس، فیلر، مزوتراپی", ids: ["botox", "filler", "meso"], c: "lilac", i: "syringe" },
+  { t: "لیزر", s: "موهای زائد · بسته به ناحیه", ids: [], c: "sky", i: "laserI" },
+  { t: "پوست", s: "پاکسازی و مشاوره", ids: ["clean", "consult"], c: "mint", i: "cleanI" },
+];
+const srcTag = (x) => `<span class="src">${ICON.srcI}منبع: ${x.src}</span>`;
+function prices() {
+  const q = state.ask.trim(), res = q ? search(q, 2) : [], lz = svcOf("laser");
+  const row = (s) => `<button class="item" type="button" data-booksvc="${s.id}"><div style="flex:1;min-width:0"><b>${s.t}</b><span class="hint">${s.sub} · ${durText(s.dur)}${s.ses ? " · " + s.ses : ""}</span></div><span class="price num">${priceText(s)}</span></button>`;
+  const laser = `<div class="hint" style="padding:12px 14px 2px">${lz.note}</div>${LASER_AREAS.map(([t, pr]) => `<button class="item" type="button" data-booksvc="laser"><div style="flex:1;min-width:0"><b>${t}</b><span class="hint">هر جلسه · ${durText(lz.dur)}</span></div><span class="price num">${toman(pr)}</span></button>`).join("")}`;
+  return `${topBar("تعرفه‌ها و پرسش")}
+    <div class="stack">${CATS.map((g, i) => `<details class="acc" data-drawer="cat${i}"${ui["cat" + i] ? " open" : ""}><summary><span class="badge t-${g.c}">${ICON[g.i]}</span><div><b>${g.t}</b><div class="hint">${g.s}</div></div><span class="chev">${ICON.chev}</span></summary><div>${g.ids.length ? g.ids.map((id) => row(svcOf(id))).join("") : laser}</div></details>`).join("")}</div>
+    <div class="hint" style="text-align:center;margin-top:10px">مبلغ‌ها به تومان · روی هر خدمت بزن تا رزروش کنی</div>
+    <form class="row" id="af" style="margin-top:14px"><input id="aq" class="input" value="${esc(state.ask)}" placeholder="سؤالت رو بنویس…" autocomplete="off" aria-label="سؤال" style="flex:1"><button class="btn" type="submit">بپرس</button></form>
+    <div class="stack" style="margin-top:12px">${q ? (res.length ? res.map((x) => `<div class="glass" style="padding:14px 16px;border-color:var(--lilac-line)"><b>${esc(x.q)}</b><div style="margin-top:4px">${esc(ans(x))}</div>${srcTag(x)}</div>`).join("") : `<div class="glass" style="padding:14px 16px">جوابش تو اسناد کلینیک نیست؛ از «مشاوره‌ی آنلاین» بپرس یا به پذیرش زنگ بزن.</div>`) : ""}
+      <div class="label" style="margin:4px 4px 0">سؤال‌های پرتکرار</div>
+      <div class="glass faq">${KB.filter((x) => x.faq).map((x) => `<details><summary><span class="qm">؟</span><span>${esc(x.q)}</span><span class="chev">${ICON.chev}</span></summary><div class="ans">${esc(ans(x))}${srcTag(x)}</div></details>`).join("")}</div>
+      <div class="glass" style="padding:14px 16px"><div class="row"><span class="sic t-peach">${ICON.pinI}</span><div style="flex:1;min-width:0"><b style="font-size:14.5px">${CLINIC.address}</b><div class="hint">${CLINIC.hours} · جمعه‌ها تعطیل</div></div></div>
+        <div class="row" style="margin-top:10px"><span class="hint">تلفن پذیرش</span><b class="num" style="margin-inline-start:auto">${CLINIC.phone}</b><button class="btn soft" type="button" data-copy="${CLINIC.tel}">کپی</button></div></div></div>`;
+}
+/* Search: keywords in the question or its tags score 2, in the answer 1; filler words don't count. */
+const STOP = ["دارید", "دارین", "داره", "داری", "دارم", "هم", "هست", "هستن", "می‌شه", "میشه", "کنم", "کنیم", "چی", "چه", "کار", "برای", "این", "اون", "من", "تو", "با", "از", "به", "که", "رو", "را", "یه", "یک", "یا", "آیا", "سلام"];
+const ans = (x) => (typeof x.a === "function" ? x.a() : x.a);
+function search(q, max = 1) {
+  const w = q.replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/[؟?!.،,:؛]/g, " ").split(/\s+/).filter((x) => x.length > 1 && !STOP.includes(x));
+  return KB.map((it) => ({ it, s: w.reduce((n, x) => n + ((it.q + " " + it.k).includes(x) ? 2 : ans(it).includes(x) ? 1 : 0), 0) }))
+    .filter((x) => x.s >= 2).sort((a, b) => b.s - a.s).slice(0, max).map((x) => x.it);
+}
+function askBot(text) {
+  const q = String(text || "").trim(); if (!q) return;
+  const hit = search(q)[0], item = { q, a: "", src: "", wait: true };
+  state.chat = [...state.chat, item].slice(-8);
+  ui.scrollChat = true; render();
+  setTimeout(() => {
+    Object.assign(item, { a: hit ? ans(hit) : "جوابش تو اسناد کلینیک نیست؛ بهتره تو مشاوره‌ی رایگان از خود دکتر بپرسی.", src: hit ? hit.src : "", wait: false });
+    if (route() !== "consult") return;
+    const keep = $("#cq") ? $("#cq").value : "";
+    ui.scrollChat = true; render(); $("#cq").value = keep; haptic("light");
+  }, 700);
+}
+
+/* ── render + actions ── */
+function mainFor(r) {
+  setMain("", null);
+  if (r !== "book") return;
+  const b = state.b, free = Boolean(b.svc && svcOf(b.svc).free);
+  if (b.step === 1) setMain(b.svc ? "ادامه · انتخاب دکتر" : "یه خدمت انتخاب کن", () => next(2));
+  if (b.step === 2) setMain("ادامه · روز و ساعت", () => next(3));
+  if (b.step === 3) setMain(free ? "ادامه · مشخصات و تأیید" : "ادامه · تأیید و پرداخت", () => next(4));
+  if (b.step === 4) setMain(free ? "ثبت نوبت مشاوره" : "پرداخت و قطعی کردن نوبت", checkout);
+}
+function render() {
+  const r = route();
+  $("#app").innerHTML = { home, consult, book, care, prices }[r]();
+  mainFor(r);
+  if (r === "consult") {
+    $("#cf").onsubmit = (e) => { e.preventDefault(); askBot($("#cq").value); };
+    const last = ui.scrollChat && $("#chat").lastElementChild; ui.scrollChat = false;
+    if (last && last.scrollIntoView) last.scrollIntoView({ block: "center", behavior: "smooth" });
+  }
+  if (r === "prices") $("#af").onsubmit = (e) => { e.preventDefault(); state.ask = $("#aq").value.trim(); render(); };
+}
+document.addEventListener("click", async (e) => {
+  const el = e.target.closest("button"); if (!el) return;
+  const d = el.dataset;
+  if (d.go) return go(d.go);
+  if (d.act === "back") return onBack();
+  if (d.act === "close") return closeSheet();
+  if (d.q) { haptic("light"); return askBot(d.q); }
+  if (d.step) { state.b.step = Number(d.step); haptic("light"); return render(); }
+  if (d.svc) { const b = state.b; if (b.svc !== d.svc) Object.assign(b, { svc: d.svc, doc: "", k: "", at: "", ses: 1, from: "", due: "", dueT: "" }); haptic("light"); return render(); }
+  if (d.doc) { const b = state.b; if (b.doc !== d.doc) Object.assign(b, { doc: d.doc, k: "", at: "" }); haptic("light"); return render(); }
+  if (d.bday) { state.b.k = d.bday; state.b.at = ""; haptic("light"); return calSheet(); }
+  if (d.at) { state.b.at = d.at; haptic("light"); return render(); }
+  if (d.waitat) { haptic("ok"); return toast(`ساعت ${d.waitat} پره؛ اسمت تو لیست انتظار رفت و اگه خالی شد خبرت می‌کنیم`); }
+  if (d.nav) { ui.calM = Math.max(0, Math.min(1, ui.calM + Number(d.nav))); ui.calDir = Number(d.nav) > 0 ? "next" : "prev"; haptic("light"); return calSheet(); }
+  if (d.pay) { state.pay = d.pay; haptic("light"); return paySheet(); }
+  if (d.remind) { haptic("light"); return remindSheet(appt(d.remind)); }
+  if (d.cancel) { haptic("light"); return cancelSheet(appt(d.cancel)); }
+  if (d.docancel) {
+    const a = appt(d.docancel); a.refund = a.paid > 0 && apptTime(a) - Date.now() >= 24 * 3600000; a.status = "cancel";
+    state.plans = state.plans.filter((p) => String(p.id) !== String(a.id));
+    state.plans.forEach((p) => { if (String(p.next) === String(a.id)) p.next = ""; });
+    save(); haptic("ok"); closeSheet();
+    toast(a.refund ? `نوبت لغو شد؛ ${a.pay === "inst" ? "قسط اول" : "بیعانه"} برمی‌گرده` : "نوبت لغو شد"); return render();
+  }
+  if (d.reply) {
+    const [id, v] = d.reply.split("|"), p = planOf(id); p.ans = v; save();
+    haptic(v === "good" ? "ok" : "medium"); if (v === "red") toast(`${docOf(p.doc).t} در جریان قرار گرفت`); return render();
+  }
+  if (d.next) return bookNext(planOf(d.next));
+  if (d.booksvc) { state.b = { ...freshBooking(), svc: d.booksvc, step: 2 }; return go("book"); }
+  if (d.copy) { try { await navigator.clipboard.writeText(d.copy); toast("کپی شد"); } catch (err) { toast(fa(d.copy)); } return; }
+  switch (d.act) {
+    case "freeconsult": state.b = { ...freshBooking(), svc: "consult", step: 2 }; return go("book");
+    case "cal": { const b = state.b; ui.calM = monthOffset(b.k || firstFree(today(), b.svc, b.doc) || today()); haptic("light"); return calSheet(); }
+    case "calok": haptic("ok"); closeSheet(); return render();
+    case "paynow": return payNow();
+    case "contact":
+      if (IN_TG && tg.requestContact) tg.requestContact((ok, res) => { const p = ok && res && res.responseUnsafe && res.responseUnsafe.contact && res.responseUnsafe.contact.phone_number; if (p) { $("#ph").value = p; haptic("ok"); } });
+      else { $("#ph").value = "09123456789"; toast("داخل تلگرام شماره‌ی خودت با یه لمس میاد (نمونه پر شد)."); }
+      return;
+    case "homescreen": if (IN_TG && tg.addToHomeScreen) tg.addToHomeScreen(); else toast("داخل تلگرام، آیکون کلینیک روی صفحه‌ی گوشی میاد."); return;
+  }
+});
+
+/* Swipe a calendar to change month (RTL: swipe right = next month). */
+let swipeX = null;
+document.addEventListener("touchstart", (e) => { swipeX = e.target.closest && e.target.closest(".cal") ? e.touches[0].clientX : null; }, { passive: true });
+document.addEventListener("touchend", (e) => {
+  if (swipeX === null) return;
+  const dx = e.changedTouches[0].clientX - swipeX; swipeX = null;
+  if (Math.abs(dx) < 50) return;
+  const b = document.querySelector(`.cal-head [data-nav="${dx > 0 ? 1 : -1}"]`);
+  if (b && !b.disabled) b.click();
+}, { passive: true });
+/* Inside Telegram: match the header to the page. */
+if (tg) { try { const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg1").trim(); tg.setHeaderColor(bg); tg.setBackgroundColor(bg); } catch (e) {} }
+render();
+</script>
+</body>
+</html>
