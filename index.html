@@ -9,9 +9,6 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,800&family=Vazirmatn:wght@400;600;800;900&display=swap">
 <style>
 /* Layout: one small, airy column; four big pastel tiles; everything else lives in sheets.
    Deliberately one light, pastel look: it stays light even when Telegram is in dark mode. */
@@ -209,12 +206,9 @@ select.input { appearance: none; -webkit-appearance: none; padding-inline-start:
 .pick:active { transform: scale(0.98); }
 .big { font-size: 26px; font-weight: 900; }
 
-/* test */
+/* progress bar */
 .bar { height: 8px; border-radius: 4px; background: var(--glass); overflow: hidden; }
 .bar > div { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--brand), var(--lilac-d)); transition: width 0.3s ease; }
-.q { font-size: 20px; font-weight: 800; direction: ltr; text-align: left; padding: 22px 18px; }
-.opt { border: 1.5px solid var(--glass-line); background: var(--glass); border-radius: 18px; padding: 14px 16px; font-weight: 800; direction: ltr; text-align: left; width: 100%; transition: transform 0.15s; }
-.opt:active { transform: scale(0.97); }
 
 /* sheet, main button, toast */
 .mainbar { position: fixed; inset: auto 0 0; z-index: 8; padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
@@ -227,6 +221,7 @@ select.input { appearance: none; -webkit-appearance: none; padding-inline-start:
 .done { text-align: center; padding: 28px 18px; }
 .done .ok { width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 12px; background: var(--brand); animation: pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1); }
 @keyframes pop { from { transform: scale(0.3); } to { transform: scale(1); } }
+.mini button svg { width: 22px; height: 22px; flex-shrink: 0; }
 .ribbon { max-width: 460px; margin: 10px auto 0; text-align: center; font-size: 12px; font-weight: 800; color: var(--lilac-d); }
 @media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; transition: none !important; } }
 
@@ -404,9 +399,98 @@ textarea.input { resize: none; line-height: 1.7; }
 .soon + .soon { margin-top: 16px; padding-top: 14px; border-top: 1.5px dashed var(--glass-line); }
 .soon > b { display: block; font-size: 14.5px; font-weight: 900; }
 .soon .tl { margin-top: 12px; }
+/* ── the clinic in the hotel's manner, but light ──────────────────────────────────────────────────────────────
+   The same design language as the Prestige app — real photography, a gold hairline, glass over a picture, an
+   eyebrow in spaced capitals, calm white cards — with ivory paper instead of the hotel's navy. Navy stays, as the
+   ink and the scrim. No green anywhere.
+   This sheet only re-skins: every class name belongs to the app as it already is, nothing was rebuilt. */
+@font-face { font-family: "Vazirmatn"; src: url("fonts/vazirmatn.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Outfit"; src: url("fonts/outfit.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+
+:root {
+  --bg1: #FAF7F2; --bg2: #F5F0E8; --bg3: #FAF7F2; --bg4: #F2EBE0;
+  --glass: #FFFFFF; --glass-line: #E7E0D4;
+  --ink: #182033; --ink2: #5C6677; --mute: #8A93A5;
+  --navy: #182033; --gold: #B98634; --gold2: #D9AF62; --gold-soft: #F5EBD8;
+  /* the four families keep their names and become one quiet gold-and-navy set */
+  --mint-a: #F6F1E6; --mint-b: #EFE6D3; --mint-d: #96681F; --mint-line: #E5D7BC;
+  --lilac-a: #F1F3F7; --lilac-b: #E4E8F0; --lilac-d: #2E3C58; --lilac-line: #D5DBE7;
+  --peach-a: #F8F2E8; --peach-b: #F0E5D2; --peach-d: #A2702A; --peach-line: #E7D8BE;
+  --sky-a: #F2F4F8; --sky-b: #E6EAF2; --sky-d: #3A4A6B; --sky-line: #D8DEEA;
+  --mint: var(--mint-b); --lilac: var(--lilac-b); --peach: var(--peach-b); --sky: var(--sky-b);
+  --brand: #B98634; --brand-2: #D9AF62;
+  --shadow: 0 1px 2px rgba(24, 32, 51, .04), 0 12px 30px -16px rgba(24, 32, 51, .22);
+  --font: "Vazirmatn", Tahoma, system-ui, sans-serif;
+}
+body { background: var(--bg1); color: var(--ink); }
+.latin { font-family: "Outfit", "Vazirmatn", sans-serif; direction: ltr; unicode-bidi: isolate; }
+
+/* a card is white paper with a hairline, the way the hotel's glass panels are */
+.glass { border-radius: 24px; border: 1px solid var(--glass-line); box-shadow: var(--shadow); }
+/* the hotel's button: gold, with the navy reading back out of it */
+.btn { border-radius: 999px; background: linear-gradient(135deg, #C9973F, #E6C27A); color: var(--navy);
+  font-weight: 900; letter-spacing: -.2px; box-shadow: 0 12px 26px -14px rgba(185, 134, 52, .9); }
+.btn:active { transform: scale(.97); }
+.btn .i, .btn svg { color: var(--navy); }
+.live::before { background: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+
+/* the hero: the clinic itself under a navy scrim, with the eyebrow the hotel uses */
+.hero { position: relative; display: block; overflow: hidden; padding: 0; min-height: 252px; border: 0; border-radius: 26px;
+  background: #182033 url("img/hero.jpg") center/cover no-repeat; box-shadow: 0 20px 44px -24px rgba(24, 32, 51, .75); }
+.hero::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(192deg, rgba(24, 32, 51, 0) 0%, rgba(24, 32, 51, .3) 46%, rgba(16, 22, 36, .88) 100%); }
+.hero .on-photo { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 7px;
+  min-height: 252px; padding: 22px 22px 20px; justify-content: flex-end; }
+.hero .kicker { font-family: "Outfit", "Vazirmatn", sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--gold2); }
+.hero b { font-size: 26px; font-weight: 900; color: #fff; }
+.hero .hint { font-size: 14px; font-weight: 600; color: #DCE2ED; }
+.hero .pill { margin-top: 5px; padding: 6px 14px; font-size: 13px; color: #182033; border: 0;
+  background: linear-gradient(135deg, #C9973F, #E6C27A); }
+
+/* the treatments, each under its own photograph — the hotel's room cards */
+.shelf { display: grid; grid-auto-flow: column; grid-auto-columns: 62%; gap: 11px; margin: 14px -16px 2px;
+  padding: 2px 16px 10px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.shelf::-webkit-scrollbar { display: none; }
+.shelf > button { position: relative; scroll-snap-align: start; height: 152px; padding: 0; border: 0; border-radius: 20px;
+  overflow: hidden; background: #182033; text-align: right; box-shadow: var(--shadow); }
+.shelf > button img { width: 100%; height: 100%; object-fit: cover; }
+.shelf > button .lbl { position: absolute; inset: auto 0 0 0; padding: 28px 14px 12px; color: #fff;
+  background: linear-gradient(to top, rgba(16, 22, 36, .93), rgba(16, 22, 36, 0)); }
+.shelf > button .lbl b { display: block; font-size: 15.5px; font-weight: 900; }
+.shelf > button .lbl small { font-size: 12.5px; font-weight: 700; color: var(--gold2); }
+.shelf > button:active { transform: scale(.975); }
+
+/* the four doors: white paper, a gold rule, a line icon in a gold ring */
+.tiles { gap: 12px; }
+.tile { position: relative; border-radius: 22px; background: #fff; border: 1px solid var(--glass-line); box-shadow: var(--shadow); }
+.tile::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; border-radius: 22px 22px 0 0;
+  background: linear-gradient(90deg, #C9973F, #E6C27A); opacity: .9; }
+.tile .ring { display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: auto; border-radius: 14px;
+  color: var(--gold); background: var(--gold-soft); border: 1px solid #EBDCBE; }
+.tile .ring svg { width: 23px; height: 23px; margin: 0; filter: none; }
+.tile b { font-size: 17px; font-weight: 900; color: var(--navy); letter-spacing: -.3px; }
+.tile span { font-weight: 700; color: var(--ink2); opacity: 1; font-size: 13px; }
+
+/* the booking list, the doctors, the chat: the same paper and the same gold */
+.pick .ph { width: 56px; height: 56px; flex-shrink: 0; border-radius: 16px; object-fit: cover; border: 1px solid var(--glass-line); }
+.pick.on .ph { border-color: var(--gold); }
+.pick.on, .sty[aria-pressed="true"] { border-color: var(--gold) !important; }
+.sec svg { color: var(--gold); }
+.sec .cnt { color: var(--gold); background: var(--gold-soft); border-color: #EBDCBE; }
+.fr { color: var(--gold); }
+.chip { border-radius: 999px; }
+.qchips .chip { color: var(--navy); background: #fff; border-color: var(--glass-line); }
+.bub.bot { border-radius: 18px 18px 18px 6px; border-color: var(--glass-line); }
+.bub.me { border-radius: 18px 18px 6px 18px; background: var(--gold-soft); border-color: #EBDCBE; }
+.src { color: var(--gold); background: var(--gold-soft); border-color: #EBDCBE; }
+.agent .av { border-radius: 14px; color: var(--gold); background: var(--gold-soft); }
+.wiz .on, .wiz button.on i { color: var(--gold); }
+.welcome, .mascot { display: none; }
+.num { font-variant-numeric: tabular-nums; }
 </style>
 
-<div class="ribbon">نسخه‌ی آزمایشی ۱ · اطلاعات نمونه</div>
+<div class="ribbon">نسخه‌ی آزمایشی ۴ · اطلاعات نمونه</div>
 <div class="app" id="app"><div class="hint" style="text-align:center;padding:40px 0">در حال باز شدن…</div></div>
 <div id="mainbar"></div>
 <div id="overlay"></div>
@@ -458,6 +542,7 @@ const ICON = {
   sunset: `<svg viewBox="0 0 32 32"><path d="M7 22a9 9 0 0 1 18 0z" fill="#FFB38A"/><path d="M4 22h24M9 26.5h14" stroke="#F08A4B" stroke-width="2.4" stroke-linecap="round"/><path d="M16 5v4M7.5 9.5l2.2 2.2M24.5 9.5l-2.2 2.2" stroke="#FFB224" stroke-width="2.4" stroke-linecap="round"/></svg>`,
   moon: `<svg viewBox="0 0 32 32"><path d="M20 5a11 11 0 1 0 7 19.5A9.5 9.5 0 0 1 20 5z" fill="#9F86FF"/><circle cx="24.5" cy="8.5" r="1.7" fill="#FFC857"/><circle cx="28" cy="14" r="1.1" fill="#FFC857"/></svg>`,
   tick: `<span class="tk"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>`,
+  trialI: `<svg viewBox="0 0 64 64"><defs><linearGradient id="gTr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#CDBEFF"/><stop offset="1" stop-color="#7C5CF0"/></linearGradient></defs><rect x="9" y="12" width="46" height="44" rx="11" fill="url(#gTr)"/><rect x="18" y="7" width="5" height="11" rx="2.5" fill="#3E2E86"/><rect x="41" y="7" width="5" height="11" rx="2.5" fill="#3E2E86"/><rect x="15" y="22" width="34" height="28" rx="7" fill="#fff"/><rect x="21" y="32" width="22" height="13" rx="3" fill="#FFC857"/><rect x="30" y="32" width="4" height="13" fill="#7C5CF0"/><path d="M32 32c-3-5-9-3-6 0M32 32c3-5 9-3 6 0" stroke="#7C5CF0" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`,
   chev: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
   cap: `<svg viewBox="0 0 24 24"><path d="M12 4 2 9l10 5 10-5z" fill="currentColor"/><path d="M6 11.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5l-6 3z" fill="currentColor" opacity=".55"/></svg>`,
   talk: `<svg viewBox="0 0 24 24"><path d="M3 10c0-3.6 3.6-6 8-6s8 2.4 8 6-3.6 6-8 6c-1 0-2-.1-2.9-.4L4 17l1.1-3C3.8 13 3 11.6 3 10z" fill="currentColor"/><path d="M20.5 12.5c.3.6.5 1.2.5 1.9 0 1-.4 1.9-1.1 2.6l.6 2.5-2.6-1.2c-.6.1-1.2.2-1.9.2-1.7 0-3.2-.5-4.3-1.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity=".55"/></svg>`,
@@ -482,6 +567,7 @@ Object.assign(ICON, {
   laserI: `<svg viewBox="0 0 24 24"><rect x="6" y="1.5" width="10" height="10" rx="3.4" fill="#FFC857"/><rect x="8.6" y="4" width="4.8" height="2.4" rx="1.2" fill="#fff" opacity=".7"/><rect x="8.5" y="10.5" width="5" height="3.2" rx="1.2" fill="#E89A10"/><path d="M11 14.8v3.4" stroke="#FFB224" stroke-width="2.4" stroke-linecap="round"/><path d="M7.4 16.6l-1.6 1M14.6 16.6l1.6 1" stroke="#FFB224" stroke-width="1.7" stroke-linecap="round"/><path d="M2 21.3c3-1.7 6-1.7 9 0s6 1.7 9 0" stroke="#2FB49B" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M20 2.5l.8 1.9 1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8z" fill="#7C5CF0"/></svg>`,
   cleanI: `<svg viewBox="0 0 24 24"><circle cx="9.5" cy="14" r="6.2" fill="#ABE7DA"/><circle cx="16.8" cy="7.6" r="4.3" fill="#8BE8D6"/><circle cx="18.4" cy="17.6" r="2.7" fill="#EAFBF7" stroke="#2FB49B" stroke-width="1.3"/><path d="M6.3 12.6a3.3 3.3 0 0 1 3.1-2.5" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><path d="M15 6.2a1.9 1.9 0 0 1 1.7-1.1" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`,
   mesoI: `<svg viewBox="0 0 24 24"><rect x="6.5" y="2" width="9" height="3.2" rx="1.3" fill="#6A4FD0"/><path d="M7.8 5.2h6.4v3l2.3 2.6v8.7a2.5 2.5 0 0 1-2.5 2.5H8a2.5 2.5 0 0 1-2.5-2.5v-8.7l2.3-2.6z" fill="#F4F0FF" stroke="#6A4FD0" stroke-width="1.4" stroke-linejoin="round"/><path d="M6.2 13.5h9.6v6a1.8 1.8 0 0 1-1.8 1.8H8a1.8 1.8 0 0 1-1.8-1.8z" fill="#B9A6FF"/><circle cx="20" cy="5" r="1.7" fill="#8BE8D6"/><circle cx="20.6" cy="10" r="1.2" fill="#FFC857"/></svg>`,
+  tagO: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11.6V5.5a2 2 0 0 1 2-2h6.1a2 2 0 0 1 1.4.6l7.1 7.1a2 2 0 0 1 0 2.8l-6.1 6.1a2 2 0 0 1-2.8 0L4.1 13a2 2 0 0 1-.6-1.4z"/><circle cx="8.3" cy="8.3" r="1.3"/></svg>`,
   ok: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`,
   srcI: `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>`,
   sendI: `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 7.5-7 2.5-2.5 7z"/><path d="M3 3l11 10"/></svg>`,
@@ -503,12 +589,12 @@ Object.assign(ICON, {
 const CLINIC = { name: "کلینیک شما", phone: "۰۲۱-۱۲۳۴۵۶۷۸", tel: "02112345678", address: "خیابان نمونه، پلاک ۱۲، طبقه‌ی دوم", hours: "شنبه تا پنجشنبه ۱۰ تا ۲۰", close: 20 * 60, deposit: 300000, instMin: 3000000, window: 30 };
 /* cat: tariff group; ses: usual number of sessions; note: one line shown when the service is picked. */
 const SERVICES = [
-  { id: "consult", t: "مشاوره‌ی رایگان", sub: "با دکتر، حضوری", price: 0, free: true, dur: 20, ses: "", cat: "skin", i: "consultS", c: "mint", note: "۲۰ دقیقه با دکتر؛ پوستت رو می‌بینه و بهترین درمان رو پیشنهاد می‌ده. هزینه‌ای نداره.", pre: "اگه دارو یا سابقه‌ی درمانی داری، با خودت بیار." },
-  { id: "botox", t: "بوتاکس", sub: "هر ناحیه · اثر ۴ تا ۶ ماه", price: 4500000, dur: 30, ses: "", cat: "inj", i: "syringe", c: "lilac", note: "پیشونی، دور چشم یا خط اخم؛ اثرش ۴ تا ۶ ماه می‌مونه و ترمیمش تا ۲ هفته رایگانه.", pre: "از ۳ روز قبل آسپرین و ویتامین E نخور." },
-  { id: "filler", t: "فیلر", sub: "هر سی‌سی · ماندگاری ۹ تا ۱۲ ماه", price: 6500000, dur: 45, ses: "", cat: "inj", i: "fillerI", c: "peach", note: "ژل هیالورونیک با برند معتبر؛ ۹ تا ۱۲ ماه می‌مونه. قسطی هم می‌شه.", pre: "از ۳ روز قبل آسپرین و امگا ۳ نخور." },
-  { id: "laser", t: "لیزر موهای زائد", sub: "هر جلسه، بسته به ناحیه", price: 1200000, from: true, dur: 45, ses: "۶ تا ۸ جلسه", cat: "laser", i: "laserI", c: "sky", note: "معمولاً ۶ تا ۸ جلسه، با فاصله‌ی ۴ تا ۶ هفته. هر جلسه از ۱٬۲۰۰٬۰۰۰ تومان، بسته به ناحیه.", pre: "ناحیه رو شب قبل با تیغ اصلاح کن؛ موم و برنزه نه." },
-  { id: "clean", t: "پاکسازی پوست", sub: "عمیق، با ماسک آرام‌بخش", price: 950000, dur: 60, ses: "ماهی یه بار", cat: "skin", i: "cleanI", c: "mint", note: "پاکسازی عمیق منافذ با ماسک آرام‌بخش؛ ماهی یه بار عالیه.", pre: "بدون آرایش بیا." },
-  { id: "meso", t: "مزوتراپی", sub: "شادابی پوست یا تقویت مو", price: 3200000, dur: 45, ses: "۴ جلسه", cat: "inj", i: "mesoI", c: "lilac", note: "۴ جلسه، هر ۲ هفته یه بار؛ برای شادابی پوست یا تقویت مو. قسطی هم می‌شه.", pre: "از ۲ روز قبل آسپرین نخور و روز نوبت آرایش نکن." },
+  { id: "consult", ph: "mirror", t: "مشاوره‌ی رایگان", sub: "با دکتر، حضوری", price: 0, free: true, dur: 20, ses: "", cat: "skin", i: "consultS", c: "mint", note: "۲۰ دقیقه با دکتر؛ پوستت رو می‌بینه و بهترین درمان رو پیشنهاد می‌ده. هزینه‌ای نداره.", pre: "اگه دارو یا سابقه‌ی درمانی داری، با خودت بیار." },
+  { id: "botox", ph: "laser", t: "بوتاکس", sub: "هر ناحیه · اثر ۴ تا ۶ ماه", price: 4500000, dur: 30, ses: "", cat: "inj", i: "syringe", c: "lilac", note: "پیشونی، دور چشم یا خط اخم؛ اثرش ۴ تا ۶ ماه می‌مونه و ترمیمش تا ۲ هفته رایگانه.", pre: "از ۳ روز قبل آسپرین و ویتامین E نخور." },
+  { id: "filler", ph: "facial", t: "فیلر", sub: "هر سی‌سی · ماندگاری ۹ تا ۱۲ ماه", price: 6500000, dur: 45, ses: "", cat: "inj", i: "fillerI", c: "peach", note: "ژل هیالورونیک با برند معتبر؛ ۹ تا ۱۲ ماه می‌مونه. قسطی هم می‌شه.", pre: "از ۳ روز قبل آسپرین و امگا ۳ نخور." },
+  { id: "laser", ph: "laserhair", t: "لیزر موهای زائد", sub: "هر جلسه، بسته به ناحیه", price: 1200000, from: true, dur: 45, ses: "۶ تا ۸ جلسه", cat: "laser", i: "laserI", c: "sky", note: "معمولاً ۶ تا ۸ جلسه، با فاصله‌ی ۴ تا ۶ هفته. هر جلسه از ۱٬۲۰۰٬۰۰۰ تومان، بسته به ناحیه.", pre: "ناحیه رو شب قبل با تیغ اصلاح کن؛ موم و برنزه نه." },
+  { id: "clean", ph: "clean", t: "پاکسازی پوست", sub: "عمیق، با ماسک آرام‌بخش", price: 950000, dur: 60, ses: "ماهی یه بار", cat: "skin", i: "cleanI", c: "mint", note: "پاکسازی عمیق منافذ با ماسک آرام‌بخش؛ ماهی یه بار عالیه.", pre: "بدون آرایش بیا." },
+  { id: "meso", ph: "meso", t: "مزوتراپی", sub: "شادابی پوست یا تقویت مو", price: 3200000, dur: 45, ses: "۴ جلسه", cat: "inj", i: "mesoI", c: "lilac", note: "۴ جلسه، هر ۲ هفته یه بار؛ برای شادابی پوست یا تقویت مو. قسطی هم می‌شه.", pre: "از ۲ روز قبل آسپرین نخور و روز نوبت آرایش نکن." },
 ];
 /* off: week days the doctor is not in (0 = Saturday); skills: services they do. */
 const DOCTORS = [
@@ -531,25 +617,6 @@ const CARE = {
   filler: { d0: "تا ۲۴ ساعت ورزش سنگین و سونا نه؛ کمپرس سرد بذار.", ask: "حالت چطوره؟ ورم کمتر شده؟", red: "هنوز ورم داره", worry: "ورم", nd: 14, nsvc: "consult", nt: "وقت چکاپ رایگانه! رزرو کنیم؟", nb: "رزرو چکاپ رایگان" },
 };
 /* The advisor's knowledge: the clinic's own price list and care guide. faq: also listed on the prices page. */
-const KB = [
-  { q: "بوتاکس چنده؟", a: "بوتاکس هر ناحیه ۴٫۵ میلیون تومانه (پیشونی، دور چشم یا خط اخم). اثرش ۴ تا ۶ ماه می‌مونه و ترمیمش تا ۲ هفته رایگانه.", src: "تعرفه‌ی کلینیک", k: "بوتاکس قیمت هزینه تزریق چروک پیشونی", faq: true },
-  { q: "فیلر چنده؟", a: "فیلر هر سی‌سی ۶٫۵ میلیون تومانه و ۹ تا ۱۲ ماه می‌مونه. قسطی هم می‌شه.", src: "تعرفه‌ی کلینیک", k: "فیلر قیمت هزینه ژل لب گونه" },
-  { q: "مشاوره رایگانه؟", a: "آره، مشاوره‌ی اول با دکتر رایگانه و ۲۰ دقیقه طول می‌کشه؛ حضوری، طبقه‌ی دوم. همین‌جا وقتش رو بگیر.", src: "تعرفه‌ی کلینیک", k: "مشاوره رایگان ویزیت اول هزینه", faq: true },
-  { q: "دکتر کی هست؟", a: () => DOCTORS.map((x) => `${x.t} (${x.sub}) ${WEEKDAY[x.off[0]]}‌ها نیست`).join("؛ ") + "؛ بقیه‌ی روزها ۱۰ تا ۲۰ تو کلینیکن.", src: "برنامه‌ی دکترها", k: "دکتر کی هست روز حضور شیفت صالحی رادمهر کیانی", faq: true },
-  { q: "لیزر چند جلسه‌ست؟", a: "معمولاً ۶ تا ۸ جلسه، با فاصله‌ی ۴ تا ۶ هفته. هر جلسه از ۱٬۲۰۰٬۰۰۰ تومان، بسته به ناحیه.", src: "تعرفه‌ی کلینیک", k: "لیزر جلسه چند موهای زائد فاصله قیمت", faq: true },
-  { q: "نوبت فیلرم کی بود؟", a: () => fillerAnswer(), src: "نوبت‌های تو", k: "نوبت فیلر کی بود نوبتم یادآوری تاریخ", faq: true },
-  { q: "قبل و بعد دارید؟", a: "آره؛ آلبوم قبل و بعد هر درمان رو تو مشاوره‌ی حضوری نشونت می‌دیم. به احترام حریم مراجعه‌کننده‌ها، عکس‌ها آنلاین منتشر نمی‌شن.", src: "قوانین کلینیک", k: "قبل بعد نمونه عکس کار آلبوم نتیجه", faq: true },
-  { q: "بعد لیزر چی کار کنم؟", a: "تا ۴۸ ساعت آفتاب و سونا نه؛ ضدآفتاب یادت نره. ناحیه رو اسکراب نکن و بین جلسه‌ها فقط تیغ بزن، موم و اپیلیدی نه.", src: "راهنمای مراقبت", k: "بعد لیزر مراقبت آفتاب سونا ضدآفتاب", faq: true },
-  { q: "قسطی هم می‌شه؟", a: "آره؛ درمان‌های ۳ میلیون به بالا رو می‌شه ۴ قسط بدون کارمزد داد: قسط اول موقع رزرو، بقیه ماهی یه قسط.", src: "قوانین کلینیک", k: "قسط قسطی اقساط پرداخت", faq: true },
-  { q: "قرمزی طبیعیه؟", a: "قرمزی و کمی تورم تا ۴۸ ساعت بعد از لیزر یا تزریق طبیعیه؛ کمپرس سرد کمک می‌کنه. اگه بیشتر موند، تو «مراقبت من» بگو تا دکتر خودش تماس بگیره.", src: "راهنمای مراقبت", k: "قرمزی طبیعی تورم ورم کبودی سوزش", faq: true },
-  { q: "تخفیف دارید؟", a: "مشاوره‌ی اول همیشه رایگانه. برای لیزر، پکیج ۶ جلسه‌ای ۱۵٪ تخفیف داره که تو مشاوره برات حسابش می‌کنیم.", src: "تعرفه‌ی کلینیک", k: "تخفیف آف پکیج بسته ارزان", faq: true },
-  { q: "بیعانه چقدره؟", a: "برای قطعی شدن نوبت درمان ۳۰۰ هزار تومان بیعانه می‌گیریم که از مبلغ نهایی کم می‌شه. مشاوره بیعانه نداره.", src: "قوانین کلینیک", k: "بیعانه پیش پرداخت" },
-  { q: "نوبتم رو لغو کنم؟", a: "تا ۲۴ ساعت قبل از نوبت لغو کنی، بیعانه کامل برمی‌گرده؛ از «مراقبت من» با یه لمس.", src: "قوانین کلینیک", k: "لغو کنسل نوبت برگشت پول جابه‌جایی" },
-  { q: "پاکسازی پوست چنده؟", a: "پاکسازی عمیق با ماسک آرام‌بخش ۹۵۰ هزار تومانه و حدود ۱ ساعت طول می‌کشه؛ ماهی یه بار عالیه.", src: "تعرفه‌ی کلینیک", k: "پاکسازی پوست قیمت جوش منافذ" },
-  { q: "مزوتراپی چند جلسه‌ست؟", a: "۴ جلسه، هر ۲ هفته یه بار؛ هر جلسه ۳٫۲ میلیون تومان. قسطی هم می‌شه.", src: "تعرفه‌ی کلینیک", k: "مزوتراپی مزو جلسه قیمت ریزش مو شادابی" },
-  { q: "آدرستون کجاست؟", a: "خیابان نمونه، پلاک ۱۲، طبقه‌ی دوم. شنبه تا پنجشنبه ۱۰ تا ۲۰؛ جمعه‌ها تعطیل.", src: "اطلاعات کلینیک", k: "آدرس نشانی کجاست ساعت کاری تلفن" },
-];
-
 /* ── state + router ── */
 /* First visit: one finished laser session two days ago, so «مراقبت من» shows a real aftercare plan.
    Built at noon with setDate (the shared calendar helpers load later in the page). */
@@ -569,13 +636,11 @@ const state = {
   pay: "dep",
   appts: store.get("appts") || [seed.appt],
   plans: store.get("plans") || [seed.plan],
-  chat: [],
-  ask: "",
 };
 /* Which drawers are open and which sheet is showing, so re-renders keep them. */
 const ui = { calM: 0, calDir: "", sheet: "", moreQ: false, soonOpen: false, pastOpen: false, cat0: true, cat1: false, cat2: false, scrollChat: false };
 document.addEventListener("toggle", (e) => { const k = e.target.dataset && e.target.dataset.drawer; if (k) ui[k] = e.target.open; }, true);
-const ROUTES = ["home", "consult", "book", "care", "prices"];
+const ROUTES = ["home", "book", "care", "prices"];   // questions are the bot's now, so there is no chat page
 const route = () => { const r = (location.hash || "#home").slice(1); return ROUTES.includes(r) ? r : "home"; };
 const go = (r) => { haptic("light"); location.hash === "#" + r ? render() : (location.hash = r); };
 /* Back inside the booking steps goes one step back; otherwise it leaves the page. */
@@ -724,32 +789,17 @@ function careTodo() {
 function home() {
   const n = firstName(), nx = upcoming()[0];
   return `${topBar("")}
-    <div class="glass hero"><div style="flex:1;min-width:0"><div class="welcome">Welcome</div><b>سلام${n ? " " + esc(n) : ""}!</b><span class="hint">پوستت امروز چطوره؟</span>
-      <div style="margin-top:8px"><span class="pill">مشاوره‌ی اول رایگانه</span></div></div>${ICON.serum}</div>
+    <div class="glass hero"><div class="on-photo"><span class="kicker">beauty clinic</span><b>سلام${n ? " " + esc(n) : ""}!</b><span class="hint">پوستت امروز چطوره؟</span>
+      <span class="pill">مشاوره‌ی اول رایگانه</span></div></div>
+    <div class="shelf">${SERVICES.filter((s) => s.ph).map((s) => `<button type="button" data-booksvc="${s.id}" aria-label="${esc(s.t)}"><img src="img/${s.ph}.jpg" alt="" loading="lazy"><span class="lbl"><b>${s.t}</b><small>${s.free ? "رایگان" : priceText(s) + " تومان"}</small></span></button>`).join("")}</div>
     ${nx ? `<button class="nextap" type="button" data-go="care">${ICON.doctorI}<span class="v"><small>نوبت بعدی · ${relDay(nx.k)}</small><b>${svcOf(nx.svc).t} با ${docOf(nx.doc).t}</b><small>${faDate(toDate(nx.k))} · ساعت ${nx.at}</small></span><span class="chev" style="color:var(--mint-d);display:grid">${ICON.chev}</span></button>` : ""}
     <div class="tiles">
-      <button class="tile t-mint" type="button" data-go="consult">${ICON.consultI}<b>مشاوره‌ی آنلاین</b><span>جواب با منبع</span></button>
-      <button class="tile t-lilac" type="button" data-go="book">${ICON.doctorI}<b>نوبت دکتر</b><span>خدمت، دکتر، ساعت</span></button>
-      <button class="tile t-sky" type="button" data-go="care">${ICON.careI}<b>مراقبت من</b><span>${careTodo()}</span></button>
-      <button class="tile t-peach" type="button" data-go="prices">${ICON.tariffI}<b>تعرفه‌ها و پرسش</b><span>بوتاکس، لیزر، فیلر…</span></button>
+      <button class="tile t-mint" type="button" data-act="ask"><span class="ring">${ICON.chatO}</span><b>پرسش از مشاور</b><span>در تلگرام جواب می‌گیری</span></button>
+      <button class="tile t-lilac" type="button" data-go="book"><span class="ring">${ICON.calO}</span><b>نوبت دکتر</b><span>خدمت، دکتر، ساعت</span></button>
+      <button class="tile t-sky" type="button" data-go="care"><span class="ring">${ICON.heartO}</span><b>مراقبت من</b><span>${careTodo()}</span></button>
+      <button class="tile t-peach" type="button" data-go="prices"><span class="ring">${ICON.tagO}</span><b>تعرفه‌ها</b><span>بوتاکس، لیزر، فیلر…</span></button>
     </div>
     <div class="mini"><button type="button" data-act="freeconsult">${ICON.gift}مشاوره‌ی رایگان ۲۰ دقیقه‌ای · قسطی هم می‌شه</button></div>`;
-}
-/* Online advisor: a small chat that answers from the clinic's own documents, with the source. */
-function consult() {
-  const n = firstName(), asked = state.chat.map((c) => c.q);
-  const pool = KB.filter((x) => x.faq && !asked.includes(x.q)), chips = pool.slice(0, 3), more = pool.slice(3);
-  const chip = (x) => `<button class="chip" type="button" data-q="${esc(x.q)}">${esc(x.q)}</button>`;
-  const docs = skilled("consult").map((d) => d.t).join(" یا ");
-  return `${topBar("مشاوره‌ی آنلاین")}
-    <div class="glass agent"><span class="av t-mint">${ICON.consultS}</span><div class="v"><b>مشاور کلینیک</b><small>${ICON.srcI}جواب با منبع، از اسناد خود کلینیک</small></div><span class="live">آنلاین</span></div>
-    <div class="chat" id="chat" aria-live="polite"><div class="bub bot">سلام${n ? " " + esc(n) : ""}! من مشاور کلینیکم ✨ از قیمت‌ها، دکترها و مراقبت بپرس؛ جوابم رو از تعرفه و راهنمای خود کلینیک می‌دم.</div>
-      ${state.chat.map((c) => `<div class="bub me">${esc(c.q)}</div>${c.wait ? `<div class="bub bot typing" aria-label="در حال نوشتن"><i></i><i></i><i></i></div>` : `<div class="bub bot">${esc(c.a)}${c.src ? `<span class="src">${ICON.srcI}منبع: ${c.src}</span>` : ""}</div>`}`).join("")}</div>
-    ${chips.length ? `<div class="chips qchips">${chips.map(chip).join("")}</div>` : ""}
-    ${more.length ? `<details class="acc more" data-drawer="moreQ"${ui.moreQ ? " open" : ""}><summary><div><b>سؤال‌های دیگه</b><div class="hint">پرتکرارهای مراجعه‌کننده‌ها</div></div><span class="cnt">${fa(more.length)}</span><span class="chev">${ICON.chev}</span></summary><div class="chips qchips">${more.map(chip).join("")}</div></details>` : ""}
-    <form class="row" id="cf" style="margin-top:12px"><input id="cq" class="input" placeholder="سؤالت رو بنویس…" autocomplete="off" aria-label="سؤال" style="flex:1"><button class="btn send" type="submit" aria-label="بفرست">${ICON.sendI}</button></form>
-    <div class="cta"><div class="row">${ICON.doctorI}<div class="v"><b>مشاوره‌ی رایگان با دکتر · ۲۰ دقیقه</b><small>با ${docs} · طبقه‌ی دوم</small></div></div>
-      <button class="btn" type="button" data-act="freeconsult">رزرو مشاوره‌ی رایگان</button></div>`;
 }
 function wizBar() {
   const b = state.b, ready = [true, Boolean(b.svc), Boolean(b.svc && b.doc), Boolean(b.svc && b.doc && b.k && b.at)];
@@ -757,7 +807,7 @@ function wizBar() {
 }
 function step1() {
   const b = state.b, sv = b.svc && svcOf(b.svc);
-  return `<div class="glass picks">${SERVICES.map((s) => `<button type="button" class="pick${b.svc === s.id ? " on" : ""}" data-svc="${s.id}" aria-pressed="${b.svc === s.id}"><span class="dot t-${s.c}">${ICON[s.i]}</span><span class="v"><b>${s.t}</b><small class="num">${s.free ? `<span class="fr">رایگان</span>` : priceText(s) + " تومان"} · ${durText(s.dur)}${s.ses ? " · " + s.ses : ""}</small></span><span class="radio"></span></button>`).join("")}</div>
+  return `<div class="glass picks">${SERVICES.map((s) => `<button type="button" class="pick${b.svc === s.id ? " on" : ""}" data-svc="${s.id}" aria-pressed="${b.svc === s.id}">${s.ph ? `<img class="ph" src="img/${s.ph}.jpg" alt="" loading="lazy">` : `<span class="dot t-${s.c}">${ICON[s.i]}</span>`}<span class="v"><b>${s.t}</b><small class="num">${s.free ? `<span class="fr">رایگان</span>` : priceText(s) + " تومان"} · ${durText(s.dur)}${s.ses ? " · " + s.ses : ""}</small></span><span class="radio"></span></button>`).join("")}</div>
     ${sv ? `<div class="when">${ICON.spark}<span>${sv.note}</span></div>` : ""}`;
 }
 function step2() {
@@ -951,40 +1001,17 @@ const CATS = [
   { t: "لیزر", s: "موهای زائد · بسته به ناحیه", ids: [], c: "sky", i: "laserI" },
   { t: "پوست", s: "پاکسازی و مشاوره", ids: ["clean", "consult"], c: "mint", i: "cleanI" },
 ];
-const srcTag = (x) => `<span class="src">${ICON.srcI}منبع: ${x.src}</span>`;
 function prices() {
-  const q = state.ask.trim(), res = q ? search(q, 2) : [], lz = svcOf("laser");
+  const lz = svcOf("laser");
   const row = (s) => `<button class="item" type="button" data-booksvc="${s.id}"><div style="flex:1;min-width:0"><b>${s.t}</b><span class="hint">${s.sub} · ${durText(s.dur)}${s.ses ? " · " + s.ses : ""}</span></div><span class="price num">${priceText(s)}</span></button>`;
   const laser = `<div class="hint" style="padding:12px 14px 2px">${lz.note}</div>${LASER_AREAS.map(([t, pr]) => `<button class="item" type="button" data-booksvc="laser"><div style="flex:1;min-width:0"><b>${t}</b><span class="hint">هر جلسه · ${durText(lz.dur)}</span></div><span class="price num">${toman(pr)}</span></button>`).join("")}`;
-  return `${topBar("تعرفه‌ها و پرسش")}
+  return `${topBar("تعرفه‌ها")}
     <div class="stack">${CATS.map((g, i) => `<details class="acc" data-drawer="cat${i}"${ui["cat" + i] ? " open" : ""}><summary><span class="badge t-${g.c}">${ICON[g.i]}</span><div><b>${g.t}</b><div class="hint">${g.s}</div></div><span class="chev">${ICON.chev}</span></summary><div>${g.ids.length ? g.ids.map((id) => row(svcOf(id))).join("") : laser}</div></details>`).join("")}</div>
     <div class="hint" style="text-align:center;margin-top:10px">مبلغ‌ها به تومان · روی هر خدمت بزن تا رزروش کنی</div>
-    <form class="row" id="af" style="margin-top:14px"><input id="aq" class="input" value="${esc(state.ask)}" placeholder="سؤالت رو بنویس…" autocomplete="off" aria-label="سؤال" style="flex:1"><button class="btn" type="submit">بپرس</button></form>
-    <div class="stack" style="margin-top:12px">${q ? (res.length ? res.map((x) => `<div class="glass" style="padding:14px 16px;border-color:var(--lilac-line)"><b>${esc(x.q)}</b><div style="margin-top:4px">${esc(ans(x))}</div>${srcTag(x)}</div>`).join("") : `<div class="glass" style="padding:14px 16px">جوابش تو اسناد کلینیک نیست؛ از «مشاوره‌ی آنلاین» بپرس یا به پذیرش زنگ بزن.</div>`) : ""}
-      <div class="label" style="margin:4px 4px 0">سؤال‌های پرتکرار</div>
-      <div class="glass faq">${KB.filter((x) => x.faq).map((x) => `<details><summary><span class="qm">؟</span><span>${esc(x.q)}</span><span class="chev">${ICON.chev}</span></summary><div class="ans">${esc(ans(x))}${srcTag(x)}</div></details>`).join("")}</div>
+    <div class="stack" style="margin-top:14px">
+      <button class="glass askrow" type="button" data-act="ask"><span class="sic t-lilac">${ICON.chatO}</span><div style="flex:1;min-width:0"><b>سؤالی داری؟ در تلگرام بپرس</b><div class="hint">مشاور کلینیک همون‌جا جواب می‌ده، از روی اسناد خود کلینیک</div></div><span class="chev">${ICON.chev}</span></button>
       <div class="glass" style="padding:14px 16px"><div class="row"><span class="sic t-peach">${ICON.pinI}</span><div style="flex:1;min-width:0"><b style="font-size:14.5px">${CLINIC.address}</b><div class="hint">${CLINIC.hours} · جمعه‌ها تعطیل</div></div></div>
         <div class="row" style="margin-top:10px"><span class="hint">تلفن پذیرش</span><b class="num" style="margin-inline-start:auto">${CLINIC.phone}</b><button class="btn soft" type="button" data-copy="${CLINIC.tel}">کپی</button></div></div></div>`;
-}
-/* Search: keywords in the question or its tags score 2, in the answer 1; filler words don't count. */
-const STOP = ["دارید", "دارین", "داره", "داری", "دارم", "هم", "هست", "هستن", "می‌شه", "میشه", "کنم", "کنیم", "چی", "چه", "کار", "برای", "این", "اون", "من", "تو", "با", "از", "به", "که", "رو", "را", "یه", "یک", "یا", "آیا", "سلام"];
-const ans = (x) => (typeof x.a === "function" ? x.a() : x.a);
-function search(q, max = 1) {
-  const w = q.replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/[؟?!.،,:؛]/g, " ").split(/\s+/).filter((x) => x.length > 1 && !STOP.includes(x));
-  return KB.map((it) => ({ it, s: w.reduce((n, x) => n + ((it.q + " " + it.k).includes(x) ? 2 : ans(it).includes(x) ? 1 : 0), 0) }))
-    .filter((x) => x.s >= 2).sort((a, b) => b.s - a.s).slice(0, max).map((x) => x.it);
-}
-function askBot(text) {
-  const q = String(text || "").trim(); if (!q) return;
-  const hit = search(q)[0], item = { q, a: "", src: "", wait: true };
-  state.chat = [...state.chat, item].slice(-8);
-  ui.scrollChat = true; render();
-  setTimeout(() => {
-    Object.assign(item, { a: hit ? ans(hit) : "جوابش تو اسناد کلینیک نیست؛ بهتره تو مشاوره‌ی رایگان از خود دکتر بپرسی.", src: hit ? hit.src : "", wait: false });
-    if (route() !== "consult") return;
-    const keep = $("#cq") ? $("#cq").value : "";
-    ui.scrollChat = true; render(); $("#cq").value = keep; haptic("light");
-  }, 700);
 }
 
 /* ── render + actions ── */
@@ -999,14 +1026,8 @@ function mainFor(r) {
 }
 function render() {
   const r = route();
-  $("#app").innerHTML = { home, consult, book, care, prices }[r]();
+  $("#app").innerHTML = { home, book, care, prices }[r]();
   mainFor(r);
-  if (r === "consult") {
-    $("#cf").onsubmit = (e) => { e.preventDefault(); askBot($("#cq").value); };
-    const last = ui.scrollChat && $("#chat").lastElementChild; ui.scrollChat = false;
-    if (last && last.scrollIntoView) last.scrollIntoView({ block: "center", behavior: "smooth" });
-  }
-  if (r === "prices") $("#af").onsubmit = (e) => { e.preventDefault(); state.ask = $("#aq").value.trim(); render(); };
 }
 document.addEventListener("click", async (e) => {
   const el = e.target.closest("button"); if (!el) return;
@@ -1014,7 +1035,6 @@ document.addEventListener("click", async (e) => {
   if (d.go) return go(d.go);
   if (d.act === "back") return onBack();
   if (d.act === "close") return closeSheet();
-  if (d.q) { haptic("light"); return askBot(d.q); }
   if (d.step) { state.b.step = Number(d.step); haptic("light"); return render(); }
   if (d.svc) { const b = state.b; if (b.svc !== d.svc) Object.assign(b, { svc: d.svc, doc: "", k: "", at: "", ses: 1, from: "", due: "", dueT: "" }); haptic("light"); return render(); }
   if (d.doc) { const b = state.b; if (b.doc !== d.doc) Object.assign(b, { doc: d.doc, k: "", at: "" }); haptic("light"); return render(); }
@@ -1040,6 +1060,11 @@ document.addEventListener("click", async (e) => {
   if (d.booksvc) { state.b = { ...freshBooking(), svc: d.booksvc, step: 2 }; return go("book"); }
   if (d.copy) { try { await navigator.clipboard.writeText(d.copy); toast("کپی شد"); } catch (err) { toast(fa(d.copy)); } return; }
   switch (d.act) {
+    case "ask":
+      /* The answers live in the bot now: the guest is sent back to the chat they opened the app from. */
+      if (IN_TG && tg.close) { toast("سؤالت رو همون‌جا تو چت بنویس؛ مشاور کلینیک جواب می‌ده ✨"); setTimeout(() => tg.close(), 1300); }
+      else toast("داخل تلگرام این دکمه برت می‌گردونه به چت ربات تا سؤالت رو بپرسی.");
+      return;
     case "freeconsult": state.b = { ...freshBooking(), svc: "consult", step: 2 }; return go("book");
     case "cal": { const b = state.b; ui.calM = monthOffset(b.k || firstFree(today(), b.svc, b.doc) || today()); haptic("light"); return calSheet(); }
     case "calok": haptic("ok"); closeSheet(); return render();
