@@ -490,7 +490,7 @@ body { background: var(--bg1); color: var(--ink); }
 .num { font-variant-numeric: tabular-nums; }
 </style>
 
-<div class="ribbon">نسخه‌ی آزمایشی ۴ · اطلاعات نمونه</div>
+<div class="ribbon">نسخه‌ی آزمایشی ۵ · اطلاعات نمونه</div>
 <div class="app" id="app"><div class="hint" style="text-align:center;padding:40px 0">در حال باز شدن…</div></div>
 <div id="mainbar"></div>
 <div id="overlay"></div>
@@ -586,7 +586,7 @@ Object.assign(ICON, {
 });
 
 /* ── clinic data (sample; the owner changes it later) ── */
-const CLINIC = { name: "کلینیک شما", phone: "۰۲۱-۱۲۳۴۵۶۷۸", tel: "02112345678", address: "خیابان نمونه، پلاک ۱۲، طبقه‌ی دوم", hours: "شنبه تا پنجشنبه ۱۰ تا ۲۰", close: 20 * 60, deposit: 300000, instMin: 3000000, window: 30 };
+const CLINIC = { name: "کلینیک زیبایی آرنیک", phone: "۰۲۱-۱۲۳۴۵۶۷۸", tel: "02112345678", address: "خیابان نمونه، پلاک ۱۲، طبقه‌ی دوم", hours: "شنبه تا پنجشنبه ۱۰ تا ۲۰", close: 20 * 60, deposit: 300000, instMin: 3000000, window: 30 };
 /* cat: tariff group; ses: usual number of sessions; note: one line shown when the service is picked. */
 const SERVICES = [
   { id: "consult", ph: "mirror", t: "مشاوره‌ی رایگان", sub: "با دکتر، حضوری", price: 0, free: true, dur: 20, ses: "", cat: "skin", i: "consultS", c: "mint", note: "۲۰ دقیقه با دکتر؛ پوستت رو می‌بینه و بهترین درمان رو پیشنهاد می‌ده. هزینه‌ای نداره.", pre: "اگه دارو یا سابقه‌ی درمانی داری، با خودت بیار." },
@@ -789,7 +789,7 @@ function careTodo() {
 function home() {
   const n = firstName(), nx = upcoming()[0];
   return `${topBar("")}
-    <div class="glass hero"><div class="on-photo"><span class="kicker">beauty clinic</span><b>سلام${n ? " " + esc(n) : ""}!</b><span class="hint">پوستت امروز چطوره؟</span>
+    <div class="glass hero"><div class="on-photo"><span class="kicker">arnik beauty clinic</span><b>${esc(CLINIC.name)}</b><span class="hint">سلام${n ? " " + esc(n) : ""}! پوستت امروز چطوره؟</span>
       <span class="pill">مشاوره‌ی اول رایگانه</span></div></div>
     <div class="shelf">${SERVICES.filter((s) => s.ph).map((s) => `<button type="button" data-booksvc="${s.id}" aria-label="${esc(s.t)}"><img src="img/${s.ph}.jpg" alt="" loading="lazy"><span class="lbl"><b>${s.t}</b><small>${s.free ? "رایگان" : priceText(s) + " تومان"}</small></span></button>`).join("")}</div>
     ${nx ? `<button class="nextap" type="button" data-go="care">${ICON.doctorI}<span class="v"><small>نوبت بعدی · ${relDay(nx.k)}</small><b>${svcOf(nx.svc).t} با ${docOf(nx.doc).t}</b><small>${faDate(toDate(nx.k))} · ساعت ${nx.at}</small></span><span class="chev" style="color:var(--mint-d);display:grid">${ICON.chev}</span></button>` : ""}
