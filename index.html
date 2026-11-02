@@ -224,6 +224,11 @@ select.input { appearance: none; -webkit-appearance: none; padding-inline-start:
 .mini button svg { width: 22px; height: 22px; flex-shrink: 0; }
 .ribbon { max-width: 460px; margin: 10px auto 0; text-align: center; font-size: 12px; font-weight: 800; color: var(--lilac-d); }
 @media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; transition: none !important; } }
+/* The app carries its own fonts. Google Fonts does not load reliably inside Iran or inside Telegram's browser,
+   and a page whose Persian font never arrives falls back to a Latin one in the middle of Persian text.
+   One family everywhere: Vazirmatn for Persian, Outfit for the few Latin words. */
+@font-face { font-family: "Vazirmatn"; src: url("fonts/vazirmatn.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Outfit"; src: url("fonts/outfit.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
 
 /* ── café ── */
 .cup .steam path { animation: steam 2.4s ease-in-out infinite; opacity: 0; }
@@ -399,101 +404,267 @@ textarea.input { resize: none; line-height: 1.7; }
 .soon + .soon { margin-top: 16px; padding-top: 14px; border-top: 1.5px dashed var(--glass-line); }
 .soon > b { display: block; font-size: 14.5px; font-weight: 900; }
 .soon .tl { margin-top: 12px; }
-/* ── the clinic in the hotel's manner, but light ──────────────────────────────────────────────────────────────
-   The same design language as the Prestige app — real photography, a gold hairline, glass over a picture, an
-   eyebrow in spaced capitals, calm white cards — with ivory paper instead of the hotel's navy. Navy stays, as the
-   ink and the scrim. No green anywhere.
-   This sheet only re-skins: every class name belongs to the app as it already is, nothing was rebuilt. */
-@font-face { font-family: "Vazirmatn"; src: url("fonts/vazirmatn.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
-@font-face { font-family: "Outfit"; src: url("fonts/outfit.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+/* ── the house layer ──────────────────────────────────────────────────────────────────────────────────────────
+   One design for every app we sell: pale paper, dark ink, hairline cards, a photograph under an ink scrim with a
+   spaced-capital eyebrow over it, a strip of the business's own pictures, and four calm doors whose icons sit in
+   a tinted ring. It is the language of the Prestige hotel app, turned to the light.
+
+   Everything here is written in terms of --accent and --ink, and each app sets only those (clinic gold, gym
+   burnt orange, shop plum, school indigo, café espresso). That is what makes the apps read as a family rather
+   than as five copies — and it is why a change here reaches all of them at once.
+
+   Loaded after the shared base and before the app's own palette file. Never green: the owner's standing rule. */
 
 :root {
-  --bg1: #FAF7F2; --bg2: #F5F0E8; --bg3: #FAF7F2; --bg4: #F2EBE0;
-  --glass: #FFFFFF; --glass-line: #E7E0D4;
-  --ink: #182033; --ink2: #5C6677; --mute: #8A93A5;
-  --navy: #182033; --gold: #B98634; --gold2: #D9AF62; --gold-soft: #F5EBD8;
-  /* the four families keep their names and become one quiet gold-and-navy set */
-  --mint-a: #F6F1E6; --mint-b: #EFE6D3; --mint-d: #96681F; --mint-line: #E5D7BC;
-  --lilac-a: #F1F3F7; --lilac-b: #E4E8F0; --lilac-d: #2E3C58; --lilac-line: #D5DBE7;
-  --peach-a: #F8F2E8; --peach-b: #F0E5D2; --peach-d: #A2702A; --peach-line: #E7D8BE;
-  --sky-a: #F2F4F8; --sky-b: #E6EAF2; --sky-d: #3A4A6B; --sky-line: #D8DEEA;
+  --paper: #F9F7F4; --paper2: #F3F0EB; --card: #FFFFFF; --line: #E6E2DB;
+  --ink: #15181F; --ink2: #5A6070;
+  --accent: #C9973F; --accent-2: #E6C27A; --accent-soft: #FBF3E4; --accent-line: #EBD6A9; --accent-on: #15181F;
+  /* the shared cards speak in four families; here they become neutral paper plus the one accent */
+  --bg1: var(--paper); --bg2: var(--paper2); --bg3: var(--paper); --bg4: var(--paper2);
+  --glass: var(--card); --glass-line: var(--line);
+  --mint-a: var(--accent-soft); --mint-b: var(--accent-line); --mint-d: var(--accent); --mint-line: var(--accent-line);
+  --lilac-a: #F1F2F5; --lilac-b: #E3E5EB; --lilac-d: #262B38; --lilac-line: #D4D7DF;
+  --peach-a: var(--accent-soft); --peach-b: var(--accent-line); --peach-d: var(--accent); --peach-line: var(--accent-line);
+  --sky-a: #F0F2F5; --sky-b: #E1E5EB; --sky-d: #39485E; --sky-line: #D2D8E0;
   --mint: var(--mint-b); --lilac: var(--lilac-b); --peach: var(--peach-b); --sky: var(--sky-b);
-  --brand: #B98634; --brand-2: #D9AF62;
-  --shadow: 0 1px 2px rgba(24, 32, 51, .04), 0 12px 30px -16px rgba(24, 32, 51, .22);
-  --font: "Vazirmatn", Tahoma, system-ui, sans-serif;
+  --brand: var(--accent); --brand-2: var(--accent-2);
+  --shadow: 0 1px 2px rgba(21, 24, 31, .05), 0 12px 30px -16px rgba(21, 24, 31, .24);
 }
-body { background: var(--bg1); color: var(--ink); }
-.latin { font-family: "Outfit", "Vazirmatn", sans-serif; direction: ltr; unicode-bidi: isolate; }
 
-/* a card is white paper with a hairline, the way the hotel's glass panels are */
-.glass { border-radius: 24px; border: 1px solid var(--glass-line); box-shadow: var(--shadow); }
-/* the hotel's button: gold, with the navy reading back out of it */
-.btn { border-radius: 999px; background: linear-gradient(135deg, #C9973F, #E6C27A); color: var(--navy);
-  font-weight: 900; letter-spacing: -.2px; box-shadow: 0 12px 26px -14px rgba(185, 134, 52, .9); }
-.btn:active { transform: scale(.97); }
-.btn .i, .btn svg { color: var(--navy); }
-.live::before { background: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+.glass { border-radius: 24px; }
+.btn { border-radius: 999px; }
+.pill { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+.welcome, .mascot { display: none; }
 
-/* the hero: the clinic itself under a navy scrim, with the eyebrow the hotel uses */
-.hero { position: relative; display: block; overflow: hidden; padding: 0; min-height: 252px; border: 0; border-radius: 26px;
-  background: #182033 url("img/hero.jpg") center/cover no-repeat; box-shadow: 0 20px 44px -24px rgba(24, 32, 51, .75); }
+/* the hero: the business's own room, under an ink scrim */
+.hero { position: relative; display: block; overflow: hidden; padding: 0; min-height: 250px; border: 0; border-radius: 26px;
+  background: #15181F url("img/hero.jpg") center/cover no-repeat; box-shadow: 0 20px 44px -24px rgba(21, 24, 31, .8); }
 .hero::after { content: ""; position: absolute; inset: 0;
-  background: linear-gradient(192deg, rgba(24, 32, 51, 0) 0%, rgba(24, 32, 51, .3) 46%, rgba(16, 22, 36, .88) 100%); }
+  background: linear-gradient(192deg, rgba(21, 24, 31, 0) 0%, rgba(21, 24, 31, .34) 46%, rgba(14, 16, 22, .9) 100%); }
 .hero .on-photo { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 7px;
-  min-height: 252px; padding: 22px 22px 20px; justify-content: flex-end; }
+  min-height: 250px; padding: 22px 22px 20px; justify-content: flex-end; }
 .hero .kicker { font-family: "Outfit", "Vazirmatn", sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px;
-  text-transform: uppercase; color: var(--gold2); }
+  text-transform: uppercase; color: var(--accent-2); }
 .hero b { font-size: 26px; font-weight: 900; color: #fff; }
-.hero .hint { font-size: 14px; font-weight: 600; color: #DCE2ED; }
-.hero .pill { margin-top: 5px; padding: 6px 14px; font-size: 13px; color: #182033; border: 0;
-  background: linear-gradient(135deg, #C9973F, #E6C27A); }
+.hero .hint { font-size: 14px; font-weight: 600; color: #D9DDE5; }
+.hero .pill { margin-top: 5px; padding: 6px 14px; font-size: 13px; color: var(--accent-on); border: 0;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
 
-/* the treatments, each under its own photograph — the hotel's room cards */
+/* the strip: what the business has, each thing under its own picture */
 .shelf { display: grid; grid-auto-flow: column; grid-auto-columns: 62%; gap: 11px; margin: 14px -16px 2px;
   padding: 2px 16px 10px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
 .shelf::-webkit-scrollbar { display: none; }
-.shelf > button { position: relative; scroll-snap-align: start; height: 152px; padding: 0; border: 0; border-radius: 20px;
-  overflow: hidden; background: #182033; text-align: right; box-shadow: var(--shadow); }
+.shelf > button { position: relative; scroll-snap-align: start; height: 150px; padding: 0; border: 0; border-radius: 20px;
+  overflow: hidden; background: #15181F; text-align: right; box-shadow: var(--shadow); }
 .shelf > button img { width: 100%; height: 100%; object-fit: cover; }
 .shelf > button .lbl { position: absolute; inset: auto 0 0 0; padding: 28px 14px 12px; color: #fff;
-  background: linear-gradient(to top, rgba(16, 22, 36, .93), rgba(16, 22, 36, 0)); }
+  background: linear-gradient(to top, rgba(14, 16, 22, .93), rgba(14, 16, 22, 0)); }
 .shelf > button .lbl b { display: block; font-size: 15.5px; font-weight: 900; }
-.shelf > button .lbl small { font-size: 12.5px; font-weight: 700; color: var(--gold2); }
+.shelf > button .lbl small { font-size: 12.5px; font-weight: 700; color: var(--accent-2); }
 .shelf > button:active { transform: scale(.975); }
 
-/* the four doors: white paper, a gold rule, a line icon in a gold ring */
+/* the four doors: white paper, one accent rule, a line icon in a tinted ring */
 .tiles { gap: 12px; }
-.tile { position: relative; border-radius: 22px; background: #fff; border: 1px solid var(--glass-line); box-shadow: var(--shadow); }
+.tile { position: relative; border-radius: 22px; background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow); }
 .tile::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; border-radius: 22px 22px 0 0;
-  background: linear-gradient(90deg, #C9973F, #E6C27A); opacity: .9; }
+  background: linear-gradient(90deg, var(--accent), var(--accent-2)); opacity: .9; }
 .tile .ring { display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: auto; border-radius: 14px;
-  color: var(--gold); background: var(--gold-soft); border: 1px solid #EBDCBE; }
+  color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-line); }
 .tile .ring svg { width: 23px; height: 23px; margin: 0; filter: none; }
-.tile b { font-size: 17px; font-weight: 900; color: var(--navy); letter-spacing: -.3px; }
+.tile b { font-size: 17px; font-weight: 900; color: var(--ink); letter-spacing: -.3px; }
 .tile span { font-weight: 700; color: var(--ink2); opacity: 1; font-size: 13px; }
 
-/* the booking list, the doctors, the chat: the same paper and the same gold */
-.pick .ph { width: 56px; height: 56px; flex-shrink: 0; border-radius: 16px; object-fit: cover; border: 1px solid var(--glass-line); }
-.pick.on .ph { border-color: var(--gold); }
-.pick.on, .sty[aria-pressed="true"] { border-color: var(--gold) !important; }
-.sec svg { color: var(--gold); }
-.sec .cnt { color: var(--gold); background: var(--gold-soft); border-color: #EBDCBE; }
-.fr { color: var(--gold); }
-.chip { border-radius: 999px; }
-.qchips .chip { color: var(--navy); background: #fff; border-color: var(--glass-line); }
-.bub.bot { border-radius: 18px 18px 18px 6px; border-color: var(--glass-line); }
-.bub.me { border-radius: 18px 18px 6px 18px; background: var(--gold-soft); border-color: #EBDCBE; }
-.src { color: var(--gold); background: var(--gold-soft); border-color: #EBDCBE; }
-.agent .av { border-radius: 14px; color: var(--gold); background: var(--gold-soft); }
-.wiz .on, .wiz button.on i { color: var(--gold); }
-.welcome, .mascot { display: none; }
-.num { font-variant-numeric: tabular-nums; }
+/* the rest of the shared furniture, brought into the same key */
+.sic, .badge { border-radius: 14px; }
+.slot[aria-pressed="true"], .pick.on, .sty[aria-pressed="true"] { border-color: var(--accent) !important; }
+.price, .pr { color: var(--ink); }
+.noimg { color: var(--accent); }
+/* the row that hands a question to the chat, where the business's bot answers it */
+.c-ask { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; text-align: right; }
+.c-ask b { display: block; font-size: 14.5px; font-weight: 900; color: var(--ink); }
+.c-ask .ic { flex: none; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 14px;
+  color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-line); }
+.c-ask .ic svg { width: 22px; height: 22px; }
+/* ── the clinic's colour, over the house layer (_theme.css) ──
+   Gold on ivory with a navy ink: the Prestige hotel's language with the light turned up. */
+:root {
+  --paper: #FAF7F2; --paper2: #F5F0E8; --line: #E7E0D4; --ink: #182033; --ink2: #5C6677;
+  --accent: #C9973F; --accent-2: #E6C27A; --accent-soft: #FBF3E4; --accent-line: #EBD6A9; --accent-on: #182033;
+  --lilac-a: #F1F3F7; --lilac-b: #E4E8F0; --lilac-d: #2E3C58; --lilac-line: #D5DBE7;
+}
+/* the pieces only this app has: the consult card, the chat bubbles, the booking wizard */
+.pick .ph { width: 56px; height: 56px; flex-shrink: 0; border-radius: 16px; object-fit: cover; border: 1.5px solid var(--line); }
+.pick.on .ph { border-color: var(--accent); }
+.agent .av { border-radius: 14px; color: var(--accent); background: var(--accent-soft); }
+.live::before { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.bub.bot { border-radius: 18px 18px 18px 6px; border-color: var(--line); }
+.bub.me { border-radius: 18px 18px 6px 18px; background: var(--accent-soft); border-color: var(--accent-line); }
+.src { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-line); }
+.sec svg, .fr { color: var(--accent); }
+.sec .cnt { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-line); }
+.wiz .on, .wiz button.on i { color: var(--accent); }
+/* ── the tour, full screen over the app (see _tour.js) ───────────────────────────────────────────────────────
+   The hotel's manner: the picture fills the screen, an ink gradient at top and bottom so the writing can be
+   read on any photograph, the name of the place in the corner, the other places as chips, and the doors as
+   soft rings that breathe. The app's accent colours the eyebrow and the chips, so each tour belongs to its
+   own business. */
+.t-host { position: fixed; inset: 0; z-index: 60; display: none; }
+.t-host.t-on { display: block; }
+.t-wrap { position: absolute; inset: 0; overflow: hidden; background: #0E1016; max-width: 520px; margin-inline: auto; }
+
+.t-stage { position: absolute; inset: 0; overflow: hidden; }
+.t-stage.is-pano .t-pan { position: absolute; top: 50%; left: 0; display: flex; transform: translateX(0); will-change: transform; }
+.t-stage.is-pano .t-pan img { height: 125vh; width: auto; max-width: none; display: block; transform: translateY(-50%); }
+.t-stage.is-photo .t-photo { width: 100%; height: 100%; object-fit: cover; animation: t-drift 18s ease-in-out infinite alternate; }
+@keyframes t-drift { from { transform: scale(1.04) translate(0, 0); } to { transform: scale(1.16) translate(-2%, -2%); } }
+/* stepping through a door: the picture leans in, then the next one settles */
+.t-stage.t-go { transition: transform .42s cubic-bezier(.4, 0, .2, 1), opacity .42s; transform: scale(1.25); opacity: .25; }
+.t-stage.t-come { animation: t-come .52s cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes t-come { from { transform: scale(1.14); opacity: .4; } to { transform: none; opacity: 1; } }
+
+.t-shade { position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(180deg, rgba(14, 16, 22, .72) 0%, rgba(14, 16, 22, 0) 22%, rgba(14, 16, 22, 0) 40%, rgba(14, 16, 22, .94) 100%); }
+
+.t-close { position: absolute; z-index: 5; top: 16px; left: 16px; width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .28); background: rgba(14, 16, 22, .45); color: #fff; font: 600 18px/1 system-ui;
+  backdrop-filter: blur(8px); }
+.t-info { position: absolute; z-index: 4; right: 20px; left: 20px; bottom: 132px; color: #fff; }
+.t-eyebrow { font-family: "Outfit", "Vazirmatn", sans-serif; font-size: 10.5px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--accent-2, #E6C27A); }
+.t-info b { display: block; margin-top: 6px; font-size: 27px; font-weight: 900; }
+.t-info small { display: block; margin-top: 4px; font-size: 13.5px; color: #CFD4DE; }
+.t-chips { position: absolute; z-index: 4; right: 0; left: 0; bottom: 74px; display: flex; gap: 8px; padding: 0 20px;
+  overflow-x: auto; scrollbar-width: none; }
+.t-chips::-webkit-scrollbar { display: none; }
+.t-chip { flex: none; padding: 9px 15px; border-radius: 999px; font: 800 13px/1 var(--font, "Vazirmatn"); color: #fff;
+  background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .22); backdrop-filter: blur(8px); }
+.t-chip.on { color: var(--accent-on, #15181F); background: linear-gradient(135deg, var(--accent, #C9973F), var(--accent-2, #E6C27A)); border-color: transparent; }
+.t-hint { position: absolute; z-index: 4; right: 0; left: 0; bottom: 28px; text-align: center; font: 700 12.5px/1 var(--font, "Vazirmatn");
+  color: rgba(255, 255, 255, .72); transition: opacity .6s; }
+.t-hint.gone { opacity: 0; }
+
+/* a door, standing in the picture */
+.t-spots { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.t-spot { position: absolute; top: 0; left: 0; display: flex; flex-direction: column; align-items: center; gap: 7px;
+  padding: 0; border: 0; background: none; color: #fff; transition: opacity .35s; }
+.t-spot i { position: relative; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255, 255, 255, .16); border: 1.5px solid rgba(255, 255, 255, .62); backdrop-filter: blur(6px); }
+.t-spot i::before { content: ""; width: 11px; height: 11px; border-radius: 50%; background: #fff; box-shadow: 0 0 14px rgba(255, 255, 255, .95); }
+.t-spot i::after { content: ""; position: absolute; inset: -7px; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, .5);
+  animation: t-ping 2.4s ease-out infinite; }
+@keyframes t-ping { 0% { transform: scale(.78); opacity: .85; } 100% { transform: scale(1.5); opacity: 0; } }
+.t-spot span { font: 800 12px/1 var(--font, "Vazirmatn"); padding: 6px 12px; border-radius: 999px; white-space: nowrap;
+  background: rgba(14, 16, 22, .6); border: 1px solid rgba(255, 255, 255, .22); backdrop-filter: blur(6px); }
+.t-spot:active i { transform: scale(.9); }
+
+/* the door into the tour, on the home page */
+.t-open { position: relative; display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 12px; padding: 0;
+  border: 0; border-radius: 22px; overflow: hidden; background: #0E1016; text-align: right; box-shadow: var(--shadow); }
+.t-open img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .55; }
+.t-open .v { position: relative; z-index: 1; flex: 1; min-width: 0; padding: 16px 18px; color: #fff; }
+.t-open .v b { display: block; font-size: 15.5px; font-weight: 900; }
+.t-open .v small { font-size: 12.5px; color: #CFD4DE; }
+.t-open .go { position: relative; z-index: 1; display: grid; place-items: center; width: 42px; height: 42px; margin-left: 16px;
+  border-radius: 50%; color: var(--accent-on, #15181F); background: linear-gradient(135deg, var(--accent, #C9973F), var(--accent-2, #E6C27A)); }
+.t-open:active { transform: scale(.985); }
+
+/* a door waiting on the edge of the frame */
+.t-spot.edge { opacity: .72 !important; }
+.t-spot.edge i { width: 32px; height: 32px; }
+.t-spot.edge i::after { animation: none; }
+.t-spot.edge span { font-size: 11px; padding: 4px 9px; background: rgba(14, 16, 22, .5); }
+/* ── the owner's dashboard, full screen over the app (see _dash.js) ──────────────────────────────────────────
+   Paper, hairlines and one accent — the same language as the app underneath it. The motion is part of the
+   reading: numbers climb, bars grow from nothing, rows arrive one after another. Everything runs once, on
+   opening, and then sits still. */
+.d-host { position: fixed; inset: 0; z-index: 60; display: none; }
+.d-host.d-on { display: block; }
+.d-wrap { position: absolute; inset: 0; max-width: 520px; margin-inline: auto; background: var(--paper, #F9F7F4);
+  display: flex; flex-direction: column; }
+
+.d-bar { display: flex; align-items: center; gap: 12px; padding: 16px 18px 12px; background: var(--card, #fff);
+  border-bottom: 1px solid var(--line, #E6E2DB); }
+.d-close { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line, #E6E2DB);
+  background: var(--paper, #F9F7F4); color: var(--ink, #15181F); font: 600 17px/1 system-ui; }
+.d-eyebrow { font-family: "Outfit", "Vazirmatn", sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--accent, #C9973F); }
+.d-bar b { display: block; font-size: 18px; font-weight: 900; color: var(--ink, #15181F); }
+.d-scroll { flex: 1; overflow-y: auto; padding: 14px 16px 28px; }
+
+.d-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.d-stat { position: relative; padding: 14px 12px; border-radius: 18px; background: var(--card, #fff);
+  border: 1px solid var(--line, #E6E2DB); text-align: center; }
+.d-stat b { font: 900 25px/1.1 var(--font, "Vazirmatn"); color: var(--ink, #15181F); font-variant-numeric: tabular-nums; }
+.d-stat i { font-style: normal; font-weight: 900; font-size: 15px; color: var(--accent, #C9973F); }
+.d-stat small { display: block; margin-top: 5px; font-size: 11.5px; font-weight: 700; color: var(--ink2, #5A6070); }
+
+.d-card { margin-top: 12px; padding: 16px; border-radius: 20px; background: var(--card, #fff); border: 1px solid var(--line, #E6E2DB); }
+.d-h { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
+.d-h b { font-size: 15px; font-weight: 900; color: var(--ink, #15181F); }
+.d-h small { font-size: 11.5px; font-weight: 700; color: var(--ink2, #5A6070); }
+
+/* seven days, growing from the floor */
+.d-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; align-items: end; height: 132px; }
+.d-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 6px; }
+.d-bar-v { position: relative; width: 100%; height: 0; border-radius: 8px 8px 3px 3px;
+  background: linear-gradient(180deg, var(--accent-2, #E6C27A), var(--accent, #C9973F));
+  transition: height .9s cubic-bezier(.22, 1, .36, 1); transition-delay: calc(var(--i) * 70ms); }
+.d-wrap.in .d-bar-v { height: var(--h); }
+.d-bar-v em { position: absolute; top: -17px; left: 0; right: 0; text-align: center; font: 800 10.5px/1 var(--font, "Vazirmatn");
+  font-style: normal; color: var(--ink2, #5A6070); opacity: 0; transition: opacity .4s calc(var(--i) * 70ms + .5s); }
+.d-wrap.in .d-bar-v em { opacity: 1; }
+.d-col small { font-size: 11px; font-weight: 800; color: var(--ink2, #5A6070); }
+
+/* the way a customer walks through the app, and where they turn back */
+.d-funnel { display: grid; gap: 8px; }
+.d-step { position: relative; display: flex; align-items: center; min-height: 46px; padding: 0 14px; border-radius: 14px;
+  overflow: hidden; background: var(--paper2, #F3F0EB); }
+.d-fill { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 14px;
+  background: linear-gradient(90deg, var(--accent-soft, #FBF3E4), var(--accent-line, #EBD6A9));
+  transition: width 1s cubic-bezier(.22, 1, .36, 1); transition-delay: calc(var(--i) * 110ms); }
+.d-wrap.in .d-fill { width: var(--w); }
+.d-txt { position: relative; z-index: 1; flex: 1; min-width: 0; }
+.d-txt b { display: block; font-size: 13.5px; font-weight: 900; color: var(--ink, #15181F); }
+.d-txt small { font-size: 11.5px; font-weight: 700; color: var(--ink2, #5A6070); font-variant-numeric: tabular-nums; }
+.d-drop { position: relative; z-index: 1; font: 900 12.5px/1 var(--font, "Vazirmatn"); color: #B3261E;
+  background: #FDECEA; border: 1px solid #F5C9C3; border-radius: 999px; padding: 5px 9px; }
+
+/* what they looked at */
+.d-top { display: grid; gap: 10px; }
+.d-row { display: flex; align-items: center; gap: 10px; opacity: 0; transform: translateY(6px);
+  transition: opacity .5s calc(var(--i) * 90ms), transform .5s calc(var(--i) * 90ms); }
+.d-wrap.in .d-row { opacity: 1; transform: none; }
+.d-name { flex: none; width: 92px; font: 800 12.5px/1.4 var(--font, "Vazirmatn"); color: var(--ink, #15181F); }
+.d-track { flex: 1; height: 10px; border-radius: 999px; background: var(--paper2, #F3F0EB); overflow: hidden; }
+.d-fill2 { display: block; width: 0; height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent, #C9973F), var(--accent-2, #E6C27A));
+  transition: width .9s cubic-bezier(.22, 1, .36, 1) calc(var(--i) * 90ms + .2s); }
+.d-wrap.in .d-fill2 { width: var(--w); }
+.d-num { flex: none; min-width: 26px; text-align: left; font: 900 12.5px/1 var(--font, "Vazirmatn");
+  color: var(--ink2, #5A6070); font-variant-numeric: tabular-nums; }
+
+.d-note { margin-top: 12px; padding: 13px 15px; border-radius: 16px; font: 700 12.5px/1.9 var(--font, "Vazirmatn");
+  color: var(--accent, #C9973F); background: var(--accent-soft, #FBF3E4); border: 1px solid var(--accent-line, #EBD6A9); }
+.d-foot { margin-top: 12px; text-align: center; font: 600 11px/1.8 var(--font, "Vazirmatn"); color: var(--ink2, #5A6070); }
+
+/* the way in, on the home page */
+.d-open { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 10px; padding: 13px 16px;
+  border-radius: 20px; text-align: right; background: var(--card, #fff); border: 1px solid var(--line, #E6E2DB);
+  box-shadow: var(--shadow); }
+.d-open .ic { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 13px;
+  color: var(--accent, #C9973F); background: var(--accent-soft, #FBF3E4); border: 1px solid var(--accent-line, #EBD6A9); }
+.d-open .v { flex: 1; min-width: 0; }
+.d-open .v b { display: block; font-size: 14.5px; font-weight: 900; color: var(--ink, #15181F); }
+.d-open .v small { font-size: 12px; color: var(--ink2, #5A6070); }
+.d-open:active { transform: scale(.985); }
 </style>
 
-<div class="ribbon">نسخه‌ی آزمایشی ۵ · اطلاعات نمونه</div>
+<div class="ribbon">نسخه‌ی آزمایشی ۱ · اطلاعات نمونه</div>
 <div class="app" id="app"><div class="hint" style="text-align:center;padding:40px 0">در حال باز شدن…</div></div>
 <div id="mainbar"></div>
 <div id="overlay"></div>
+<div class="t-host" id="tour"></div>
+<div class="d-host" id="dash"></div>
 <script>
 /* Shows any script error on the page, so a screenshot tells us what went wrong. */
 window.addEventListener("error", function (e) {
@@ -553,6 +724,21 @@ const ICON = {
   mascot: `<svg class="mascot" viewBox="0 0 64 64"><path d="M32 34C32 20 22 14 12 16c0 10 8 18 20 18z" fill="#6FD3A3"/><path d="M32 34c0-12 9-18 20-17 0 10-8 17-20 17z" fill="#9BE7C3"/><path d="M32 34v6" stroke="#3FA878" stroke-width="3" stroke-linecap="round"/><ellipse cx="32" cy="50" rx="17" ry="12" fill="#FFD2BC"/><circle cx="26" cy="49" r="2.4" fill="#1E2233"/><circle cx="38" cy="49" r="2.4" fill="#1E2233"/><path d="M28 54q4 3 8 0" stroke="#1E2233" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="22" cy="53" r="2.2" fill="#FFC2A8" opacity=".7"/><circle cx="42" cy="53" r="2.2" fill="#FFC2A8" opacity=".7"/></svg>`,
 };
 
+/* ── the house's line icons ──────────────────────────────────────────────────────────────────────────────────
+   One set for every app: a line drawing at 23px inside a tinted ring (see _theme.css). The illustrated icons
+   the apps started with are beautiful at 60px and turn to mud at 23, so the doors use these instead. */
+Object.assign(ICON, {
+  calO: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>`,
+  chatO: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5c0-3.9 3.6-7 8-7s8 3.1 8 7-3.6 7-8 7c-1 0-1.9-.15-2.8-.4L5 19.5l1.1-3.2C4.8 15 4 13.3 4 11.5z"/></svg>`,
+  bagO: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7.5h14l-1.2 13H6.2z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>`,
+  gridO: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>`,
+  pinO: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5s7-6.1 7-11.5a7 7 0 0 0-14 0c0 5.4 7 11.5 7 11.5z"/><circle cx="12" cy="10" r="2.6"/></svg>`,
+  bookO: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.6C10.4 5.3 8.5 4.7 6 4.7a1 1 0 0 0-1 1v10.8a1 1 0 0 0 1 1c2.5 0 4.4.6 6 1.8 1.6-1.2 3.5-1.8 6-1.8a1 1 0 0 0 1-1V5.7a1 1 0 0 0-1-1c-2.5 0-4.4.6-6 1.9z"/><path d="M12 6.6v12.7"/></svg>`,
+  penO: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 19.5H9l9.3-9.3a2.6 2.6 0 0 0-3.5-3.5L5.5 16z"/><path d="M14 7.5l2.5 2.5M4.5 19.5l1-3.5"/></svg>`,
+  listO: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6.5h12M8 12h12M8 17.5h12M4 6.5h.01M4 12h.01M4 17.5h.01"/></svg>`,
+  dumbO: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 8v8M17.5 8v8M3.5 10v4M20.5 10v4M6.5 12h11"/></svg>`,
+  renewO: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 4v5h-5"/></svg>`,
+});
 
 /* ── clinic icons (added to the shared set) ── */
 Object.assign(ICON, {
@@ -586,6 +772,35 @@ Object.assign(ICON, {
 });
 
 /* ── clinic data (sample; the owner changes it later) ── */
+/* The tour (see _tour.js): the clinic's own pictures, since no free 360 of a clinic exists. */
+const TOUR = {
+  title: "تور کلینیک",
+  first: "hero",
+  scenes: {
+    hero:   { kind: "photo", src: "img/hero.jpg", name: "پذیرش", line: "آینه‌های نورانی و سنگ" },
+    mirror: { kind: "photo", src: "img/mirror.jpg", name: "سالن انتظار", line: "تا نوبتتان برسد" },
+    laser:  { kind: "photo", src: "img/laserhair.jpg", name: "اتاق لیزر", line: "با عینک محافظ" },
+    facial: { kind: "photo", src: "img/facial.jpg", name: "اتاق درمان", line: "پاکسازی و تزریق" },
+    meso:   { kind: "photo", src: "img/meso.jpg", name: "محصولات", line: "سرم‌ها و مراقبت خانگی" },
+  },
+  doors: {
+    hero:   [{ to: "mirror", at: [27, 60], label: "سالن انتظار" }, { to: "laser", at: [74, 60], label: "اتاق لیزر" }],
+    mirror: [{ to: "facial", at: [27, 62], label: "اتاق درمان" }, { to: "hero", at: [74, 62], label: "برگشت به پذیرش" }],
+    laser:  [{ to: "facial", at: [27, 62], label: "اتاق درمان" }, { to: "hero", at: [74, 62], label: "برگشت به پذیرش" }],
+    facial: [{ to: "meso", at: [27, 62], label: "محصولات" }, { to: "hero", at: [74, 62], label: "برگشت به پذیرش" }],
+    meso:   [{ to: "hero", at: [50, 64], label: "برگشت به پذیرش" }],
+  },
+};
+
+const DASH = {
+  title: "داشبورد کلینیک",
+  today: [[31, "بازدید امروز"], [6, "نوبت گرفتند"], [19, "تبدیل", "٪"]],
+  week: [12, 17, 14, 22, 19, 26, 31],
+  funnel: [["اپ را باز کردند", 31], ["تعرفه را دیدند", 22], ["صفحه‌ی نوبت", 11], ["نوبت گرفتند", 6]],
+  top: [["لیزر", 14], ["بوتاکس", 9], ["پاکسازی", 6], ["فیلر", 4]],
+  note: "۵ نفر در صفحه‌ی نوبت برگشتند — همه روی انتخاب دکتر. شاید «فرقی نداره» را بالاتر بگذاریم.",
+};
+
 const CLINIC = { name: "کلینیک زیبایی آرنیک", phone: "۰۲۱-۱۲۳۴۵۶۷۸", tel: "02112345678", address: "خیابان نمونه، پلاک ۱۲، طبقه‌ی دوم", hours: "شنبه تا پنجشنبه ۱۰ تا ۲۰", close: 20 * 60, deposit: 300000, instMin: 3000000, window: 30 };
 /* cat: tariff group; ses: usual number of sessions; note: one line shown when the service is picked. */
 const SERVICES = [
@@ -791,6 +1006,8 @@ function home() {
   return `${topBar("")}
     <div class="glass hero"><div class="on-photo"><span class="kicker">arnik beauty clinic</span><b>${esc(CLINIC.name)}</b><span class="hint">سلام${n ? " " + esc(n) : ""}! پوستت امروز چطوره؟</span>
       <span class="pill">مشاوره‌ی اول رایگانه</span></div></div>
+    <button class="d-open" type="button" data-act="dash"><span class="ic">${ICON.gridO}</span><span class="v"><b>داشبورد صاحب کسب‌وکار</b><small>چند نفر آمدند، چه دیدند، کجا برگشتند</small></span><span class="chev">${ICON.chev}</span></button>
+    <button class="t-open" type="button" data-act="tour"><img src="img/hero.jpg" alt=""><span class="v"><b>تور مجازی کلینیک</b><small>پذیرش، سالن انتظار، اتاق لیزر و درمان</small></span><span class="go">${ICON.chev}</span></button>
     <div class="shelf">${SERVICES.filter((s) => s.ph).map((s) => `<button type="button" data-booksvc="${s.id}" aria-label="${esc(s.t)}"><img src="img/${s.ph}.jpg" alt="" loading="lazy"><span class="lbl"><b>${s.t}</b><small>${s.free ? "رایگان" : priceText(s) + " تومان"}</small></span></button>`).join("")}</div>
     ${nx ? `<button class="nextap" type="button" data-go="care">${ICON.doctorI}<span class="v"><small>نوبت بعدی · ${relDay(nx.k)}</small><b>${svcOf(nx.svc).t} با ${docOf(nx.doc).t}</b><small>${faDate(toDate(nx.k))} · ساعت ${nx.at}</small></span><span class="chev" style="color:var(--mint-d);display:grid">${ICON.chev}</span></button>` : ""}
     <div class="tiles">
@@ -1073,10 +1290,256 @@ document.addEventListener("click", async (e) => {
       if (IN_TG && tg.requestContact) tg.requestContact((ok, res) => { const p = ok && res && res.responseUnsafe && res.responseUnsafe.contact && res.responseUnsafe.contact.phone_number; if (p) { $("#ph").value = p; haptic("ok"); } });
       else { $("#ph").value = "09123456789"; toast("داخل تلگرام شماره‌ی خودت با یه لمس میاد (نمونه پر شد)."); }
       return;
+    case "dash": { haptic("light"); const h = $("#dash"); if (h) startDash(h, DASH); return; }
+    case "tour": { haptic("light"); const h = $("#tour"); if (h) startTour(h, TOUR); return; }
     case "homescreen": if (IN_TG && tg.addToHomeScreen) tg.addToHomeScreen(); else toast("داخل تلگرام، آیکون کلینیک روی صفحه‌ی گوشی میاد."); return;
   }
 });
 
+/* ── the tour ────────────────────────────────────────────────────────────────────────────────────────────────
+   A walk through the business, full screen, in the manner of the Prestige hotel's tour — and it takes two kinds
+   of scene, because only some trades have a real 360 photograph in the world:
+
+     { kind: "pano",  src: "pano/hall.jpg" }   a real 360: drag to look round, it wraps, it drifts when idle
+     { kind: "photo", src: "img/chairs.jpg" }  the business's own picture, moving slowly across the screen
+
+   Both carry the same doors: a mark that sits in the picture and, tapped, turns towards it and walks into the
+   next scene. So every app has a tour today, and the day a business shoots its own 360 the only change is the
+   scene's kind and a file in pano/.
+
+   The app supplies TOUR = { title, scenes: {key: {...}}, doors: {key: [{to, at, label}]}, first } where `at` is
+   the yaw in degrees for a pano (0 is the middle of the photograph) or an [x%, y%] on a photo.
+
+   No three.js: a panorama is an image panned behind a window, which is what a phone shows anyway, and it keeps
+   these demo pages at tens of kilobytes instead of a megabyte. */
+
+function startTour(host, TOUR, onClose) {
+  const keys = Object.keys(TOUR.scenes);
+  let key = TOUR.first && TOUR.scenes[TOUR.first] ? TOUR.first : keys[0];
+  let x = 0, vx = 0, idle = 0, dragging = false, px = 0, walking = false, raf = 0, last = performance.now();
+
+  host.innerHTML = `<div class="t-wrap">
+    <div class="t-stage" id="t-stage"></div>
+    <i class="t-shade"></i>
+    <button class="t-close" type="button" aria-label="بستن">✕</button>
+    <div class="t-spots" id="t-spots"></div>
+    <div class="t-info"><span class="t-eyebrow">${esc(TOUR.title || "تور مجازی")}</span><b id="t-name"></b><small id="t-line"></small></div>
+    <div class="t-chips" id="t-chips"></div>
+    <div class="t-hint" id="t-hint">انگشتتان را بکشید، و روی نقطه‌ها بزنید تا جلو بروید</div>
+  </div>`;
+  const $$ = (s) => host.querySelector(s);
+  const stage = $$("#t-stage"), spots = $$("#t-spots"), chips = $$("#t-chips");
+
+  chips.innerHTML = keys.map((k) => `<button type="button" class="t-chip" data-k="${k}">${esc(TOUR.scenes[k].name)}</button>`).join("");
+
+  const scene = () => TOUR.scenes[key];
+  const doorsOf = (k) => (TOUR.doors && TOUR.doors[k]) || [];
+  const panoWidth = () => stage.clientHeight * 2 * 1.25;   // an equirectangular picture is twice as wide as it is tall
+
+  /** Paint the scene: a panorama is two copies side by side so it can wrap; a photo simply drifts. */
+  function paint(fresh) {
+    const s = scene();
+    if (fresh) {
+      stage.className = "t-stage " + (s.kind === "pano" ? "is-pano" : "is-photo");
+      stage.innerHTML = s.kind === "pano"
+        ? `<div class="t-pan" id="t-pan"><img src="${esc(s.src)}" alt=""><img src="${esc(s.src)}" alt="" aria-hidden="true"></div>`
+        : `<img class="t-photo" src="${esc(s.src)}" alt="">`;
+      x = s.kind === "pano" ? -((s.at || 0) / 360) * panoWidth() : 0;
+      vx = 0;
+    }
+    $$("#t-name").textContent = s.name;
+    $$("#t-line").textContent = s.line || "";
+    [...chips.children].forEach((c) => c.classList.toggle("on", c.dataset.k === key));
+    spots.innerHTML = doorsOf(key).map((d, i) =>
+      `<button class="t-spot" type="button" data-i="${i}"><i></i><span>${esc(d.label)}</span></button>`).join("");
+  }
+
+  /** Where each door sits on the screen right now. A pano's door follows the pan and wraps with it. */
+  function place() {
+    const s = scene(), list = doorsOf(key), w = stage.clientWidth, h = stage.clientHeight;
+    [...spots.children].forEach((el, i) => {
+      const d = list[i];
+      if (!d) return;
+      let left, top;
+      if (s.kind === "pano") {
+        const pw = panoWidth();
+        let dx = x + ((d.at || 0) / 360) * pw + pw / 2;
+        dx = ((dx % pw) + pw) % pw;                      // the same door, whichever way round you came
+        left = dx > w ? dx - pw : dx;
+        top = h * (d.y == null ? 0.56 : d.y);
+      } else {
+        left = w * (d.at[0] / 100);
+        top = h * (d.at[1] / 100);
+      }
+      /* A door out of the frame is not lost: its mark waits on the edge it lies behind, smaller and quieter,
+         and tapping it turns the camera there on the way through. */
+      const EDGE = 44, inFrame = left > EDGE && left < w - EDGE;
+      if (!inFrame) left = Math.max(EDGE, Math.min(w - EDGE, left));
+      el.classList.toggle("edge", !inFrame);
+      el.style.opacity = walking ? "0" : "1";
+      el.style.pointerEvents = walking ? "none" : "auto";
+      el.style.transform = `translate(-50%, -50%) translate(${left.toFixed(1)}px, ${top.toFixed(1)}px)`;
+    });
+  }
+
+  /** Walk through a door: lean towards it, step through, and come to rest in the next scene. */
+  function walk(d) {
+    if (!d || walking || !TOUR.scenes[d.to]) return;
+    walking = true;
+    place();
+    stage.classList.add("t-go");
+    setTimeout(() => {
+      key = d.to;
+      paint(true);
+      stage.classList.remove("t-go");
+      stage.classList.add("t-come");
+      setTimeout(() => { stage.classList.remove("t-come"); walking = false; idle = 0; }, 520);
+    }, 420);
+  }
+
+  const show = (k) => { if (TOUR.scenes[k]) { key = k; paint(true); } };
+
+  // a finger turns a panorama; a photo just watches
+  const at = (e) => (e.touches ? e.touches[0] : e);
+  const down = (e) => { if (walking || scene().kind !== "pano") return; dragging = true; px = at(e).clientX; vx = 0; idle = 0; };
+  const move = (e) => {
+    if (!dragging) return;
+    const p = at(e).clientX;
+    vx = p - px; x += vx; px = p; idle = 0;
+    if (e.cancelable) e.preventDefault();
+  };
+  const up = () => { dragging = false; };
+  host.addEventListener("pointerdown", down);
+  addEventListener("pointermove", move, { passive: false });
+  addEventListener("pointerup", up);
+  host.addEventListener("touchstart", down, { passive: true });
+  host.addEventListener("touchmove", move, { passive: false });
+  addEventListener("touchend", up);
+
+  host.addEventListener("click", (e) => {
+    const spot = e.target.closest(".t-spot");
+    if (spot) return walk(doorsOf(key)[Number(spot.dataset.i)]);
+    const chip = e.target.closest(".t-chip");
+    if (chip) return show(chip.dataset.k);
+    if (e.target.closest(".t-close")) return stop();
+  });
+
+  function frame(now) {
+    raf = requestAnimationFrame(frame);
+    const dt = Math.min(0.1, (now - last) / 1000);
+    last = now;
+    if (scene().kind === "pano") {
+      if (!dragging) {
+        x += vx; vx *= 0.92;
+        if (Math.abs(vx) < 0.05) vx = 0;
+        idle += dt;
+        if (idle > 2.5 && !vx && !walking) x -= dt * 14;     // nobody is touching it: drift, slowly
+      }
+      const pw = panoWidth();
+      x = ((x % pw) + pw) % pw - pw;                          // keep the two copies covering the window
+      const pan = $$("#t-pan");
+      if (pan) pan.style.transform = `translateX(${x.toFixed(1)}px)`;
+    }
+    place();
+  }
+
+  function stop() {
+    cancelAnimationFrame(raf);
+    removeEventListener("pointermove", move);
+    removeEventListener("pointerup", up);
+    removeEventListener("touchend", up);
+    host.innerHTML = "";
+    host.classList.remove("t-on");
+    if (onClose) onClose();
+  }
+
+  host.classList.add("t-on");
+  paint(true);
+  raf = requestAnimationFrame(frame);
+  setTimeout(() => { const h = $$("#t-hint"); if (h) h.classList.add("gone"); }, 4200);
+  return { stop, show };
+}
+/* ── the owner's dashboard ───────────────────────────────────────────────────────────────────────────────────
+   What a business owner has never been able to see: how many people opened the app today, what they looked at,
+   and — the one that sells it — where they turned back. Full screen over the app, in the house's manner.
+
+   2026 practice, and the reason it looks the way it does: one accent and no colour-per-tile (that pattern now
+   reads as dated), a hairline instead of a shadow, dense but readable on a phone, and motion that explains
+   rather than decorates — every number counts up to its value and every bar grows from nothing, once, when the
+   dashboard opens, so the eye follows the shape of the day.
+
+   The app supplies DASH = { title, today: [[n, label, suffix?]], week: [7 numbers], funnel: [[label, n]],
+   top: [[label, n]], note }. In the demos the numbers are a believable sample; on the platform they come from
+   the server. */
+
+function startDash(host, DASH, onClose) {
+  const fa = (n) => String(n).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[d]);
+  const WEEK = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
+  const max = Math.max(1, ...DASH.week);
+  const topMax = Math.max(1, ...DASH.top.map((t) => t[1]));
+  const first = DASH.funnel[0][1] || 1;
+
+  host.innerHTML = `<div class="d-wrap">
+    <div class="d-bar"><button class="d-close" type="button" aria-label="بستن">✕</button>
+      <div><span class="d-eyebrow">dashboard</span><b>${esc(DASH.title)}</b></div></div>
+    <div class="d-scroll">
+      <div class="d-stats">${DASH.today.map(([n, t, suf]) =>
+        `<div class="d-stat"><b data-to="${n}">۰</b><i>${esc(suf || "")}</i><small>${esc(t)}</small></div>`).join("")}</div>
+
+      <div class="d-card">
+        <div class="d-h"><b>هفت روز گذشته</b><small>بازدید روزانه</small></div>
+        <div class="d-week">${DASH.week.map((v, i) =>
+          `<div class="d-col"><span class="d-bar-v" style="--h:${Math.round(v / max * 100)}%;--i:${i}"><em>${fa(v)}</em></span><small>${WEEK[i]}</small></div>`).join("")}</div>
+      </div>
+
+      <div class="d-card">
+        <div class="d-h"><b>مسیر مشتری</b><small>از باز کردن تا سفارش</small></div>
+        <div class="d-funnel">${DASH.funnel.map(([t, n], i) => {
+          const pc = Math.round(n / first * 100);
+          const drop = i ? DASH.funnel[i - 1][1] - n : 0;
+          return `<div class="d-step" style="--i:${i}"><span class="d-fill" style="--w:${pc}%"></span>
+            <span class="d-txt"><b>${esc(t)}</b><small>${fa(n)} نفر · ${fa(pc)}٪</small></span>
+            ${drop ? `<span class="d-drop">−${fa(drop)}</span>` : ""}</div>`;
+        }).join("")}</div>
+      </div>
+
+      <div class="d-card">
+        <div class="d-h"><b>بیشترین چیزی که دیدند</b><small>این هفته</small></div>
+        <div class="d-top">${DASH.top.map(([t, n], i) =>
+          `<div class="d-row" style="--i:${i}"><span class="d-name">${esc(t)}</span>
+            <span class="d-track"><span class="d-fill2" style="--w:${Math.round(n / topMax * 100)}%"></span></span>
+            <span class="d-num">${fa(n)}</span></div>`).join("")}</div>
+      </div>
+
+      ${DASH.note ? `<div class="d-note">${esc(DASH.note)}</div>` : ""}
+      <div class="d-foot">اعداد این صفحه نمونه‌اند. روی نسخه‌ی واقعی، از رفتار همین مشتری‌ها ساخته می‌شوند.</div>
+    </div>
+  </div>`;
+
+  // the numbers climb to their value, and the bars grow, once — the eye follows the shape of the day
+  const run = () => { const w = host.querySelector(".d-wrap"); if (w) w.classList.add("in"); };
+  requestAnimationFrame(run);
+  setTimeout(run, 60);                 // a covered web view has no frames; the bars still have to grow
+  host.querySelectorAll(".d-stat b").forEach((el) => {
+    const to = Number(el.dataset.to) || 0, t0 = performance.now();
+    let done = false;
+    const land = () => { done = true; el.textContent = fa(to); };
+    const tick = (now) => {
+      if (done) return;
+      const k = Math.min(1, (now - t0) / 900);
+      if (k >= 1) return land();
+      el.textContent = fa(Math.round(to * (1 - Math.pow(1 - k, 3))));
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    setTimeout(land, 980);                 // whatever happens, the number on screen is the right one
+  });
+
+  const stop = () => { host.innerHTML = ""; host.classList.remove("d-on"); if (onClose) onClose(); };
+  host.addEventListener("click", (e) => { if (e.target.closest(".d-close")) stop(); });
+  host.classList.add("d-on");
+  return { stop };
+}
 /* Swipe a calendar to change month (RTL: swipe right = next month). */
 let swipeX = null;
 document.addEventListener("touchstart", (e) => { swipeX = e.target.closest && e.target.closest(".cal") ? e.touches[0].clientX : null; }, { passive: true });
