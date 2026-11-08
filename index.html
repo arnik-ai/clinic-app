@@ -810,14 +810,12 @@ textarea.input { resize: none; line-height: 1.7; }
 .hero.live .on-photo { min-height: 320px; }
 /* The house scrim was mixed for a dark photograph. The clinic underneath is warm ivory and far brighter, so it
    needs its own: warmer, so it belongs to this palette, and heavier at the top where the name sits. */
+/* Nothing is read over the room any more, so the scrim stops being a wash and becomes a floor: clear at the
+   top where the clinic is, darkening only at the foot so the way in does not float. */
 .hero.live::after {
   background:
-    linear-gradient(188deg, rgba(28, 22, 16, .46) 0%, rgba(26, 20, 15, .50) 44%, rgba(20, 15, 11, .90) 100%);
+    linear-gradient(188deg, rgba(28, 22, 16, .06) 0%, rgba(26, 20, 15, .10) 52%, rgba(20, 15, 11, .62) 100%);
 }
-.hero.live b, .hero.live .hint, .hero.live .kicker {
-  text-shadow: 0 1px 3px rgba(20, 15, 11, .85), 0 3px 20px rgba(20, 15, 11, .55);
-}
-.hero.live b { color: #FFFDF9; }
 .hero.live .hint { color: #EFE7DA; }
 .hero .heroslot {
   position: absolute; inset: 0; display: block; overflow: hidden; border-radius: inherit;
@@ -1808,10 +1806,9 @@ function careTodo() {
 
 /* ── pages ── */
 function home() {
-  const n = firstName(), nx = upcoming()[0];
+  const nx = upcoming()[0];
   return `${topBar("")}
-    <button class="glass hero live" type="button" data-act="walk"><span class="heroslot" id="heroslot"></span><span class="on-photo"><span class="kicker">arnik beauty clinic</span><b>${esc(CLINIC.name)}</b><span class="hint">سلام${n ? " " + esc(n) : ""}! پوستت امروز چطوره؟</span>
-      <span class="pill">مشاوره‌ی اول رایگانه</span><span class="herogo">${C3I.walk}<i>قدم بزنید در کلینیک</i></span></span></button>
+    <button class="glass hero live" type="button" data-act="walk"><span class="heroslot" id="heroslot"></span><span class="on-photo"><span class="herogo">${C3I.walk}<i>قدم بزنید در کلینیک</i></span></span></button>
     <button class="w-open" type="button" data-act="wheel"><span class="ic">🎁</span><span class="v"><b>گردونه‌ی شانس</b><small>روزی یک بار بچرخان؛ جایزه‌ات همین‌جا</small></span><span class="chev">${ICON.chev}</span></button>
     <button class="d-open" type="button" data-act="dash"><span class="ic">${ICON.gridO}</span><span class="v"><b>داشبورد صاحب کسب‌وکار</b><small>چند نفر آمدند، چه دیدند، کجا برگشتند</small></span><span class="chev">${ICON.chev}</span></button>
     <div class="shelf">${SERVICES.filter((s) => s.ph && !s.noshelf).map((s) => `<button type="button" data-booksvc="${s.id}" aria-label="${esc(s.t)}"><img src="img/${s.ph}.jpg" alt="" loading="lazy"><span class="lbl"><b>${s.t}</b><small>${s.free ? "رایگان" : priceText(s) + " تومان"}</small></span></button>`).join("")}</div>
