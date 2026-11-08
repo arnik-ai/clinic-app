@@ -302,6 +302,9 @@ function makeTextures(renderer) {
     marble: tex(marbleCanvas(512), { srgb: true }),
     toothN: tex(normalFromHeight(toothCanvas(256), 1.4)),
     brushed: tex(brushedCanvas(256)),
+    // The big flat boxes — counters, desks, plinths — had no surface at all, which is most of what read as
+    // cartoon. Run through the normal map, the brushed canvas becomes a fine linear grain.
+    grainN: tex(normalFromHeight(brushedCanvas(256, .5), .7)),
     blob: tex(blobCanvas(), { srgb: true, mips: false }),
     spill: tex(spillCanvas(), { srgb: true, mips: false }),
   };
@@ -316,31 +319,34 @@ function makeMaterials(T) {
   const S = THREE.FrontSide, D = THREE.DoubleSide;
   const v2 = (a, b) => new THREE.Vector2(a, b);
   return {
-    floorStone: new THREE.MeshStandardMaterial({ color: 0xC8C2B6, roughness: .62, metalness: 0, envMapIntensity: .45,
-      side: S, map: T.travertine, normalMap: T.travertineN, normalScale: v2(.45, .45), roughnessMap: T.travertine, vertexColors: true }),
-    floorPolished: new THREE.MeshStandardMaterial({ color: 0xC8C2B6, roughness: .22, metalness: 0, envMapIntensity: .70,
+    // Honed, not wet: .36 keeps the grain visible and still gives the long soft sheen a stone floor has.
+    floorStone: new THREE.MeshStandardMaterial({ color: 0xC8C2B6, roughness: .36, metalness: 0, envMapIntensity: .85,
+      side: S, map: T.travertine, normalMap: T.travertineN, normalScale: v2(.5, .5), roughnessMap: T.travertine, vertexColors: true }),
+    floorPolished: new THREE.MeshStandardMaterial({ color: 0xC8C2B6, roughness: .16, metalness: 0, envMapIntensity: 1.05,
       side: S, map: T.travertine, vertexColors: true }),
-    marble: new THREE.MeshStandardMaterial({ color: 0xE7E4DE, roughness: .28, metalness: 0, envMapIntensity: .65,
+    marble: new THREE.MeshStandardMaterial({ color: 0xE7E4DE, roughness: .13, metalness: 0, envMapIntensity: .95,
       side: S, map: T.marble, vertexColors: true }),
-    metal: new THREE.MeshStandardMaterial({ color: 0xD8C5A5, roughness: .34, metalness: 1, envMapIntensity: 1.15,
+    metal: new THREE.MeshStandardMaterial({ color: 0xD8C5A5, roughness: .28, metalness: 1, envMapIntensity: 1.55,
       side: S, roughnessMap: T.brushed }),
     // No `transmission`: it adds a full-resolution render-target pass every frame. The brushed edge strip, not the
     // body, is what makes a glass partition read as glass.
     glass: new THREE.MeshPhysicalMaterial({ color: 0xE8EFEE, roughness: .05, metalness: 0, ior: 1.5,
       transparent: true, opacity: .16, depthWrite: false, side: D, envMapIntensity: 1.6 }),
-    wood: new THREE.MeshPhysicalMaterial({ color: 0x5E4B38, roughness: .45, metalness: 0, envMapIntensity: .6,
-      side: S, clearcoat: .35, clearcoatRoughness: .25, vertexColors: true }),
-    wall: new THREE.MeshStandardMaterial({ color: 0xEEEBE5, roughness: .92, metalness: 0, envMapIntensity: .30,
-      side: S, normalMap: T.toothN, normalScale: v2(.35, .35), vertexColors: true }),
-    wallWarm: new THREE.MeshStandardMaterial({ color: 0xE9E4DB, roughness: .92, metalness: 0, envMapIntensity: .30,
-      side: S, normalMap: T.toothN, normalScale: v2(.35, .35), vertexColors: true }),
-    ceiling: new THREE.MeshStandardMaterial({ color: 0xFAF8F4, roughness: .95, metalness: 0, envMapIntensity: .25,
+    wood: new THREE.MeshPhysicalMaterial({ color: 0x5E4B38, roughness: .34, metalness: 0, envMapIntensity: .8,
+      side: S, clearcoat: .55, clearcoatRoughness: .14, normalMap: T.grainN, normalScale: v2(.3, .3), vertexColors: true }),
+    // At .35 the tooth is a texture nobody can see. At .62, with the environment no longer turned down to a
+    // quarter, plaster reads as plaster across a whole wall instead of as a flat fill.
+    wall: new THREE.MeshStandardMaterial({ color: 0xEEEBE5, roughness: .84, metalness: 0, envMapIntensity: .45,
+      side: S, normalMap: T.toothN, normalScale: v2(.62, .62), vertexColors: true }),
+    wallWarm: new THREE.MeshStandardMaterial({ color: 0xE9E4DB, roughness: .84, metalness: 0, envMapIntensity: .45,
+      side: S, normalMap: T.toothN, normalScale: v2(.62, .62), vertexColors: true }),
+    ceiling: new THREE.MeshStandardMaterial({ color: 0xFAF8F4, roughness: .86, metalness: 0, envMapIntensity: .38,
       side: S, vertexColors: true }),
-    gold: new THREE.MeshStandardMaterial({ color: 0xB89A68, roughness: .22, metalness: 1, envMapIntensity: 1.35, side: S }),
-    joinery: new THREE.MeshPhysicalMaterial({ color: 0x51483F, roughness: .55, metalness: 0, envMapIntensity: .5,
-      side: S, clearcoat: .25, clearcoatRoughness: .4, vertexColors: true }),
-    fabric: new THREE.MeshStandardMaterial({ color: 0xD1C7B6, roughness: .95, metalness: 0, envMapIntensity: .3,
-      side: S, vertexColors: true }),
+    gold: new THREE.MeshStandardMaterial({ color: 0xB89A68, roughness: .17, metalness: 1, envMapIntensity: 1.75, side: S }),
+    joinery: new THREE.MeshPhysicalMaterial({ color: 0x51483F, roughness: .4, metalness: 0, envMapIntensity: .75,
+      side: S, clearcoat: .55, clearcoatRoughness: .16, normalMap: T.grainN, normalScale: v2(.22, .22), vertexColors: true }),
+    fabric: new THREE.MeshStandardMaterial({ color: 0xD1C7B6, roughness: .78, metalness: 0, envMapIntensity: .5,
+      side: S, normalMap: T.toothN, normalScale: v2(.3, .3), vertexColors: true }),
     // toneMapped:false keeps a cove strip at full value, so it reads as a light and not as painted plastic.
     cove: new THREE.MeshBasicMaterial({ color: 0xFFF1DC, toneMapped: false, fog: false }),
     bezel: new THREE.MeshStandardMaterial({ color: 0x3A342D, roughness: .4, metalness: .2, envMapIntensity: .4, side: S }),
@@ -909,7 +915,13 @@ function makeRoomEnv(renderer) {
     x.save(); x.translate(cx, cy); x.scale(1, ry / Math.max(rx, ry)); x.translate(-cx, -cy);
     x.fillStyle = r; x.fillRect(0, 0, 256, 128); x.restore();
   };
-  glow(52, 46, 46, 26, .95); glow(186, 40, 30, 18, .65); glow(128, 8, 120, 10, .35);
+  // Low-roughness surfaces only look expensive if there is something in the reflection to see. A flat
+  // gradient gives a flat sheen; a lit ceiling, a bright band of glazing and two warm pools give a floor
+  // something to carry across it.
+  x.fillStyle = "rgba(255,252,246,.55)"; x.fillRect(0, 0, 256, 16);         // the lit ceiling plane
+  x.fillStyle = "rgba(184,154,104,.18)"; x.fillRect(0, 62, 256, 5);         // a gold reveal at the horizon
+  glow(52, 44, 50, 24, 1); glow(186, 38, 34, 18, .78); glow(128, 6, 130, 12, .5);
+  glow(96, 96, 52, 22, .2); glow(214, 92, 40, 18, .16);                     // warm pools on the floor plane
   const src = new THREE.CanvasTexture(c);
   src.mapping = THREE.EquirectangularReflectionMapping; src.colorSpace = THREE.SRGBColorSpace;
   const pm = new THREE.PMREMGenerator(renderer);
@@ -953,23 +965,25 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   // Khronos PBR Neutral keeps champagne and gold at their own hue; ACES drifts them grey-pink.
   renderer.toneMapping = THREE.NeutralToneMapping ?? THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = THREE.NeutralToneMapping ? 1.06 : 1.15;
+  renderer.toneMappingExposure = THREE.NeutralToneMapping ? .98 : 1.06;   // deepen the shadow end a little
   renderer.shadowMap.enabled = false;
   renderer.debug.checkShaderErrors = false;
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xEFE9DE);
-  scene.fog = new THREE.Fog(0xEFE9DE, 7, 34);   // closes the depth and softens the cut at a culled doorway
+  // Fog is here to soften the cut where a culled room ends at a doorway — which happens at twenty metres,
+  // not at seven. Starting at seven was hazing the far wall of a nine-metre reception.
+  scene.fog = new THREE.Fog(0xEFE9DE, 16, 55);
   const camera = new THREE.PerspectiveCamera(78, 1, .08, 40);
 
   const T = makeTextures(renderer);
   const M = makeMaterials(T);
   const K = kit(M);
   scene.environment = makeRoomEnv(renderer);
-  scene.environmentIntensity = .9;
+  scene.environmentIntensity = 1.15;
 
   // ── exactly four lights, for the whole visit. Adding or hiding one recompiles every shader program.
-  const hemi = new THREE.HemisphereLight(0xFFF6E8, 0x6B5F52, .55);
+  const hemi = new THREE.HemisphereLight(0xFFF6E8, 0x574C41, .55);   // a darker ground bounce: more gradient down a wall
   const key = new THREE.DirectionalLight(0xFFE9CC, 1.1);
   key.position.set(-4.2, 6.0, 3.4);
   const poolA = new THREE.PointLight(0xFFE2BC, 15, 9, 2);
