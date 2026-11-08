@@ -980,6 +980,13 @@ textarea.input { resize: none; line-height: 1.7; }
 .sec .cnt { color: var(--accent-ink); background: var(--accent-soft); border-color: var(--accent-line); }
 .wiz .on, .wiz button.on i { color: var(--accent-ink); }
 
+/* Two service cards are left, so the shelf stops being a strip you drag and becomes a pair that fits. */
+.shelf {
+  grid-auto-flow: row; grid-template-columns: 1fr 1fr; grid-auto-columns: auto;
+  margin: 14px 0 2px; padding: 2px 0 10px; overflow: visible;
+}
+.shelf > button { height: 170px; }
+
 /* The home page keeps one tile. A single half-width card beside an empty column reads as a mistake, so it
    lies down into a row like the cards above it. (This has to live here rather than in clinic3d.css: only
    <app>-theme.css is inlined after _theme.css, and anything earlier loses to the house layer on equal
@@ -1374,8 +1381,8 @@ const CLINIC = { name: "کلینیک زیبایی آرنیک", phone: "۰۲۱-۱
 const SERVICES = [
   { id: "consult", noshelf: true, ph: "mirror", t: "مشاوره‌ی رایگان", sub: "با دکتر، حضوری", price: 0, free: true, dur: 20, ses: "", cat: "skin", i: "consultS", c: "mint", note: "۲۰ دقیقه با دکتر؛ پوستت رو می‌بینه و بهترین درمان رو پیشنهاد می‌ده. هزینه‌ای نداره.", pre: "اگه دارو یا سابقه‌ی درمانی داری، با خودت بیار." },
   { id: "botox", noshelf: true, ph: "laser", t: "بوتاکس", sub: "هر ناحیه · اثر ۴ تا ۶ ماه", price: 4500000, dur: 30, ses: "", cat: "inj", i: "syringe", c: "lilac", note: "پیشونی، دور چشم یا خط اخم؛ اثرش ۴ تا ۶ ماه می‌مونه و ترمیمش تا ۲ هفته رایگانه.", pre: "از ۳ روز قبل آسپرین و ویتامین E نخور." },
-  { id: "filler", ph: "facial", t: "فیلر", sub: "هر سی‌سی · ماندگاری ۹ تا ۱۲ ماه", price: 6500000, dur: 45, ses: "", cat: "inj", i: "fillerI", c: "peach", note: "ژل هیالورونیک با برند معتبر؛ ۹ تا ۱۲ ماه می‌مونه. قسطی هم می‌شه.", pre: "از ۳ روز قبل آسپرین و امگا ۳ نخور." },
-  { id: "laser", ph: "laserhair", t: "لیزر موهای زائد", sub: "هر جلسه، بسته به ناحیه", price: 1200000, from: true, dur: 45, ses: "۶ تا ۸ جلسه", cat: "laser", i: "laserI", c: "sky", note: "معمولاً ۶ تا ۸ جلسه، با فاصله‌ی ۴ تا ۶ هفته. هر جلسه از ۱٬۲۰۰٬۰۰۰ تومان، بسته به ناحیه.", pre: "ناحیه رو شب قبل با تیغ اصلاح کن؛ موم و برنزه نه." },
+  { id: "filler", noshelf: true, ph: "facial", t: "فیلر", sub: "هر سی‌سی · ماندگاری ۹ تا ۱۲ ماه", price: 6500000, dur: 45, ses: "", cat: "inj", i: "fillerI", c: "peach", note: "ژل هیالورونیک با برند معتبر؛ ۹ تا ۱۲ ماه می‌مونه. قسطی هم می‌شه.", pre: "از ۳ روز قبل آسپرین و امگا ۳ نخور." },
+  { id: "laser", noshelf: true, ph: "laserhair", t: "لیزر موهای زائد", sub: "هر جلسه، بسته به ناحیه", price: 1200000, from: true, dur: 45, ses: "۶ تا ۸ جلسه", cat: "laser", i: "laserI", c: "sky", note: "معمولاً ۶ تا ۸ جلسه، با فاصله‌ی ۴ تا ۶ هفته. هر جلسه از ۱٬۲۰۰٬۰۰۰ تومان، بسته به ناحیه.", pre: "ناحیه رو شب قبل با تیغ اصلاح کن؛ موم و برنزه نه." },
   { id: "clean", ph: "clean", t: "پاکسازی پوست", sub: "عمیق، با ماسک آرام‌بخش", price: 950000, dur: 60, ses: "ماهی یه بار", cat: "skin", i: "cleanI", c: "mint", note: "پاکسازی عمیق منافذ با ماسک آرام‌بخش؛ ماهی یه بار عالیه.", pre: "بدون آرایش بیا." },
   { id: "meso", ph: "meso", t: "مزوتراپی", sub: "شادابی پوست یا تقویت مو", price: 3200000, dur: 45, ses: "۴ جلسه", cat: "inj", i: "mesoI", c: "lilac", note: "۴ جلسه، هر ۲ هفته یه بار؛ برای شادابی پوست یا تقویت مو. قسطی هم می‌شه.", pre: "از ۲ روز قبل آسپرین نخور و روز نوبت آرایش نکن." },
 ];
