@@ -1296,11 +1296,16 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
       }
       guideAt.lerp(guideTo, Math.min(1, dt * 1.2));          // she walks over; she does not appear
     }
-    // standing still is never quite still: a slow shift of weight, and that is all
+    // Standing still is never quite still: a slow shift of weight, and that is all.
+    // She turns on her vertical axis ONLY. lookAt() would pitch her backwards towards the camera's eye line —
+    // the closer you stood, the further she leaned, until she was lying on the floor.
     guideIdle += dt;
     guide.position.set(guideAt.x, Math.sin(guideIdle * .9) * .006, guideAt.z);
-    guide.rotation.z = Math.sin(guideIdle * .55) * .006;
-    guide.lookAt(camera.position.x, guide.position.y + 1.55, camera.position.z);
+    guide.rotation.set(
+      0,
+      Math.atan2(camera.position.x - guideAt.x, camera.position.z - guideAt.z),   // the figure is built facing +z
+      Math.sin(guideIdle * .55) * .006,
+    );
     guideShadow.position.set(guideAt.x, .008, guideAt.z);
 
     // only the room you are in, plus what is genuinely visible through its doorways
