@@ -513,22 +513,33 @@ textarea.input { resize: none; line-height: 1.7; }
 @media (prefers-reduced-motion: reduce) { .c3spot { transition: none; } }
 
 /* ── the thumb pad: bottom-left, physically ──────────────────────────────────────────────────────────────────── */
+/* Four arrows, in the bottom-LEFT corner physically: that is where a hand is, and RTL moves the text, not
+   anyone's thumb. A pad you push in any direction is a control people learn in games; an arrow is a control
+   nobody has to be taught, which is why the box that used to explain the pad could be deleted with it. */
 .c3pad {
-  position: absolute; left: 22px; bottom: calc(env(safe-area-inset-bottom, 0px) + 34px);
-  width: 124px; height: 124px; border-radius: 50%; z-index: 4;
-  border: 1px solid rgba(255, 255, 255, .26); background: rgba(40, 33, 26, .18);
-  -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
-  display: grid; place-items: center; pointer-events: none;
+  position: absolute; left: 14px; bottom: calc(env(safe-area-inset-bottom, 0px) + 62px);
+  z-index: 5; display: grid; gap: 5px;
+  grid-template-columns: repeat(3, 44px); grid-template-rows: repeat(3, 44px);
+  direction: ltr;                       /* a left arrow must be on the left, whatever the page is doing */
 }
-.c3pad i {
-  width: 46px; height: 46px; border-radius: 50%;
-  background: rgba(248, 245, 239, .7); border: 1.5px solid var(--c3-champagne);
-  box-shadow: 0 4px 14px rgba(40, 33, 26, .3);
+.c3pad button {
+  grid-area: 2 / 2; width: 44px; height: 44px; border-radius: 14px; cursor: pointer; padding: 0;
+  display: grid; place-items: center; color: #FFFBF3;
+  background: rgba(40, 33, 26, .42); border: 1px solid rgba(216, 197, 165, .4);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  -webkit-tap-highlight-color: transparent; touch-action: none;
+  transition: background .12s ease, transform .12s ease;
 }
-.c3pad::after {
-  content: ""; position: absolute; inset: 20px; border-radius: 50%;
-  border: 1px dashed rgba(255, 255, 255, .2);
+.c3pad button[data-dir="f"] { grid-area: 1 / 2; }
+.c3pad button[data-dir="l"] { grid-area: 2 / 1; }
+.c3pad button[data-dir="r"] { grid-area: 2 / 3; }
+.c3pad button[data-dir="b"] { grid-area: 3 / 2; }
+.c3pad button.on { background: rgba(184, 154, 104, .85); border-color: var(--c3-champagne); transform: scale(.94); }
+.c3pad button svg {
+  width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round;
 }
+@media (prefers-reduced-motion: reduce) { .c3pad button { transition: none; } }
 
 /* ── the nav that is always there ────────────────────────────────────────────────────────────────────────────── */
 .c3nav {
@@ -766,22 +777,6 @@ textarea.input { resize: none; line-height: 1.7; }
 }
 @keyframes c3spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .c3ring { animation-duration: 2.4s; } }
-
-.c3hint {
-  position: absolute; inset-inline: 18px; top: 50%; z-index: 6; transform: translateY(-50%);
-  background: rgba(32, 27, 22, .72); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-  border: 1px solid rgba(216, 197, 165, .3); border-radius: 17px;
-  padding: 17px 19px; color: var(--c3-ivory); text-align: center;
-  display: none; transition: opacity .4s ease;
-}
-.c3hint.on { display: block; }
-.c3hint.gone { opacity: 0; }
-.c3hint b { display: block; font-size: 14px; margin-bottom: 8px; color: var(--c3-champagne); }
-.c3hint p { font-size: 12.5px; line-height: 1.95; margin: 0; color: rgba(248, 245, 239, .86); }
-.c3hint button {
-  margin-top: 13px; padding: 10px 20px; border-radius: 999px; border: 1px solid rgba(216, 197, 165, .4);
-  background: rgba(216, 197, 165, .16); color: var(--c3-ivory); font: inherit; font-size: 12.5px; cursor: pointer;
-}
 
 /* this phone cannot show it */
 .c3nope { position: absolute; inset: 0; z-index: 11; display: grid; place-content: center; justify-items: center;
@@ -1481,10 +1476,6 @@ window.addEventListener("hashchange", () => { closeSheet(); render(); window.scr
    Prices and service names are never repeated: they come from SERVICES, so the tariff can only ever say one thing. */
 const WALK3D = {
   title: "کلینیک مجازی",
-  hint: {
-    t: "راه رفتن در کلینیک",
-    p: "انگشتتان را روی صفحه بکشید تا دور و برتان را ببینید، و پدِ گوشه‌ی پایین را فشار دهید تا راه بروید. روی هر نشانه بزنید تا باز شود.",
-  },
   /* Each space: what the advisor says when you walk in, four questions worth tapping, and the panel its markers open. */
   rooms: {
     reception: {
@@ -2179,7 +2170,12 @@ const walkShell = () => `<canvas id="c3cv"></canvas><i class="c3vig"></i>
     <div class="c3where"><span class="c3eyebrow">${WALK3D.title}</span><b id="c3name">پذیرش بزرگ</b><small id="c3line">در حال باز شدن…</small></div>
     <button class="c3ib" type="button" data-c3="rooms" aria-label="فهرست اتاق‌ها">${C3I.grid}</button>
   </header>
-  <div class="c3pad" id="c3pad"><i></i></div>
+  <div class="c3pad" id="c3pad">
+    <button type="button" data-dir="f" aria-label="جلو"><svg viewBox="0 0 24 24"><path d="M12 19V6"/><path d="m6 12 6-6 6 6"/></svg></button>
+    <button type="button" data-dir="l" aria-label="چرخش به چپ"><svg viewBox="0 0 24 24"><path d="M19 12H6"/><path d="m12 6-6 6 6 6"/></svg></button>
+    <button type="button" data-dir="r" aria-label="چرخش به راست"><svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="m12 6 6 6-6 6"/></svg></button>
+    <button type="button" data-dir="b" aria-label="عقب"><svg viewBox="0 0 24 24"><path d="M12 5v13"/><path d="m6 12 6 6 6-6"/></svg></button>
+  </div>
   <nav class="c3nav" id="c3nav">
     <button type="button" data-c3="go-home">${C3I.home}خانه</button>
     <button type="button" data-c3="rooms">${C3I.walk}اتاق‌ها</button>
@@ -2190,8 +2186,7 @@ const walkShell = () => `<canvas id="c3cv"></canvas><i class="c3vig"></i>
   </nav>
   <div class="c3chips" id="c3chips"></div>
   <div class="c3bot" id="c3bot"></div>
-  <div class="c3sheet" id="c3sheet"></div>
-  <div class="c3hint" id="c3hint"><b>${WALK3D.hint.t}</b><p>${WALK3D.hint.p}</p><button type="button" data-c3="gothint">فهمیدم</button></div>
+  <div class="c3sheet" id="c3sheet"></div>
   <div class="c3load" id="c3load"><i class="c3ring"></i>در حال ساختن کلینیک…<small style="opacity:.6;font-size:11px">سنگ، مرمر و نور، همین‌جا در گوشی شما</small></div>
   <div class="c3welcome" id="c3welcome">
     <span class="c3wmark">${C3I.spark}</span>
@@ -2426,12 +2421,8 @@ document.addEventListener("click", (e) => {
     case "enter": {
       haptic("ok");
       const w = $("#c3welcome"); if (w) { w.classList.add("gone"); setTimeout(() => w.remove(), 500); }
-      if (!store.get("walkhint")) { const hn = $("#c3hint"); if (hn) { hn.classList.add("on");
-        setTimeout(() => { hn.classList.add("gone"); setTimeout(() => hn.remove(), 500); }, 5200); }
-        store.set("walkhint", 1); }
       return;
     }
-    case "gothint": { const hn = $("#c3hint"); if (hn) { hn.classList.add("gone"); setTimeout(() => hn.remove(), 400); } return; }
     case "rooms": haptic("light"); closeSheet3(); return host.classList.toggle("rooms");
     case "sheetclose": haptic("light"); return closeSheet3();
     case "botoff": { walkDismissed = true; const b = $("#c3bot"); if (b) b.classList.remove("on"); return; }

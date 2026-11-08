@@ -119,14 +119,14 @@ export const DOORS = [
   { a: "reception", b: "corridor", x: 0, z: 2, w: 2.6, axis: "x", glass: false, labelFa: "راهرو و اتاق‌ها" },
   { a: "reception", b: "lounge", x: -4.5, z: 4.5, w: 1.8, axis: "z", glass: true, labelFa: "لانژ انتظار" },
   { a: "reception", b: "gallery", x: 4.5, z: 4.5, w: 1.8, axis: "z", glass: true, labelFa: "گالری درمان‌ها" },
-  { a: "corridor", b: "booking", x: 1.3, z: 0.6, w: 1.4, axis: "z", glass: true, labelFa: "نوبت و تماس" },
-  { a: "corridor", b: "derm", x: -1.3, z: -3, w: 1.2, axis: "z", glass: false, labelFa: "مشاوره‌ی پوست" },
-  { a: "corridor", b: "inject", x: 1.3, z: -3, w: 1.2, axis: "z", glass: false, labelFa: "مشاوره‌ی تزریق" },
-  { a: "corridor", b: "analysis", x: -1.3, z: -7.2, w: 1.2, axis: "z", glass: false, labelFa: "آنالیز پوست" },
-  { a: "corridor", b: "facial", x: 1.3, z: -7.2, w: 1.2, axis: "z", glass: false, labelFa: "فیشال" },
-  { a: "corridor", b: "laser", x: -1.3, z: -11.7, w: 1.2, axis: "z", glass: false, labelFa: "اتاق لیزر" },
-  { a: "corridor", b: "hair", x: 1.3, z: -11.7, w: 1.2, axis: "z", glass: false, labelFa: "احیای مو" },
-  { a: "corridor", b: "doctor", x: 0, z: -14, w: 1.4, axis: "x", glass: false, labelFa: "دفتر دکتر" },
+  { a: "corridor", b: "booking", x: 1.3, z: 0.6, w: 1.6, axis: "z", glass: true, labelFa: "نوبت و تماس" },
+  { a: "corridor", b: "derm", x: -1.3, z: -3, w: 1.5, axis: "z", glass: false, labelFa: "مشاوره‌ی پوست" },
+  { a: "corridor", b: "inject", x: 1.3, z: -3, w: 1.5, axis: "z", glass: false, labelFa: "مشاوره‌ی تزریق" },
+  { a: "corridor", b: "analysis", x: -1.3, z: -7.2, w: 1.5, axis: "z", glass: false, labelFa: "آنالیز پوست" },
+  { a: "corridor", b: "facial", x: 1.3, z: -7.2, w: 1.5, axis: "z", glass: false, labelFa: "فیشال" },
+  { a: "corridor", b: "laser", x: -1.3, z: -11.7, w: 1.5, axis: "z", glass: false, labelFa: "اتاق لیزر" },
+  { a: "corridor", b: "hair", x: 1.3, z: -11.7, w: 1.5, axis: "z", glass: false, labelFa: "احیای مو" },
+  { a: "corridor", b: "doctor", x: 0, z: -14, w: 1.6, axis: "x", glass: false, labelFa: "دفتر دکتر" },
 ];
 
 /* The order the chip bar shows them, and the order the guided walk visits them. */
@@ -509,7 +509,7 @@ function kit(M) {
         put(out, box(.05, h, .05), M.wood, x - w / 2 + (i + .5) * (w / n), h / 2, z, rotY);
     },
 
-    planter(out, solids, blobs, x, z) {
+    planter(out, solids, blobs, x, z, soft) {
       put(out, new THREE.CylinderGeometry(.19, .15, .42, 10), M.marble, x, .21, z);
       put(out, box(.012, .012, .38), M.gold, x, .42, z);
       // dried palm and bleached branches: the Dubai reference, and no green anywhere
@@ -518,7 +518,7 @@ function kit(M) {
         const leaf = put(out, new THREE.PlaneGeometry(.1, .62), M.botanical, x, .72, z, a);
         leaf.rotation.z = (i % 2 ? .22 : -.22); leaf.translateY(.1);
       }
-      solid(solids, x, z, .4, .4, .5);
+      if (!soft) solid(solids, x, z, .4, .4, .5);
       blobs.push([x, z, .64, .64]);
     },
 
@@ -692,8 +692,8 @@ function furnish(ctx, key) {
   if (key === "corridor") {
     K.slats(P, R.x0 + .05, -5.1, 1.2, 2.9, 90);
     K.slats(P, R.x1 - .05, -9.3, 1.2, 2.9, -90);
-    K.planter(P, S, B, 0, -0.2);
-    K.planter(P, S, B, 0, -13.2);
+    K.planter(P, S, B, -0.78, -0.4, true);      // soft: a 2.6 m corridor has no room for a solid one
+    K.planter(P, S, B, 0.78, -13.0, true);
   }
 
   if (key === "booking") {
@@ -1038,8 +1038,10 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     rooms.get(d.b).portals.push({ to: d.a, box: b });
     PORTALS.push({ ...d, box: b, centre: new THREE.Vector3(d.x, 1.1, d.z) });
     // the walkable slot through the wall, so collision lets you pass
-    if (d.axis === "x") solids.push({ pass: true, x0: d.x - d.w / 2 + RADIUS, x1: d.x + d.w / 2 - RADIUS, z0: d.z - .7, z1: d.z + .7 });
-    else solids.push({ pass: true, x0: d.x - .7, x1: d.x + .7, z0: d.z - d.w / 2 + RADIUS, z1: d.z + d.w / 2 - RADIUS });
+    // The field 'pull' is the axis to drift onto while crossing: the one the opening runs along, never the one you walk
+    // along. Aiming a doorway with four arrow buttons is otherwise much harder than aiming it with your feet.
+    if (d.axis === "x") solids.push({ pass: true, pull: "x", at: d.x, x0: d.x - d.w / 2 + RADIUS, x1: d.x + d.w / 2 - RADIUS, z0: d.z - .7, z1: d.z + .7 });
+    else solids.push({ pass: true, pull: "z", at: d.z, x0: d.x - .7, x1: d.x + .7, z0: d.z - d.w / 2 + RADIUS, z1: d.z + d.w / 2 - RADIUS });
   }
   const passes = solids.filter((s) => s.pass);
   const blocks = solids.filter((s) => !s.pass);
@@ -1071,13 +1073,36 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
   };
   const step = (dx, dz) => {
     if (legal(at.x + dx, at.z + dz)) { at.x += dx; at.z += dz; return; }
-    if (legal(at.x + dx, at.z)) { at.x += dx; return; }
-    if (legal(at.x, at.z + dz)) at.z += dz;
+    if (legal(at.x + dx, at.z)) { at.x += dx; return; }               // slide along a wall
+    if (legal(at.x, at.z + dz)) { at.z += dz; return; }
+    // Both axes blocked at once is a corner, and the old code simply stopped there with the arrow still held.
+    // Try a short sidestep along whichever wall is being pressed into, so the corner releases you.
+    const s = Math.hypot(dx, dz) * .7;
+    if (s < 1e-5) return;
+    for (const [ox, oz] of [[dz, -dx], [-dz, dx]]) {
+      const k = s / Math.hypot(ox, oz);
+      if (legal(at.x + ox * k, at.z + oz * k)) { at.x += ox * k; at.z += oz * k; return; }
+    }
+  };
+  // Crossing a threshold, drift onto its centre line. A person aims for a gap without thinking about it; four
+  // arrow buttons cannot, and clipping the frame was what made walking feel like fighting.
+  const throughDoor = (dt, dx, dz) => {
+    for (const p of passes) {
+      if (at.x <= p.x0 || at.x >= p.x1 || at.z <= p.z0 || at.z >= p.z1) continue;
+      // You cross an opening along the axis it does NOT run along. Walking past a side door — down a corridor,
+      // say — must not drag you sideways into the room you are walking past.
+      const crossing = p.pull === "x" ? Math.abs(dz) : Math.abs(dx);
+      const along = p.pull === "x" ? Math.abs(dx) : Math.abs(dz);
+      if (crossing < along * 1.2) return;
+      const k = Math.min(1, dt * 5);
+      if (p.pull === "x") at.x += (p.at - at.x) * k; else at.z += (p.at - at.z) * k;
+      return;
+    }
   };
 
   // ── looking and walking
   let dragging = false, px = 0, py = 0, moved = 0, downAt = 0;
-  let pad = null;                           // the thumb pad: { id, cx, cy, dx, dy }
+  const held = { f: 0, b: 0, l: 0, r: 0 };  // which arrows are being pressed
   const keys = new Set();
   let walking = null;                        // an automatic walk: { fx, fz, tx, tz, t, dur, after }
   let tour = null;                           // the guided walk: a list of room keys
@@ -1094,29 +1119,13 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     renderer.setSize(w, h, false);
   };
 
-  // The thumb pad lives in the bottom-left corner whatever the page direction: that is where a thumb is, and RTL
-  // does not move anyone's hand.
-  const padBox = () => {
-    const w = host.clientWidth, h = host.clientHeight;
-    return { cx: 84, cy: h - 96, r: 62, w, h };
-  };
   const onDown = (e) => {
-    const p = at2(e), rct = canvas.getBoundingClientRect();
-    const lx = p.clientX - rct.left, ly = p.clientY - rct.top, B = padBox();
+    const p = at2(e);
     idle = 0;
-    if (Math.hypot(lx - B.cx, ly - B.cy) < B.r * 1.5) { pad = { cx: B.cx, cy: B.cy, dx: 0, dy: 0 }; return; }
     dragging = true; px = p.clientX; py = p.clientY; moved = 0; downAt = performance.now();
   };
   const onMove = (e) => {
     const p = at2(e);
-    if (pad) {
-      const rct = canvas.getBoundingClientRect();
-      const lx = p.clientX - rct.left - pad.cx, ly = p.clientY - rct.top - pad.cy, B = padBox();
-      const d = Math.min(1, Math.hypot(lx, ly) / B.r), a = Math.atan2(ly, lx);
-      pad.dx = Math.cos(a) * d; pad.dy = Math.sin(a) * d;
-      if (e.cancelable) e.preventDefault();
-      return;
-    }
     if (!dragging) return;
     const dx = p.clientX - px, dy = p.clientY - py;
     px = p.clientX; py = p.clientY; moved += Math.abs(dx) + Math.abs(dy);
@@ -1126,7 +1135,6 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     if (e.cancelable) e.preventDefault();
   };
   const onUp = (e) => {
-    if (pad) { pad = null; return; }
     if (dragging && moved < 10 && performance.now() - downAt < 420) tapped(e);
     dragging = false;
   };
@@ -1214,7 +1222,8 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
   let drift = 0;
   const home0 = { x: at.x, z: at.z, yaw };
   let last = performance.now(), acc = 0, frames = 0, lastDpr = 0, stop = false;
-  const WALK = 1.3;                         // metres a second: a slow confident walk, never a sprint
+  const WALK = 1.9;                         // metres a second. A person walks at 1.4 and strides at 2; the
+                                            // old 1.3 looked unhurried and felt heavy.
 
   function frame(now) {
     if (stop) return;
@@ -1241,20 +1250,23 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
         else if (tour) setTimeout(nextTourStop, 2600);
       }
     } else {
-      // the thumb pad and the keyboard both feed the same two numbers
-      let fwd = 0, side = 0;
-      if (pad) { fwd = -pad.dy; side = pad.dx; }
+      // the arrows and the keyboard feed the same numbers. Left and right TURN rather than slide sideways:
+      // turning is what a person does with their feet, and sidling is what a crab does.
+      let fwd = held.f - held.b, side = 0;
       if (keys.has("w") || keys.has("ArrowUp")) fwd += 1;
       if (keys.has("s") || keys.has("ArrowDown")) fwd -= 1;
-      if (keys.has("a") || keys.has("ArrowLeft")) side -= 1;
-      if (keys.has("d") || keys.has("ArrowRight")) side += 1;
+      if (keys.has("a")) side -= 1;
+      if (keys.has("d")) side += 1;
+      const turning = (held.l - held.r) + (keys.has("ArrowLeft") ? 1 : 0) - (keys.has("ArrowRight") ? 1 : 0);
+      if (turning) { yaw += turning * 88 * dt; idle = 0; }
       const n = Math.hypot(fwd, side);
       if (n > 1) { fwd /= n; side /= n; }
       const s = Math.sin(yaw * RAD), c = Math.cos(yaw * RAD);
       const wx = (-s * fwd + c * side) * WALK, wz = (-c * fwd - s * side) * WALK;
-      vx += (wx - vx) * Math.min(1, dt * 9); vz += (wz - vz) * Math.min(1, dt * 9);
+      vx += (wx - vx) * Math.min(1, dt * 13); vz += (wz - vz) * Math.min(1, dt * 13);
       if (Math.abs(vx) > .002 || Math.abs(vz) > .002) {
         step(vx * dt, vz * dt);
+        throughDoor(dt, vx * dt, vz * dt);
         const here = roomAt(at.x, at.z);
         if (here) setRoom(here);
         idle = 0;
@@ -1372,6 +1384,30 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
 
   // ── listeners
   if (!showcase) {
+    // the arrows: press and hold to keep going, let go to stop. They sit over the canvas as real buttons, so a
+    // press on one never reaches the drag-to-look handler below.
+    const stop = () => { held.f = held.b = held.l = held.r = 0; };
+    for (const b of host.querySelectorAll("[data-dir]")) {
+      const d = b.dataset.dir;
+      // The arrow takes ownership of the pointer the moment it is pressed. Without that the browser hands the
+      // gesture back the instant the finger drifts a pixel off the button — pointerleave, or a pointercancel it
+      // raises by itself — and the walk stops while the finger is still down. That is what "سخت حرکت میکنه"
+      // actually was: the press was being taken away, not the speed being wrong.
+      const go = (e) => {
+        held[d] = 1; idle = 0; b.classList.add("on");
+        if (e.pointerId !== undefined) { try { b.setPointerCapture(e.pointerId); } catch (err) {} }
+        if (e.cancelable) e.preventDefault();
+      };
+      const end = () => { held[d] = 0; b.classList.remove("on"); };
+      b.addEventListener("pointerdown", go);
+      b.addEventListener("pointerup", end);
+      b.addEventListener("pointercancel", end);
+      b.addEventListener("touchstart", go, { passive: false });
+      b.addEventListener("touchend", end);
+      b.addEventListener("contextmenu", (e) => e.preventDefault());
+    }
+    addEventListener("blur", stop);                 // a backgrounded tab must not keep walking
+
     canvas.addEventListener("pointerdown", onDown);
     addEventListener("pointermove", onMove, { passive: false });
     addEventListener("pointerup", onUp);
