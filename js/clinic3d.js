@@ -350,6 +350,10 @@ function makeMaterials(T) {
     skin: new THREE.MeshStandardMaterial({ color: 0xD9B493, roughness: .74, metalness: 0, envMapIntensity: .28, side: S }),
     coat: new THREE.MeshStandardMaterial({ color: 0xF0EDE6, roughness: .88, metalness: 0, envMapIntensity: .22, side: S }),
     hair: new THREE.MeshStandardMaterial({ color: 0x3B322A, roughness: .58, metalness: 0, envMapIntensity: .35, side: S }),
+    // her trousers and shoes need materials WITHOUT vertexColors: the furniture's materials carry it for their
+    // baked corner shading, and a mesh with no colour attribute would be multiplied to black by it.
+    trouser: new THREE.MeshStandardMaterial({ color: 0x9C8B77, roughness: .9, metalness: 0, envMapIntensity: .2, side: S }),
+    shoe: new THREE.MeshStandardMaterial({ color: 0x4A4038, roughness: .45, metalness: 0, envMapIntensity: .45, side: S }),
   };
 }
 
@@ -771,58 +775,123 @@ function furnish(ctx, key) {
    face so softly drawn it stays a suggestion at the distance she keeps. At arm's length a drawn face on a simple
    head goes uncanny; at the two and a half metres she stands away it reads as a person, which is the whole point. */
 function faceCanvas() {
-  const c = document.createElement("canvas"); c.width = c.height = 128;
+  const c = document.createElement("canvas"); c.width = c.height = 256;
   const x = c.getContext("2d");
-  x.fillStyle = "#D9B493"; x.fillRect(0, 0, 128, 128);
-  // a little warmth in the cheeks, so the face is not a flat swatch
-  for (const cx of [34, 94]) {
-    const g = x.createRadialGradient(cx, 82, 2, cx, 82, 22);
-    g.addColorStop(0, "rgba(199,134,112,.30)"); g.addColorStop(1, "rgba(199,134,112,0)");
-    x.fillStyle = g; x.fillRect(0, 0, 128, 128);
+  x.fillStyle = "#D9B493"; x.fillRect(0, 0, 256, 256);
+
+  // the edges of a face are always in shade; painting that in is what keeps a round head from reading as a ball
+  const rim = x.createRadialGradient(128, 132, 60, 128, 132, 140);
+  rim.addColorStop(0, "rgba(160,110,82,0)"); rim.addColorStop(1, "rgba(150,100,74,.5)");
+  x.fillStyle = rim; x.fillRect(0, 0, 256, 256);
+  for (const cx of [72, 184]) {                                   // a little warmth in the cheeks
+    const g = x.createRadialGradient(cx, 168, 3, cx, 168, 44);
+    g.addColorStop(0, "rgba(201,131,109,.34)"); g.addColorStop(1, "rgba(201,131,109,0)");
+    x.fillStyle = g; x.fillRect(0, 0, 256, 256);
   }
-  x.strokeStyle = "#4A3A2E"; x.lineCap = "round";
-  x.lineWidth = 5; x.beginPath(); x.moveTo(30, 58); x.quadraticCurveTo(42, 54, 54, 58);   // the eyes, closed-soft
-  x.moveTo(74, 58); x.quadraticCurveTo(86, 54, 98, 58); x.stroke();
-  x.lineWidth = 3; x.globalAlpha = .55;
-  x.beginPath(); x.moveTo(29, 45); x.quadraticCurveTo(42, 40, 55, 45);                    // brows
-  x.moveTo(73, 45); x.quadraticCurveTo(86, 40, 99, 45); x.stroke();
+
+  const eye = (cx) => {
+    x.save();
+    x.beginPath();                                                // an almond, not a circle
+    x.moveTo(cx - 26, 118); x.quadraticCurveTo(cx, 100, cx + 26, 118);
+    x.quadraticCurveTo(cx, 134, cx - 26, 118); x.closePath();
+    x.fillStyle = "#FBF4EC"; x.fill(); x.clip();
+    x.fillStyle = "#4B3826"; x.beginPath(); x.arc(cx, 116, 10.5, 0, 6.2832); x.fill();   // iris
+    x.fillStyle = "#1C140D"; x.beginPath(); x.arc(cx, 116, 4.6, 0, 6.2832); x.fill();    // pupil
+    x.fillStyle = "rgba(255,255,255,.85)"; x.beginPath(); x.arc(cx - 3.6, 112, 2.6, 0, 6.2832); x.fill();
+    x.restore();
+    x.strokeStyle = "#3A2B1E"; x.lineWidth = 3.6; x.lineCap = "round";  // the lash line, heavier than the lower lid
+    x.beginPath(); x.moveTo(cx - 26, 118); x.quadraticCurveTo(cx, 100, cx + 26, 118); x.stroke();
+    x.globalAlpha = .45; x.lineWidth = 2;
+    x.beginPath(); x.moveTo(cx - 24, 119); x.quadraticCurveTo(cx, 133, cx + 24, 119); x.stroke();
+    x.globalAlpha = 1;
+  };
+  eye(72); eye(184);
+
+  x.strokeStyle = "#4A3728"; x.lineWidth = 6; x.lineCap = "round"; x.globalAlpha = .62;
+  x.beginPath(); x.moveTo(46, 90); x.quadraticCurveTo(72, 78, 98, 88);          // brows
+  x.moveTo(158, 88); x.quadraticCurveTo(184, 78, 210, 90); x.stroke();
+  x.globalAlpha = .3; x.lineWidth = 4;
+  x.beginPath(); x.moveTo(122, 128); x.quadraticCurveTo(118, 158, 130, 166); x.stroke();   // the bridge of the nose
   x.globalAlpha = 1;
-  x.strokeStyle = "#A9644F"; x.lineWidth = 3.5;
-  x.beginPath(); x.arc(64, 86, 13, .45, Math.PI - .45); x.stroke();                        // the quietest smile
+
+  // the mouth: an upper lip of two curves and a fuller lower one, barely smiling
+  x.fillStyle = "#B8705C";
+  x.beginPath();
+  x.moveTo(104, 196);
+  x.quadraticCurveTo(116, 188, 128, 193); x.quadraticCurveTo(140, 188, 152, 196);
+  x.quadraticCurveTo(128, 214, 104, 196);
+  x.fill();
+  x.globalAlpha = .4; x.strokeStyle = "#8E5343"; x.lineWidth = 1.6;
+  x.beginPath(); x.moveTo(104, 196); x.quadraticCurveTo(128, 200, 152, 196); x.stroke();
+  x.globalAlpha = 1;
   return c;
 }
 
 function makeGuide(M) {
   const g = new THREE.Group();
-  const put = (geo, mat, y, z = 0, xx = 0) => {
-    const m = new THREE.Mesh(geo, mat); m.position.set(xx, y, z); m.frustumCulled = false; g.add(m); return m;
-  };
-  const cyl = (rt, rb, h, seg = 12) => new THREE.CylinderGeometry(rt, rb, h, seg);
-  const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
+  const add = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.frustumCulled = false; g.add(m); return m; };
+  const cap = (r, len, seg = 8) => new THREE.CapsuleGeometry(r, len, 2, seg);
 
+  /* The coat, as one revolved profile: hem, knee, hip, waist, bust, shoulder, neck. A circle of revolution would
+     make her a column, so the whole surface is squashed on z — a body is an oval seen from above, not a tube. */
+  const profile = [
+    [0, .605], [.192, .615], [.188, .72], [.177, .84], [.159, .945], [.168, 1.03],
+    [.186, 1.12], [.182, 1.23], [.17, 1.31], [.138, 1.375], [.08, 1.408], [0, 1.42],
+  ].map(([r, y]) => new THREE.Vector2(r, y));
+  const coat = add(new THREE.LatheGeometry(profile, 18), M.coat, 0, 0, 0);
+  coat.scale.set(1.22, 1, .78);
+
+  // a champagne collar sitting on the shoulders, and one thin belt at the waist
+  const collar = add(new THREE.TorusGeometry(.1, .016, 6, 14), M.metal, 0, 1.385, 0);
+  collar.rotation.x = Math.PI / 2; collar.scale.set(1.2, .8, 1);
+  const belt = add(new THREE.TorusGeometry(.159, .01, 6, 18), M.gold, 0, .945, 0);
+  belt.rotation.x = Math.PI / 2; belt.scale.set(1.22, .78, 1);
+
+  // arms, hanging with the slight outward fall of a sleeve, and hands below them
   for (const s of [-1, 1]) {
-    put(box(.085, .045, .2), M.joinery, .022, .02, s * .065);                 // shoes
-    put(cyl(.048, .042, .34), M.skin, .2, 0, s * .065);                       // lower legs
+    const arm = add(cap(.044, .38), M.coat, s * .234, 1.11, .012);
+    arm.rotation.z = s * -.055;
+    add(cap(.035, .04), M.skin, s * .251, .862, .018);                // the hand below the cuff
   }
-  put(cyl(.17, .26, .58, 16), M.coat, .64);                                   // the coat below the waist
-  put(cyl(.155, .155, .035, 16), M.gold, .91);                                // one thin belt
-  put(cyl(.14, .17, .47, 16), M.coat, 1.14);                                  // the coat above it
-  put(box(.1, .016, .13), M.metal, 1.31, .075);                               // a collar of brushed champagne
-  for (const s of [-1, 1]) {
-    put(cyl(.044, .04, .5), M.coat, 1.11, 0, s * .175);                       // arms, at rest
-    put(cyl(.038, .034, .09), M.skin, .83, 0, s * .175);                      // hands
+
+  /* Weight on her left: one leg takes it, the other is relaxed and a touch forward. Standing square is the
+     single most mannequin-like thing a figure can do. */
+  add(cap(.057, .45), M.trouser, -.075, .315, 0);
+  add(cap(.055, .44), M.trouser, .082, .322, .038);
+  for (const [sx, sz] of [[-.075, .012], [.086, .052]]) {
+    const shoe = add(cap(.034, .075), M.shoe, sx, .034, sz + .018);
+    shoe.rotation.x = Math.PI / 2; shoe.scale.set(1, 1, .6);
   }
-  put(cyl(.045, .048, .09), M.skin, 1.41);                                    // neck
-  put(box(.165, .205, .175), M.skin, 1.55);                                   // head
+
+  add(cap(.046, .035), M.skin, 0, 1.448, 0);                        // neck
+
+  // the head: an ellipsoid, with the face painted onto a patch of its own surface so it curves with the skull
+  const head = new THREE.Group();
+  head.position.set(0, 1.565, .004);
+  head.scale.set(1, 1.1, .95);
+  g.add(head);
+  const skull = new THREE.Mesh(new THREE.SphereGeometry(.098, 16, 12), M.skin);
+  skull.frustumCulled = false; head.add(skull);
   const t = new THREE.CanvasTexture(faceCanvas());
   t.colorSpace = THREE.SRGBColorSpace; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter;
-  put(new THREE.PlaneGeometry(.145, .145), new THREE.MeshStandardMaterial({ map: t, roughness: .74,
-    metalness: 0, envMapIntensity: .28 }), 1.552, .0885);
-  put(box(.195, .185, .2), M.hair, 1.605, -.012);                             // the crown
-  put(box(.185, .3, .095), M.hair, 1.4, -.06);                                // and its length down her back
-  for (const s of [-1, 1]) put(box(.03, .17, .19), M.hair, 1.52, -.004, s * .085);   // framing her face
+  // phi = π/2 faces +z in three.js sphere maths, so this is the front of her face and nothing else
+  const face = new THREE.Mesh(
+    new THREE.SphereGeometry(.0995, 18, 14, Math.PI / 2 - .62, 1.24, 1.0, .92),
+    new THREE.MeshStandardMaterial({ map: t, roughness: .62, metalness: 0, envMapIntensity: .26 }));
+  face.frustumCulled = false; head.add(face);
+
+  // hair: a cap over the crown, the weight of it down her back, and two strands framing her face
+  const crown = new THREE.Mesh(new THREE.SphereGeometry(.106, 14, 10, 0, 6.2832, 0, 1.0), M.hair);
+  crown.position.set(0, .006, -.012); crown.frustumCulled = false; head.add(crown);
+  const fall = add(new THREE.SphereGeometry(.098, 12, 10), M.hair, 0, 1.432, -.062);
+  fall.scale.set(.98, 1.7, .58);
+  for (const s of [-1, 1]) {                                          // two strands down the sides of her face
+    const strand = add(new THREE.SphereGeometry(.05, 8, 8), M.hair, s * .101, 1.5, -.012);
+    strand.scale.set(.52, 1.85, .95);
+  }
   return g;
 }
+
 
 /* ── the stage ─────────────────────────────────────────────────────────────────────────────────────────────── */
 

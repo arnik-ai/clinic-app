@@ -79,9 +79,20 @@ extra class: `.hero.live .on-photo`.
 
 ## آوا, the guide
 
-Walk into a room and someone is there. She is a woman in a clinic coat — 1.7 m, built from the same boxes and
-cylinders as the furniture, in the same palette — and deliberately **not** a machine: no screen for a face, no
-antenna, no glow. The owner asked for exactly that: «یک خانم که مشخص نیست رباته». She comes with you from room to
+Walk into a room and someone is there. She is a woman in a clinic tunic over soft taupe trousers — 1.67 m, in the same
+palette as the rooms — and deliberately **not** a machine: no screen for a face, no antenna, no glow.
+
+What gives a figure away as made rather than seen is the silhouette, not the detail, so she is not stacked out of
+the furniture's boxes: her body is one revolved profile with shoulders, a waist and a hem, squashed on z so its
+cross-section is a person's oval instead of a tube; her head is an ellipsoid; her limbs are capsules; her face is
+painted onto a curved patch of her own skull rather than stuck flat on the front of it; and she stands with her
+weight on one leg, because standing square is the most mannequin-like thing a figure can do. About 1,400
+triangles, which is the only object in the clinic that earns that many.
+
+Two traps worth remembering: she needs **her own materials** for anything the furniture also wears, because the
+furniture's carry `vertexColors: true` for their baked corner shading and a limb with no colour attribute is
+multiplied to black by it; and her sleeves have to sit at a wider radius than the body they hang beside, or her
+arms float clear of her. The owner asked for exactly that: «یک خانم که مشخص نیست رباته». She comes with you from room to
 room rather than being a different machine waiting in each, keeps a conversation's distance, turns to face you,
 and says «من راهنماییت می‌کنم» when you arrive.
 
