@@ -134,6 +134,14 @@ export const SPACE_KEYS = ["reception", "lounge", "derm", "analysis", "laser", "
                            "doctor", "gallery", "booking"];
 export const spaceInfo = (k) => ({ key: k, ...ROOMS[k] });
 
+/* Where the guide will stand, in the order she tries them: [how far ahead, how far to the side]. The first is
+   the one that composes best — a conversation's distance, a little off centre so she is beside what you came to
+   look at. The rest are what you do when someone is standing behind a pillar. */
+const GUIDE_SPOTS = [
+  [3.0, .55], [3.0, -.55], [2.6, 1.0], [2.6, -1.0], [3.2, .15], [3.2, -.15],
+  [2.2, .7], [2.2, -.7], [1.9, .3], [1.9, -.3],
+];
+
 const RAD = Math.PI / 180;
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const ease = (k) => (k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
@@ -337,6 +345,11 @@ function makeMaterials(T) {
     cove: new THREE.MeshBasicMaterial({ color: 0xFFF1DC, toneMapped: false, fog: false }),
     bezel: new THREE.MeshStandardMaterial({ color: 0x3A342D, roughness: .4, metalness: .2, envMapIntensity: .4, side: S }),
     botanical: new THREE.MeshStandardMaterial({ color: 0xCDB78E, roughness: .8, metalness: 0, envMapIntensity: .3, side: D }),
+    // the guide. Skin is the one colour here that is not derived from the stone palette, but it is chosen inside
+    // the same warm family so she belongs to the room rather than being pasted onto it.
+    skin: new THREE.MeshStandardMaterial({ color: 0xD9B493, roughness: .74, metalness: 0, envMapIntensity: .28, side: S }),
+    coat: new THREE.MeshStandardMaterial({ color: 0xF0EDE6, roughness: .88, metalness: 0, envMapIntensity: .22, side: S }),
+    hair: new THREE.MeshStandardMaterial({ color: 0x3B322A, roughness: .58, metalness: 0, envMapIntensity: .35, side: S }),
   };
 }
 
@@ -635,7 +648,7 @@ function furnish(ctx, key) {
     // the waiting side: two sofas facing each other across a glass partition, west of the walk-through
     K.sofa(P, S, B, -2.9, 7.0, 2.4, 90);
     K.sofa(P, S, B, -2.9, 4.0, 1.8, 90);
-    K.partition(P, S, 0.7, 6.0, 2.4, 2.2, 90);
+    K.partition(P, S, -1.55, 6.2, 2.6, 2.2, 90);   // beside the seating, not across the view of the counter
     K.put(P, new THREE.CylinderGeometry(.38, .34, .34, 12), M.marble, -1.6, .17, 5.6);
     B.push([-1.6, 5.6, .9, .9]);
     // the service directory on the slatted wall, and the booking screen next to it
@@ -752,6 +765,65 @@ function furnish(ctx, key) {
   return hot;
 }
 
+/* ── the guide ─────────────────────────────────────────────────────────────────────────────────────────────────
+   A woman in a clinic coat, 1.7 m tall, built from the same boxes and cylinders as the furniture. She must not
+   read as a machine, so there is no screen, no antenna and no glow — only the warm silhouette, dark hair, and a
+   face so softly drawn it stays a suggestion at the distance she keeps. At arm's length a drawn face on a simple
+   head goes uncanny; at the two and a half metres she stands away it reads as a person, which is the whole point. */
+function faceCanvas() {
+  const c = document.createElement("canvas"); c.width = c.height = 128;
+  const x = c.getContext("2d");
+  x.fillStyle = "#D9B493"; x.fillRect(0, 0, 128, 128);
+  // a little warmth in the cheeks, so the face is not a flat swatch
+  for (const cx of [34, 94]) {
+    const g = x.createRadialGradient(cx, 82, 2, cx, 82, 22);
+    g.addColorStop(0, "rgba(199,134,112,.30)"); g.addColorStop(1, "rgba(199,134,112,0)");
+    x.fillStyle = g; x.fillRect(0, 0, 128, 128);
+  }
+  x.strokeStyle = "#4A3A2E"; x.lineCap = "round";
+  x.lineWidth = 5; x.beginPath(); x.moveTo(30, 58); x.quadraticCurveTo(42, 54, 54, 58);   // the eyes, closed-soft
+  x.moveTo(74, 58); x.quadraticCurveTo(86, 54, 98, 58); x.stroke();
+  x.lineWidth = 3; x.globalAlpha = .55;
+  x.beginPath(); x.moveTo(29, 45); x.quadraticCurveTo(42, 40, 55, 45);                    // brows
+  x.moveTo(73, 45); x.quadraticCurveTo(86, 40, 99, 45); x.stroke();
+  x.globalAlpha = 1;
+  x.strokeStyle = "#A9644F"; x.lineWidth = 3.5;
+  x.beginPath(); x.arc(64, 86, 13, .45, Math.PI - .45); x.stroke();                        // the quietest smile
+  return c;
+}
+
+function makeGuide(M) {
+  const g = new THREE.Group();
+  const put = (geo, mat, y, z = 0, xx = 0) => {
+    const m = new THREE.Mesh(geo, mat); m.position.set(xx, y, z); m.frustumCulled = false; g.add(m); return m;
+  };
+  const cyl = (rt, rb, h, seg = 12) => new THREE.CylinderGeometry(rt, rb, h, seg);
+  const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
+
+  for (const s of [-1, 1]) {
+    put(box(.085, .045, .2), M.joinery, .022, .02, s * .065);                 // shoes
+    put(cyl(.048, .042, .34), M.skin, .2, 0, s * .065);                       // lower legs
+  }
+  put(cyl(.17, .26, .58, 16), M.coat, .64);                                   // the coat below the waist
+  put(cyl(.155, .155, .035, 16), M.gold, .91);                                // one thin belt
+  put(cyl(.14, .17, .47, 16), M.coat, 1.14);                                  // the coat above it
+  put(box(.1, .016, .13), M.metal, 1.31, .075);                               // a collar of brushed champagne
+  for (const s of [-1, 1]) {
+    put(cyl(.044, .04, .5), M.coat, 1.11, 0, s * .175);                       // arms, at rest
+    put(cyl(.038, .034, .09), M.skin, .83, 0, s * .175);                      // hands
+  }
+  put(cyl(.045, .048, .09), M.skin, 1.41);                                    // neck
+  put(box(.165, .205, .175), M.skin, 1.55);                                   // head
+  const t = new THREE.CanvasTexture(faceCanvas());
+  t.colorSpace = THREE.SRGBColorSpace; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter;
+  put(new THREE.PlaneGeometry(.145, .145), new THREE.MeshStandardMaterial({ map: t, roughness: .74,
+    metalness: 0, envMapIntensity: .28 }), 1.552, .0885);
+  put(box(.195, .185, .2), M.hair, 1.605, -.012);                             // the crown
+  put(box(.185, .3, .095), M.hair, 1.4, -.06);                                // and its length down her back
+  for (const s of [-1, 1]) put(box(.03, .17, .19), M.hair, 1.52, -.004, s * .085);   // framing her face
+  return g;
+}
+
 /* ── the stage ─────────────────────────────────────────────────────────────────────────────────────────────── */
 
 // An environment to reflect, with no file. Without one, metal and glass have nothing to catch and read as plastic.
@@ -778,6 +850,7 @@ function makeRoomEnv(renderer) {
 }
 
 const _pv = new THREE.Matrix4(), _frustum = new THREE.Frustum(), _v4 = new THREE.Vector4();
+const _guidePos = new THREE.Vector3();
 
 // A doorway's rectangle in screen space, or the whole screen if it straddles the camera.
 function projectRect(box) {
@@ -850,6 +923,16 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
   scene.add(blobs);
   const _m4 = new THREE.Matrix4();
   let blobN = 0;
+
+  // ── the guide, and the soft patch of floor she stands on
+  const guide = makeGuide(M);
+  scene.add(guide);
+  const guideShadow = new THREE.Mesh(blobGeo, new THREE.MeshBasicMaterial({ map: T.blob, transparent: true,
+    opacity: .72, depthWrite: false, toneMapped: false, fog: false }));
+  guideShadow.scale.set(.62, 1, .62); guideShadow.renderOrder = 2; guideShadow.frustumCulled = false;
+  scene.add(guideShadow);
+  const guideAt = new THREE.Vector3(), guideTo = new THREE.Vector3();
+  let guideSaid = 0, guideIdle = 0, guideLook = 0;
 
   // ── build the clinic: all eleven spaces at once, then cull by what you can see
   const rooms = new Map();
@@ -1000,6 +1083,7 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     const id = b.dataset.id;
     const d = PORTALS.find((p) => "door:" + p.a + ">" + p.b === id || "door:" + p.b + ">" + p.a === id);
     if (d) return walkTo(d.x, d.z, d);
+    if (id === "guide") { if (onHotspot) onHotspot({ key: "guide", room, title: "راهنمای کلینیک", opens: "advisor" }); return; }
     const h = HOTSPOTS.find((x) => x.key === id);
     if (h && onHotspot) onHotspot(h);
   });
@@ -1044,6 +1128,10 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
   const setRoom = (k) => {
     if (k === room || !ROOMS[k]) return;
     room = k; lightRoom(k);
+    // put her inside the new room before she starts walking, or she would cross a wall to reach you
+    const r = rooms.get(k);
+    if (r && !showcase) guideAt.set(clamp(guideAt.x, r.R.x0 + .65, r.R.x1 - .65), 0, clamp(guideAt.z, r.R.z0 + .65, r.R.z1 - .65));
+    guideSaid = performance.now();
     if (onRoom) onRoom(spaceInfo(k));
   };
   const startTour = () => { tour = SPACE_KEYS.slice(); nextTourStop(); };
@@ -1108,6 +1196,44 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     camera.rotation.set(pitch * RAD, yaw * RAD, 0, "YXZ");
     camera.updateMatrixWorld();
 
+    // She keeps a conversation's distance and stands a little to one side, beside what you are looking at rather
+    // than in front of it. In the header she simply waits in the lobby instead of following a drifting camera.
+    if (!showcase) {
+      guideLook -= dt;
+      if (guideLook <= 0) {
+        guideLook = .16;
+        const s = Math.sin(yaw * RAD), c = Math.cos(yaw * RAD);
+        const r = rooms.get(room);
+        // Free floor is not the same as being visible: a counter, a post or a glass screen in between hides her.
+        // So try the place she would like to stand first, then a step either way, then nearer — the order a
+        // person would try them in.
+        const clear = (px, pz) => {
+          for (let k = .3; k <= 1.001; k += .14) if (!legal(at.x + (px - at.x) * k, at.z + (pz - at.z) * k)) return false;
+          return true;
+        };
+        // and she does not stand in front of what she is showing you, which would put its label across her face
+        const onTopOfAMarker = (px, pz) =>
+          HOTSPOTS.some((h) => h.room === room && Math.hypot(h.pos.x - px, h.pos.z - pz) < 1.25);
+        let ok = false;
+        for (let pass = 0; pass < 2 && !ok; pass++) {
+          for (const d of GUIDE_SPOTS) {
+            let px = at.x - s * d[0] + c * d[1], pz = at.z - c * d[0] - s * d[1];
+            if (r) { px = clamp(px, r.R.x0 + .6, r.R.x1 - .6); pz = clamp(pz, r.R.z0 + .6, r.R.z1 - .6); }
+            if (pass === 0 && onTopOfAMarker(px, pz)) continue;
+            if (legal(px, pz) && clear(px, pz)) { guideTo.set(px, 0, pz); ok = true; break; }
+          }
+        }
+        if (!ok) guideTo.set(at.x - s * 2.2, 0, at.z - c * 2.2);        // nothing worked: stand in front of you
+      }
+      guideAt.lerp(guideTo, Math.min(1, dt * 1.2));          // she walks over; she does not appear
+    }
+    // standing still is never quite still: a slow shift of weight, and that is all
+    guideIdle += dt;
+    guide.position.set(guideAt.x, Math.sin(guideIdle * .9) * .006, guideAt.z);
+    guide.rotation.z = Math.sin(guideIdle * .55) * .006;
+    guide.lookAt(camera.position.x, guide.position.y + 1.55, camera.position.z);
+    guideShadow.position.set(guideAt.x, .008, guideAt.z);
+
     // only the room you are in, plus what is genuinely visible through its doorways
     _pv.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     _frustum.setFromProjectionMatrix(_pv);
@@ -1146,6 +1272,8 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
       m.classList.toggle("near", d < 2.4);
       seen.add(id);
     };
+    _guidePos.set(guideAt.x, 1.86, guideAt.z);
+    place("guide", now - guideSaid < 5200 ? "من راهنماییت می‌کنم" : "بپرس", "guide", _guidePos, 9);
     for (const h of HOTSPOTS) if (shown.has(h.room)) place(h.key, h.title, "hot", h.pos, 7);
     for (const p of PORTALS) {
       if (!shown.has(p.a) && !shown.has(p.b)) continue;

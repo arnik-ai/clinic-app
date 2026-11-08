@@ -77,10 +77,27 @@ selector in the house layer — which is how the scrim came to be painted across
 word ghosted while the gold pill stayed solid. Anything in this sheet that has to beat `_theme.css` needs the
 extra class: `.hero.live .on-photo`.
 
-## The advisor in every room
+## آوا, the guide
 
-Walk into a room and an advisor appears: it names the room, asks what you need, and offers four questions a visitor
-standing there would really ask. It is **rule-based and says so**. It matches what you type against the clinic's own
+Walk into a room and someone is there. She is a woman in a clinic coat — 1.7 m, built from the same boxes and
+cylinders as the furniture, in the same palette — and deliberately **not** a machine: no screen for a face, no
+antenna, no glow. The owner asked for exactly that: «یک خانم که مشخص نیست رباته». She comes with you from room to
+room rather than being a different machine waiting in each, keeps a conversation's distance, turns to face you,
+and says «من راهنماییت می‌کنم» when you arrive.
+
+Standing somewhere is not the same as being seen, so before she walks she looks for a spot that is free to stand
+in, has nothing between it and you, and is not in front of whatever the room's marker is pointing at — trying a
+handful of bearings and distances in the order a person would. (The glass partition in reception was moved for
+the same reason: it stood across the view of the counter.) A face drawn on a simple head goes uncanny at arm's
+length and reads as a person at the two and a half metres she keeps, which is why she keeps it.
+
+What answers behind her is the rule-based advisor below, and the line under every answer still says where it came
+from. A friendly face is not a reason to be less clear about that.
+
+## What she answers from
+
+She names the room, asks what you need, and offers four questions a visitor standing there would really ask. The
+answers are **rule-based and say so**. It matches what you type against the clinic's own
 knowledge (`KB` in `clinic-a.js` — the 16 answers this app used to carry, plus one set per room), and every answer
 carries the clinic paper it came from. The ladder is the house one:
 

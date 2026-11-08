@@ -497,6 +497,13 @@ textarea.input { resize: none; line-height: 1.7; }
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   text-shadow: 0 1px 6px rgba(0, 0, 0, .4);
 }
+/* the guide: gold, because she is the one thing in the room that is speaking to you */
+.c3spot.guide i { border-color: var(--c3-gold); background: rgba(184, 154, 104, .5); }
+.c3spot.guide i::after { background: var(--c3-ivory); }
+.c3spot.guide b {
+  background: rgba(184, 154, 104, .92); border-color: rgba(255, 253, 249, .5);
+  color: #241E17; font-weight: 700;
+}
 /* a doorway reads as a way through, not as a thing to inspect */
 .c3spot.door i { border-radius: 8px; border-color: rgba(255, 255, 255, .5); }
 .c3spot.door i::after { inset: 6px; border-radius: 3px; background: rgba(255, 255, 255, .78); }
@@ -1746,7 +1753,6 @@ function home() {
     <div class="shelf">${SERVICES.filter((s) => s.ph).map((s) => `<button type="button" data-booksvc="${s.id}" aria-label="${esc(s.t)}"><img src="img/${s.ph}.jpg" alt="" loading="lazy"><span class="lbl"><b>${s.t}</b><small>${s.free ? "رایگان" : priceText(s) + " تومان"}</small></span></button>`).join("")}</div>
     ${nx ? `<button class="nextap" type="button" data-go="care">${ICON.doctorI}<span class="v"><small>نوبت بعدی · ${relDay(nx.k)}</small><b>${svcOf(nx.svc).t} با ${docOf(nx.doc).t}</b><small>${faDate(toDate(nx.k))} · ساعت ${nx.at}</small></span><span class="chev" style="color:var(--mint-d);display:grid">${ICON.chev}</span></button>` : ""}
     <div class="tiles">
-      <button class="tile t-mint" type="button" data-act="ask"><span class="ring">${ICON.chatO}</span><b>پرسش از مشاور</b><span>در تلگرام جواب می‌گیری</span></button>
       <button class="tile t-lilac" type="button" data-go="book"><span class="ring">${ICON.calO}</span><b>نوبت دکتر</b><span>خدمت، دکتر، ساعت</span></button>
       <button class="tile t-sky" type="button" data-go="care"><span class="ring">${ICON.heartO}</span><b>مراقبت من</b><span>${careTodo()}</span></button>
       <button class="tile t-peach" type="button" data-go="prices"><span class="ring">${ICON.tagO}</span><b>تعرفه‌ها</b><span>بوتاکس، لیزر، فیلر…</span></button>
@@ -2102,6 +2108,7 @@ const C3I = {
   grid: '<svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>',
   send: '<svg viewBox="0 0 24 24"><path d="M3 3l18 7.5-7 2.5-2.5 7z"/><path d="M3 3l11 10"/></svg>',
   bot: '<svg viewBox="0 0 24 24"><rect x="4" y="7.5" width="16" height="12" rx="4"/><path d="M12 3.5v4M8.5 13h.01M15.5 13h.01M9.5 16.5h5"/></svg>',
+  her: '<svg viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="3.6"/><path d="M8.4 6.2c0-2.4 1.6-3.7 3.6-3.7s3.6 1.3 3.6 3.7"/><path d="M5 20.5c0-3.5 3.1-5.8 7-5.8s7 2.3 7 5.8"/></svg>',
   src: '<svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>',
   spark: '<svg viewBox="0 0 24 24"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg>',
 };
@@ -2205,7 +2212,12 @@ async function startWalk() {
       });
       advisorEnter(s.key);
     },
-    onHotspot: (hs) => { haptic("light"); walkOpen(hs); },
+    onHotspot: (hs) => {
+      haptic("light");
+      // she is the advisor's face: pressing her brings the answers back, even after they were sent away
+      if (hs.opens === "advisor") { walkDismissed = false; advisorEnter(walkRoom); const b = $("#c3bot"); if (b) b.classList.add("on"); return; }
+      walkOpen(hs);
+    },
     onReady: () => {
       const load = $("#c3load");
       if (load) { load.classList.add("gone"); setTimeout(() => load.remove(), 600); }
@@ -2275,8 +2287,8 @@ function advisorEnter(key) {
   if (!R || !R.greet) return;
   const box = $("#c3bot"); if (!box) return;
   box.innerHTML = `<div class="c3bothead">
-      <span class="c3botav">${C3I.bot}</span>
-      <div><b>مشاور کلینیک</b><small>از روی اسناد خود کلینیک</small></div>
+      <span class="c3botav">${C3I.her}</span>
+      <div><b>آوا · راهنمای کلینیک</b><small>از روی اسناد خود کلینیک</small></div>
       <button class="c3botx" type="button" data-c3="botoff" aria-label="بستن مشاور">${C3I.x}</button>
     </div>
     <div class="c3botlog" id="c3botlog"><div class="c3msg bot">${R.greet}</div></div>
