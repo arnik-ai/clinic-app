@@ -404,6 +404,438 @@ textarea.input { resize: none; line-height: 1.7; }
 .soon + .soon { margin-top: 16px; padding-top: 14px; border-top: 1.5px dashed var(--glass-line); }
 .soon > b { display: block; font-size: 14.5px; font-weight: 900; }
 .soon .tl { margin-top: 12px; }
+/* ── the walkable clinic, over the app ──────────────────────────────────────────────────────────────────────────
+   A full screen of its own, like the hotel's tour. Everything here is prefixed c3 so it cannot collide with the
+   app underneath, and it is all pinned over the scene rather than laid out in the page.
+
+   Two rules the whole sheet obeys:
+     · The scene is the picture. Every panel is translucent warm ivory over a blur, never an opaque slab, and
+       nothing covers the middle of the screen unless the visitor asked for it.
+     · The thumb pad stays in the bottom-LEFT corner physically, not at the inline start. RTL moves the text;
+       it does not move anyone's hand. */
+
+:root {
+  --c3-ivory: #F8F5EF;
+  --c3-champagne: #D8C5A5;
+  --c3-gold: #B89A68;
+  --c3-taupe: #51483F;
+  --c3-glass: rgba(248, 245, 239, .82);
+  --c3-glass-2: rgba(248, 245, 239, .94);
+  --c3-dark: rgba(34, 29, 24, .46);
+  --c3-hair: rgba(184, 154, 104, .42);
+  --c3-shadow: 0 10px 34px rgba(42, 35, 28, .22);
+}
+
+.c3-host {
+  position: fixed; inset: 0; z-index: 70;
+  display: none; background: #EFE9DE;
+  direction: rtl; color: var(--c3-taupe);
+  font-family: Vazirmatn, system-ui, sans-serif;
+  overscroll-behavior: none; touch-action: none;   /* the drag belongs to the scene, not to the page */
+  -webkit-user-select: none; user-select: none;
+}
+.c3-host.on { display: block; }
+.c3-host canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* a soft vignette: it does not darken the room, it just gives the panels an edge to sit against */
+.c3vig {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(120% 86% at 50% 42%, transparent 48%, rgba(60, 50, 40, .26) 100%);
+}
+
+/* ── where you are ───────────────────────────────────────────────────────────────────────────────────────────── */
+.c3top {
+  position: absolute; inset-inline: 0; top: 0; z-index: 4;
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) 14px 14px;
+  background: linear-gradient(to bottom, rgba(40, 33, 26, .42), transparent);
+}
+.c3where { flex: 1; min-width: 0; text-shadow: 0 1px 10px rgba(40, 33, 26, .55); color: #FFF; }
+.c3eyebrow {
+  display: block; font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--c3-champagne); margin-bottom: 3px;
+}
+.c3where b { display: block; font-size: 17px; font-weight: 700; line-height: 1.25; }
+.c3where small { display: block; font-size: 12px; opacity: .84; margin-top: 2px; }
+
+.c3ib {
+  flex-shrink: 0; width: 40px; height: 40px; border-radius: 13px;
+  display: grid; place-items: center; cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, .34);
+  background: rgba(40, 33, 26, .34); color: #FFF;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.c3ib:active { transform: scale(.94); }
+.c3ib svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── the markers you tap ─────────────────────────────────────────────────────────────────────────────────────── */
+.c3spots { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+/* [hidden] alone cannot win against the display below — an author rule beats the browser's own sheet — and a
+   marker that is merely transparent is still a button waiting to be pressed. */
+.c3spot[hidden] { display: none; }
+.c3spot {
+  position: absolute; transform: translate(-50%, -50%);
+  pointer-events: auto; cursor: pointer; border: 0; padding: 0;
+  display: flex; align-items: center; gap: 7px;
+  background: none; color: #FFF; font: inherit; font-size: 12.5px;
+  transition: opacity .22s ease;
+}
+.c3spot i {
+  width: 26px; height: 26px; flex-shrink: 0; border-radius: 50%;
+  border: 1.5px solid var(--c3-champagne); background: rgba(40, 33, 26, .3);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  position: relative;
+}
+.c3spot i::after {
+  content: ""; position: absolute; inset: 7px; border-radius: 50%;
+  background: var(--c3-champagne);
+}
+.c3spot b {
+  font-weight: 500; white-space: nowrap; padding: 5px 11px; border-radius: 999px;
+  background: rgba(40, 33, 26, .46); border: 1px solid rgba(255, 255, 255, .2);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .4);
+}
+/* a doorway reads as a way through, not as a thing to inspect */
+.c3spot.door i { border-radius: 8px; border-color: rgba(255, 255, 255, .5); }
+.c3spot.door i::after { inset: 6px; border-radius: 3px; background: rgba(255, 255, 255, .78); }
+/* close enough to touch: the gold wakes up */
+.c3spot.near i { border-color: var(--c3-gold); box-shadow: 0 0 0 5px rgba(184, 154, 104, .22); }
+.c3spot.near b { background: rgba(184, 154, 104, .85); border-color: rgba(255, 255, 255, .42); }
+@media (prefers-reduced-motion: reduce) { .c3spot { transition: none; } }
+
+/* ── the thumb pad: bottom-left, physically ──────────────────────────────────────────────────────────────────── */
+.c3pad {
+  position: absolute; left: 22px; bottom: calc(env(safe-area-inset-bottom, 0px) + 34px);
+  width: 124px; height: 124px; border-radius: 50%; z-index: 4;
+  border: 1px solid rgba(255, 255, 255, .26); background: rgba(40, 33, 26, .18);
+  -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+  display: grid; place-items: center; pointer-events: none;
+}
+.c3pad i {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: rgba(248, 245, 239, .7); border: 1.5px solid var(--c3-champagne);
+  box-shadow: 0 4px 14px rgba(40, 33, 26, .3);
+}
+.c3pad::after {
+  content: ""; position: absolute; inset: 20px; border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, .2);
+}
+
+/* ── the nav that is always there ────────────────────────────────────────────────────────────────────────────── */
+.c3nav {
+  position: absolute; inset-inline: 0; bottom: 0; z-index: 5;
+  display: flex; gap: 4px; justify-content: center;
+  padding: 10px 12px calc(env(safe-area-inset-bottom, 0px) + 10px);
+  background: linear-gradient(to top, rgba(40, 33, 26, .5), transparent);
+  pointer-events: none;
+}
+.c3nav > * { pointer-events: auto; }
+.c3nav button {
+  flex: 0 1 auto; min-width: 54px; border: 0; cursor: pointer;
+  background: none; color: rgba(255, 255, 255, .82); font: inherit; font-size: 10.5px;
+  display: grid; justify-items: center; gap: 3px; padding: 6px 4px; border-radius: 12px;
+}
+.c3nav button svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2.1;
+  stroke-linecap: round; stroke-linejoin: round; }
+.c3nav button.on { color: var(--c3-champagne); }
+.c3nav button:active { transform: scale(.95); }
+/* the booking button is never a sibling among equals */
+.c3nav .c3book {
+  background: var(--c3-gold); color: #241E17; font-weight: 700; font-size: 12px;
+  padding: 9px 16px; border-radius: 999px; grid-auto-flow: column; align-items: center; gap: 6px;
+  box-shadow: 0 6px 18px rgba(184, 154, 104, .45);
+}
+.c3nav .c3book svg { width: 17px; height: 17px; stroke-width: 2.3; }
+
+/* the thumb pad and the nav must not fight: the pad sits above the nav's own row */
+.c3-host.walking .c3nav { opacity: .55; }
+
+/* ── the room chips ──────────────────────────────────────────────────────────────────────────────────────────── */
+.c3chips {
+  position: absolute; inset-inline: 0; bottom: 0; z-index: 6;
+  display: none; gap: 7px; overflow-x: auto; scrollbar-width: none;
+  padding: 14px 14px calc(env(safe-area-inset-bottom, 0px) + 14px);
+  background: linear-gradient(to top, rgba(32, 27, 22, .92) 40%, transparent);
+}
+.c3chips::-webkit-scrollbar { display: none; }
+.c3-host.rooms .c3chips { display: flex; }
+.c3-host.rooms .c3nav, .c3-host.rooms .c3pad { opacity: 0; pointer-events: none; }
+.c3chips button {
+  flex: 0 0 auto; cursor: pointer; font: inherit; font-size: 12.5px;
+  display: flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .22); background: rgba(255, 255, 255, .1); color: #FFF;
+}
+.c3chips button svg { width: 16px; height: 16px; }
+.c3chips button.on { background: var(--c3-champagne); border-color: var(--c3-champagne); color: #241E17; font-weight: 600; }
+
+/* ── a panel a marker opens ──────────────────────────────────────────────────────────────────────────────────── */
+.c3sheet {
+  position: absolute; inset-inline: 0; bottom: 0; z-index: 8;
+  transform: translateY(102%); transition: transform .3s cubic-bezier(.22, 1, .36, 1);
+  max-height: 78%; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  background: var(--c3-glass-2); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+  border-top: 1px solid var(--c3-hair);
+  border-radius: 22px 22px 0 0; box-shadow: var(--c3-shadow);
+  padding: 8px 18px calc(env(safe-area-inset-bottom, 0px) + 20px);
+  touch-action: pan-y;
+}
+.c3sheet.on { transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) { .c3sheet { transition: none; } }
+.c3grab { width: 42px; height: 4px; border-radius: 4px; background: var(--c3-champagne); margin: 6px auto 12px; }
+.c3sheet h2 { font-size: 18px; font-weight: 700; margin: 0 0 4px; color: #2E2821; }
+.c3sheet .c3sub { font-size: 12.5px; color: #6B6055; margin-bottom: 14px; }
+.c3sheet p { font-size: 13.5px; line-height: 1.85; color: #4A423A; margin: 0 0 12px; }
+.c3sheet ul { margin: 0 0 14px; padding: 0; list-style: none; display: grid; gap: 8px; }
+.c3sheet li {
+  font-size: 13px; line-height: 1.7; padding: 10px 13px; border-radius: 13px;
+  background: rgba(255, 255, 255, .72); border: 1px solid rgba(184, 154, 104, .2);
+  display: flex; align-items: flex-start; gap: 9px;
+}
+.c3sheet li::before {
+  content: ""; flex-shrink: 0; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--c3-gold); margin-top: 7px;
+}
+.c3sheet .c3note {
+  font-size: 11.5px; line-height: 1.75; color: #7A6E60;
+  border-top: 1px solid var(--c3-hair); padding-top: 11px; margin-top: 4px;
+}
+.c3cta {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+  margin-top: 4px; padding: 14px; border: 0; border-radius: 15px; cursor: pointer;
+  background: var(--c3-gold); color: #241E17; font: inherit; font-size: 14.5px; font-weight: 700;
+  box-shadow: 0 6px 18px rgba(184, 154, 104, .36);
+}
+.c3cta.ghost { background: rgba(255, 255, 255, .7); color: #4A423A; border: 1px solid var(--c3-hair); box-shadow: none; }
+.c3cta svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round; }
+.c3row { display: flex; gap: 9px; }
+.c3row .c3cta { margin-top: 0; }
+
+/* the five things the skin-analysis demonstration shows */
+.c3meters { display: grid; gap: 10px; margin-bottom: 14px; }
+.c3meter { font-size: 12.5px; }
+.c3meter > span { display: flex; justify-content: space-between; margin-bottom: 5px; color: #4A423A; }
+.c3meter i {
+  display: block; height: 6px; border-radius: 4px; background: rgba(184, 154, 104, .18); overflow: hidden;
+}
+.c3meter i::after {
+  content: ""; display: block; height: 100%; width: var(--v, 50%); border-radius: 4px;
+  background: linear-gradient(90deg, var(--c3-champagne), var(--c3-gold));
+  transition: width .9s cubic-bezier(.22, 1, .36, 1);
+}
+
+/* ── the advisor who meets you in each room ──────────────────────────────────────────────────────────────────── */
+.c3bot {
+  position: absolute; inset-inline: 14px; bottom: calc(env(safe-area-inset-bottom, 0px) + 76px);
+  z-index: 7; max-height: 44%; display: flex; flex-direction: column;
+  background: var(--c3-glass); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  border: 1px solid var(--c3-hair); border-radius: 18px; box-shadow: var(--c3-shadow);
+  transform: translateY(16px); opacity: 0; pointer-events: none;
+  transition: transform .28s cubic-bezier(.22, 1, .36, 1), opacity .28s ease;
+}
+.c3bot.on { transform: translateY(0); opacity: 1; pointer-events: auto; }
+@media (prefers-reduced-motion: reduce) { .c3bot { transition: opacity .2s ease; } }
+.c3bot.small { max-height: none; }
+
+.c3bothead { display: flex; align-items: center; gap: 10px; padding: 9px 12px 7px; }
+.c3botav {
+  width: 34px; height: 34px; flex-shrink: 0; border-radius: 12px; display: grid; place-items: center;
+  background: rgba(184, 154, 104, .16); color: var(--c3-gold); border: 1px solid var(--c3-hair);
+}
+.c3botav svg { width: 19px; height: 19px; }
+.c3bothead div { flex: 1; min-width: 0; }
+.c3bothead b { display: block; font-size: 13px; font-weight: 700; color: #2E2821; }
+.c3bothead small { display: block; font-size: 10.5px; color: #7A6E60; }
+.c3botx {
+  width: 28px; height: 28px; flex-shrink: 0; border-radius: 9px; border: 0; cursor: pointer;
+  background: rgba(81, 72, 63, .08); color: #7A6E60; display: grid; place-items: center;
+}
+.c3botx svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+
+.c3botlog { overflow-y: auto; padding: 0 13px; display: grid; gap: 9px; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+.c3msg { font-size: 12.5px; line-height: 1.75; padding: 9px 12px; max-width: 88%; }
+.c3msg.bot {
+  background: rgba(255, 255, 255, .8); border: 1px solid rgba(184, 154, 104, .22);
+  border-radius: 16px 16px 16px 5px; color: #3C352D; justify-self: start;
+}
+.c3msg.me {
+  background: rgba(216, 197, 165, .42); border: 1px solid var(--c3-hair);
+  border-radius: 16px 16px 5px 16px; color: #3C352D; justify-self: end;
+}
+/* every answer says which of the clinic's own papers it came from */
+.c3src {
+  display: inline-flex; align-items: center; gap: 4px; margin-top: 7px;
+  font-size: 10.5px; padding: 3px 8px; border-radius: 999px;
+  color: #8A7550; background: rgba(184, 154, 104, .14); border: 1px solid rgba(184, 154, 104, .28);
+}
+.c3src svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 2.2; }
+.c3typing { display: inline-flex; gap: 4px; padding: 13px; }
+.c3typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--c3-champagne); animation: c3dot 1.1s infinite; }
+.c3typing i:nth-child(2) { animation-delay: .14s; }
+.c3typing i:nth-child(3) { animation-delay: .28s; }
+@keyframes c3dot { 0%, 60%, 100% { opacity: .3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) { .c3typing i { animation: none; opacity: .6; } }
+
+.c3botchips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 8px 12px 0; }
+.c3botchips::-webkit-scrollbar { display: none; }
+.c3botchips button {
+  flex: 0 0 auto; cursor: pointer; font: inherit; font-size: 12px; padding: 8px 12px; border-radius: 999px;
+  background: rgba(255, 255, 255, .78); border: 1px solid var(--c3-hair); color: #4A423A;
+}
+.c3botchips button:active { background: rgba(216, 197, 165, .5); }
+
+.c3botask { display: flex; gap: 7px; align-items: center; padding: 8px 12px; }
+.c3botask input {
+  flex: 1; min-width: 0; font: inherit; font-size: 13px; padding: 10px 12px; border-radius: 12px;
+  border: 1px solid var(--c3-hair); background: rgba(255, 255, 255, .86); color: #3C352D;
+}
+.c3botask input::placeholder { color: #9A8E80; }
+.c3botask input:focus { outline: 2px solid rgba(184, 154, 104, .45); outline-offset: 0; }
+.c3botask button {
+  width: 38px; height: 38px; flex-shrink: 0; border: 0; border-radius: 12px; cursor: pointer;
+  background: var(--c3-gold); color: #241E17; display: grid; place-items: center;
+}
+.c3botask button svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round; }
+.c3botfoot {
+  font-size: 10px; line-height: 1.5; color: #8A7E70; text-align: center; padding: 0 12px 9px;
+}
+
+/* ── the way in ──────────────────────────────────────────────────────────────────────────────────────────────── */
+.c3welcome {
+  position: absolute; inset: 0; z-index: 10; display: grid; align-content: center; justify-items: center;
+  gap: 14px; padding: 32px 26px calc(env(safe-area-inset-bottom, 0px) + 32px); text-align: center;
+  background:
+    radial-gradient(90% 60% at 50% 32%, rgba(248, 245, 239, .2), transparent 70%),
+    linear-gradient(170deg, #2A241C, #15120E);
+  color: var(--c3-ivory);
+  transition: opacity .45s ease;
+}
+.c3welcome.gone { opacity: 0; pointer-events: none; }
+.c3wmark {
+  width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center;
+  border: 1px solid var(--c3-hair); color: var(--c3-gold); margin-bottom: 4px;
+}
+.c3wmark svg { width: 30px; height: 30px; }
+.c3welcome .c3eyebrow { color: var(--c3-champagne); }
+.c3welcome h1 { font-size: 25px; line-height: 1.5; font-weight: 700; margin: 0; max-width: 17ch; }
+.c3welcome h1 em { font-style: normal; color: var(--c3-champagne); }
+.c3welcome p { font-size: 13.5px; line-height: 1.9; color: rgba(248, 245, 239, .76); margin: 0; max-width: 30ch; }
+.c3wbtns { display: grid; gap: 9px; width: 100%; max-width: 320px; margin-top: 10px; }
+.c3wbtns button {
+  width: 100%; padding: 15px; border-radius: 15px; cursor: pointer; font: inherit; font-size: 14.5px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--c3-gold); color: #241E17; border: 0; font-weight: 700;
+}
+.c3wbtns button.ghost {
+  background: rgba(248, 245, 239, .08); color: var(--c3-ivory);
+  border: 1px solid rgba(216, 197, 165, .36); font-weight: 500;
+}
+.c3wbtns button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round; }
+.c3wfoot { font-size: 10.5px; color: rgba(248, 245, 239, .5); line-height: 1.7; max-width: 34ch; margin-top: 6px; }
+
+/* ── bringing the clinic up, and the hint it shows once ──────────────────────────────────────────────────────── */
+.c3load {
+  position: absolute; inset: 0; z-index: 9; display: grid; place-content: center; justify-items: center; gap: 14px;
+  background: linear-gradient(170deg, #2A241C, #15120E); color: var(--c3-champagne);
+  font-size: 13px; transition: opacity .5s ease; text-align: center; padding: 26px;
+}
+.c3load.gone { opacity: 0; pointer-events: none; }
+.c3ring {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 2px solid rgba(216, 197, 165, .24); border-top-color: var(--c3-gold);
+  animation: c3spin .9s linear infinite;
+}
+@keyframes c3spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .c3ring { animation-duration: 2.4s; } }
+
+.c3hint {
+  position: absolute; inset-inline: 18px; top: 50%; z-index: 6; transform: translateY(-50%);
+  background: rgba(32, 27, 22, .72); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border: 1px solid rgba(216, 197, 165, .3); border-radius: 17px;
+  padding: 17px 19px; color: var(--c3-ivory); text-align: center;
+  display: none; transition: opacity .4s ease;
+}
+.c3hint.on { display: block; }
+.c3hint.gone { opacity: 0; }
+.c3hint b { display: block; font-size: 14px; margin-bottom: 8px; color: var(--c3-champagne); }
+.c3hint p { font-size: 12.5px; line-height: 1.95; margin: 0; color: rgba(248, 245, 239, .86); }
+.c3hint button {
+  margin-top: 13px; padding: 10px 20px; border-radius: 999px; border: 1px solid rgba(216, 197, 165, .4);
+  background: rgba(216, 197, 165, .16); color: var(--c3-ivory); font: inherit; font-size: 12.5px; cursor: pointer;
+}
+
+/* this phone cannot show it */
+.c3nope { position: absolute; inset: 0; z-index: 11; display: grid; place-content: center; justify-items: center;
+  gap: 13px; padding: 30px; text-align: center; background: #1C1813; color: var(--c3-ivory); }
+.c3nope p { font-size: 13.5px; line-height: 1.9; color: rgba(248, 245, 239, .8); max-width: 30ch; margin: 0; }
+
+/* a wide screen: the panel becomes a column on the side instead of a drawer across the bottom */
+@media (min-width: 760px) and (min-height: 480px) {
+  .c3sheet {
+    inset-inline: auto 0; inset-block: 0; width: 390px; max-height: none;
+    transform: translateX(-102%); border-radius: 0; border-inline-start: 1px solid var(--c3-hair); border-top: 0;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 72px);
+  }
+  .c3sheet.on { transform: translateX(0); }
+  .c3grab { display: none; }
+  .c3bot { inset-inline: 14px auto; width: 380px; }
+}
+
+/* ── the living header on the home page ──────────────────────────────────────────────────────────────────────
+   The hero photograph stays underneath as the floor of the thing: it is what shows while three.js is still on its
+   way, and it is what a phone without WebGL keeps. The clinic fades in over it. */
+.hero.live {
+  display: block; width: 100%; box-sizing: border-box;   /* a button shrinks to its content; a header does not */
+  min-height: 320px; cursor: pointer; text-align: start; -webkit-tap-highlight-color: transparent;
+}
+.hero.live .on-photo { min-height: 320px; }
+/* The house scrim was mixed for a dark photograph. The clinic underneath is warm ivory and far brighter, so it
+   needs its own: warmer, so it belongs to this palette, and heavier at the top where the name sits. */
+.hero.live::after {
+  background:
+    linear-gradient(188deg, rgba(28, 22, 16, .46) 0%, rgba(26, 20, 15, .50) 44%, rgba(20, 15, 11, .90) 100%);
+}
+.hero.live b, .hero.live .hint, .hero.live .kicker {
+  text-shadow: 0 1px 3px rgba(20, 15, 11, .85), 0 3px 20px rgba(20, 15, 11, .55);
+}
+.hero.live b { color: #FFFDF9; }
+.hero.live .hint { color: #EFE7DA; }
+.hero .heroslot {
+  position: absolute; inset: 0; display: block; overflow: hidden; border-radius: inherit;
+  opacity: 0; transition: opacity .9s ease;
+}
+.hero .heroslot.on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .hero .heroslot { transition: none; } }
+.hero .heroslot canvas { width: 100%; height: 100%; display: block; }
+/* The scrim has to sit over the clinic as well as over the photograph, and the words over the scrim.
+   These need .live in the selector to outrank _theme.css: build-app.cjs inlines this sheet BEFORE the house
+   layer, so a plain `.hero .on-photo` here loses to the identical selector there and the scrim ends up painted
+   across the clinic name. (Only <app>-theme.css is loaded last; everything else must win on specificity.) */
+.hero.live::after { z-index: 1; }
+.hero.live .on-photo { z-index: 3; }
+.hero .herogo {
+  display: inline-flex; align-items: center; gap: 7px; margin-top: 10px;
+  font-size: 12.5px; font-weight: 600; color: var(--accent-2);
+  padding: 7px 13px 7px 11px; border-radius: 999px;
+  color: #F6EEDD; background: rgba(184, 154, 104, .34); border: 1px solid rgba(216, 197, 165, .62);
+  box-shadow: 0 4px 16px rgba(20, 15, 11, .35);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.hero .herogo i { font-style: normal; }
+.hero .herogo svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.1;
+  stroke-linecap: round; stroke-linejoin: round; }
+
+/* the debug numbers, behind ?fps in the address bar */
+.c3fps {
+  position: absolute; inset-inline-start: 50%; top: 4px; transform: translateX(50%); z-index: 12;
+  font: 10px/1.5 ui-monospace, monospace; color: #FFF; background: rgba(0, 0, 0, .55);
+  padding: 3px 8px; border-radius: 8px; display: none; direction: ltr;
+}
+.c3-host.fps .c3fps { display: block; }
 /* ── the house layer ──────────────────────────────────────────────────────────────────────────────────────────
    One design for every app we sell: pale paper, dark ink, hairline cards, a photograph under an ink scrim with a
    spaced-capital eyebrow over it, a strip of the business's own pictures, and four calm doors whose icons sit in
@@ -486,23 +918,60 @@ textarea.input { resize: none; line-height: 1.7; }
   color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-line); }
 .c-ask .ic svg { width: 22px; height: 22px; }
 /* ── the clinic's colour, over the house layer (_theme.css) ──
-   Gold on ivory with a navy ink: the Prestige hotel's language with the light turned up. */
+   Dubai luxury minimalism: warm ivory, champagne beige, soft gold and dark taupe — the palette of travertine,
+   cream marble and brushed champagne metal that the walkable clinic (js/clinic3d.js) is built from, so the flat
+   pages and the room you stand in read as one place.
+
+   This file is loaded LAST, after _theme.css, so a colour here always wins. Nothing but colour is redefined:
+   every class name, every piece of markup and every rule of the house layer stays as it was.
+
+   Two things worth knowing before changing a value:
+     · --mint-* and --peach-* in _theme.css already alias the accent family, so they follow --accent by
+       themselves. Only --lilac-* and --sky-* are their own colours and have to be warmed here by hand.
+     · soft gold #B89A68 is bright enough to carry dark text ON it, but not dark enough to BE text on ivory
+       (2.4:1). So --accent is the real gold for fills and hairlines, and --accent-ink is the same gold taken
+       down to 4.8:1 for the few places the house layer prints a word in it.
+   No green anywhere, in any value. */
 :root {
-  --paper: #FAF7F2; --paper2: #F5F0E8; --line: #E7E0D4; --ink: #182033; --ink2: #5C6677;
-  --accent: #C9973F; --accent-2: #E6C27A; --accent-soft: #FBF3E4; --accent-line: #EBD6A9; --accent-on: #182033;
-  --lilac-a: #F1F3F7; --lilac-b: #E4E8F0; --lilac-d: #2E3C58; --lilac-line: #D5DBE7;
+  --paper: #F8F5EF;            /* warm ivory */
+  --paper2: #F1EBDF;           /* ivory, one shade into the champagne */
+  --line: #E4DAC7;             /* champagne at hairline strength */
+  --ink: #51483F;              /* dark taupe — 7.7:1 on the ivory */
+  --ink2: #6E6356;             /* the quiet one — 4.8:1 */
+  --bg1: #F8F5EF;              /* what Telegram paints its header with */
+  --brand: #B89A68;
+
+  --accent: #B89A68;           /* soft gold */
+  --accent-2: #D8C5A5;         /* champagne beige */
+  --accent-soft: #F7F1E4;      /* the palest champagne wash */
+  --accent-line: #E0CFAC;
+  --accent-on: #2A241C;        /* on a gold fill — 5.5:1 */
+  --accent-ink: #7E6534;       /* gold, dark enough to be a word */
+
+  /* the two card families that are not aliases: warmed from grey-navy to wood and champagne */
+  --lilac-a: #F6F1E8; --lilac-b: #EDE4D4; --lilac-d: #5E4B38; --lilac-line: #E0D4BE;
+  --sky-a: #F5F1EA; --sky-b: #EBE3D6; --sky-d: #6B5A44; --sky-line: #DED3C0;
 }
 /* the pieces only this app has: the consult card, the chat bubbles, the booking wizard */
 .pick .ph { width: 56px; height: 56px; flex-shrink: 0; border-radius: 16px; object-fit: cover; border: 1.5px solid var(--line); }
 .pick.on .ph { border-color: var(--accent); }
-.agent .av { border-radius: 14px; color: var(--accent); background: var(--accent-soft); }
+.agent .av { border-radius: 14px; color: var(--accent-ink); background: var(--accent-soft); }
 .live::before { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .bub.bot { border-radius: 18px 18px 18px 6px; border-color: var(--line); }
 .bub.me { border-radius: 18px 18px 6px 18px; background: var(--accent-soft); border-color: var(--accent-line); }
-.src { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-line); }
-.sec svg, .fr { color: var(--accent); }
-.sec .cnt { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-line); }
-.wiz .on, .wiz button.on i { color: var(--accent); }
+/* every answer carries the clinic's own paper it came from, so it is never taken for a doctor's word */
+.src { color: var(--accent-ink); background: var(--accent-soft); border-color: var(--accent-line); }
+.sec svg, .fr { color: var(--accent-ink); }
+.sec .cnt { color: var(--accent-ink); background: var(--accent-soft); border-color: var(--accent-line); }
+.wiz .on, .wiz button.on i { color: var(--accent-ink); }
+
+/* the way into the walkable clinic, on the home page: the photo tour's card, one step above it */
+.t-open[data-act="walk"] .v b::after {
+  content: "سه‌بعدی";
+  margin-inline-start: 7px; font-size: 10px; font-weight: 700; letter-spacing: .04em;
+  padding: 2px 7px; border-radius: 999px; vertical-align: middle;
+  color: var(--accent-on); background: var(--accent-2); border: 1px solid var(--accent-line);
+}
 /* ── the tour, full screen over the app (see _tour.js) ───────────────────────────────────────────────────────
    The hotel's manner: the picture fills the screen, an ink gradient at top and bottom so the writing can be
    read on any photograph, the name of the place in the corner, the other places as chips, and the doors as
@@ -720,13 +1189,14 @@ textarea.input { resize: none; line-height: 1.7; }
 .w-open:active { transform: scale(.985); }
 </style>
 
-<div class="ribbon">نسخه‌ی آزمایشی ۱ · اطلاعات نمونه</div>
+<div class="ribbon">نسخه‌ی آزمایشی ۴ · اطلاعات نمونه</div>
 <div class="app" id="app"><div class="hint" style="text-align:center;padding:40px 0">در حال باز شدن…</div></div>
 <div id="mainbar"></div>
 <div id="overlay"></div>
 <div class="t-host" id="tour"></div>
 <div class="d-host" id="dash"></div>
 <div class="w-host" id="wheel"></div>
+<div class="c3-host" id="walk"></div>
 <script>
 /* Shows any script error on the page, so a screenshot tells us what went wrong. */
 window.addEventListener("error", function (e) {
@@ -871,7 +1341,7 @@ const WHEEL = {
            { t: "دفعه‌ی بعد 🌿", w: 16, code: "" }, { t: "یک جلسه لیزر هدیه", w: 2, code: "LASER1" }],
 };
 
-const CLINIC = { name: "کلینیک زیبایی آرنیک", phone: "۰۲۱-۱۲۳۴۵۶۷۸", tel: "02112345678", address: "خیابان نمونه، پلاک ۱۲، طبقه‌ی دوم", hours: "شنبه تا پنجشنبه ۱۰ تا ۲۰", close: 20 * 60, deposit: 300000, instMin: 3000000, window: 30 };
+const CLINIC = { name: "کلینیک زیبایی آرنیک", phone: "۰۲۱-۱۲۳۴۵۶۷۸", tel: "02112345678", address: "خیابان نمونه، پلاک ۱۲، طبقه‌ی دوم", hours: "شنبه تا پنجشنبه ۱۰ تا ۲۰", close: 20 * 60, deposit: 300000, instMin: 3000000, window: 30, bot: "clinicahvaz_2advisor_bot" };
 /* cat: tariff group; ses: usual number of sessions; note: one line shown when the service is picked. */
 const SERVICES = [
   { id: "consult", ph: "mirror", t: "مشاوره‌ی رایگان", sub: "با دکتر، حضوری", price: 0, free: true, dur: 20, ses: "", cat: "skin", i: "consultS", c: "mint", note: "۲۰ دقیقه با دکتر؛ پوستت رو می‌بینه و بهترین درمان رو پیشنهاد می‌ده. هزینه‌ای نداره.", pre: "اگه دارو یا سابقه‌ی درمانی داری، با خودت بیار." },
@@ -935,6 +1405,201 @@ const onBack = () => {
 };
 if (tg && tg.BackButton) tg.BackButton.onClick(onBack);
 window.addEventListener("hashchange", () => { closeSheet(); render(); window.scrollTo(0, 0); });
+
+/* ── the walkable clinic (js/clinic3d.js) ──────────────────────────────────────────────────────────────────────
+   Defining WALK3D is what makes the build carry the walk, the same way TOUR, DASH and WHEEL work.
+   The room shells, the furniture and the walking are all in js/clinic3d.js; everything a visitor READS is here.
+   Prices and service names are never repeated: they come from SERVICES, so the tariff can only ever say one thing. */
+const WALK3D = {
+  title: "کلینیک مجازی",
+  hint: {
+    t: "راه رفتن در کلینیک",
+    p: "انگشتتان را روی صفحه بکشید تا دور و برتان را ببینید، و پدِ گوشه‌ی پایین را فشار دهید تا راه بروید. روی هر نشانه بزنید تا باز شود.",
+  },
+  /* Each space: what the advisor says when you walk in, four questions worth tapping, and the panel its markers open. */
+  rooms: {
+    reception: {
+      greet: "به پذیرش کلینیک آرنیک خوش آمدید. چه کمکی از من می‌خواهید؟ بپرسید.",
+      chips: ["مشاوره رایگانه؟", "آدرستون کجاست؟", "دکتر کی هست؟", "قسطی هم می‌شه؟"],
+      panel: {
+        title: "پذیرش بزرگ",
+        sub: "سنگ تراورتن، مرمر کرم و نور طلایی",
+        body: "اینجا اولین جایی است که وارد می‌شوید. پذیرش اسم و شماره‌تان را می‌گیرد، پرونده‌تان را باز می‌کند و شما را به اتاق درمان راهنمایی می‌کند. مشاوره‌ی اول همیشه رایگان است.",
+        items: ["پذیرش و تشکیل پرونده", "راهنمایی به اتاق درمان", "تسویه و صدور فاکتور", "هماهنگی نوبت جلسه‌ی بعد"],
+        note: "اطلاعات این دمو نمونه است؛ اسم و تلفن و نشانی کلینیک واقعی بعداً جایش می‌نشیند.",
+      },
+    },
+    lounge: {
+      greet: "تا نوبتتان برسد همین‌جا راحت باشید. سؤالی دارید؟ از من بپرسید.",
+      chips: ["نوبتم کی بود؟", "تا چقدر معطل می‌شم؟", "بیعانه چقدره؟", "نوبتم رو لغو کنم؟"],
+      panel: {
+        title: "لانژ انتظار VIP",
+        sub: "آسودگی شما بخشی از مراقبت ماست",
+        body: "سالن انتظار جدا از راهروی درمان است، تا کسی وقت انتظارش را در رفت‌وآمد نگذراند. چای و آب در گوشه‌ی پذیرایی هست.",
+        items: ["مبل‌های نرم و میز سنگی", "گوشه‌ی پذیرایی", "نور ملایم غیرمستقیم", "فاصله از راهروی درمان"],
+        note: "",
+      },
+    },
+    gallery: {
+      greet: "اینجا گالری کارهای کلینیک است. سؤالی دارید؟ بپرسید.",
+      chips: ["قبل و بعد دارید؟", "نتیجه‌اش چقدر می‌مونه؟", "لیزر چند جلسه‌ست؟", "تخفیف دارید؟"],
+      panel: {
+        title: "گالری درمان‌ها",
+        sub: "با اجازه‌ی مراجعه‌کننده، و بدون قولِ نتیجه",
+        body: "عکس‌های قبل و بعد را در مشاوره‌ی حضوری نشانتان می‌دهیم. آنلاین منتشرشان نمی‌کنیم، چون حریم کسی که به ما اعتماد کرده مال خودش است.",
+        items: ["آلبوم هر درمان، جداگانه", "فقط با اجازه‌ی کتبی مراجعه‌کننده", "بدون روتوش و بدون تغییر نور", "در مشاوره‌ی حضوری، نه آنلاین"],
+        note: "نتیجه‌ی هر پوست با پوست دیگر فرق دارد؛ عکسِ کارِ یک نفر قولِ نتیجه برای شما نیست.",
+      },
+    },
+    corridor: {
+      greet: "در راهرو هستید؛ اتاق‌های درمان دو طرفتان است. کجا را می‌خواهید ببینید؟",
+      chips: ["لیزر چند جلسه‌ست؟", "بوتاکس چنده؟", "مشاوره رایگانه؟", "دکتر کی هست؟"],
+      panel: { title: "راهرو", sub: "به اتاق‌های درمان", body: "", items: [], note: "" },
+    },
+    booking: {
+      greet: "همین‌جا می‌توانید وقت بگیرید. چه درمانی را می‌خواهید؟",
+      chips: ["مشاوره رایگانه؟", "بیعانه چقدره؟", "قسطی هم می‌شه؟", "نوبتم رو لغو کنم؟"],
+      panel: {
+        title: "نوبت و تماس",
+        sub: "خدمت، دکتر، روز و ساعت — چهار گام",
+        body: "خدمت را انتخاب می‌کنید، دکتری که آن را انجام می‌دهد و در آن روز هست، بعد روز و ساعت از ساعت‌های خالی. آخر هم اسم و شماره.",
+        items: ["مشاوره‌ی اول رایگان و بدون بیعانه", "برای درمان، ۳۰۰ هزار تومان بیعانه که از مبلغ نهایی کم می‌شود", "درمان‌های ۳ میلیون به بالا، چهار قسط بدون کارمزد", "لغو تا ۲۴ ساعت قبل، با برگشت کامل بیعانه"],
+        note: "آنچه می‌فرستید «درخواست نوبت» است، نه نوبت قطعی؛ پذیرش تأییدش می‌کند و به شما خبر می‌دهد.",
+      },
+    },
+    derm: {
+      greet: "اتاق مشاوره‌ی پوست. چه مشکلی دارید؟ از من بپرسید.",
+      chips: ["مشاوره رایگانه؟", "پاکسازی پوست چنده؟", "قرمزی طبیعیه؟", "دکتر کی هست؟"],
+      panel: {
+        title: "مشاوره‌ی پوست",
+        sub: "آکنه، جای جوش، لک و سلامت پوست",
+        body: "دکتر پوستتان را می‌بیند، سابقه و داروهایتان را می‌پرسد و بعد می‌گوید چه درمانی به پوست شما می‌خورد — و چه درمانی نمی‌خورد.",
+        items: ["بررسی آکنه و جای جوش", "ارزیابی لک و تیرگی", "سلامت کلی پوست", "راهنمای مراقبت خانگی"],
+        note: "تشخیص و تجویز فقط حضوری و توسط پزشک انجام می‌شود.",
+        svc: ["consult", "clean"],
+      },
+    },
+    inject: {
+      greet: "اتاق مشاوره‌ی تزریق. سؤالتان را بپرسید.",
+      chips: ["بوتاکس چنده؟", "فیلر چنده؟", "قرمزی طبیعیه؟", "قسطی هم می‌شه؟"],
+      panel: {
+        title: "مشاوره‌ی تزریق",
+        sub: "بوتاکس، فیلر و تناسب چهره",
+        body: "اول دکتر چهره‌تان را می‌بیند و می‌گوید چه چیزی لازم است و چه چیزی لازم نیست. تزریق در جلسه‌ی بعد، با برنامه‌ی مشخص انجام می‌شود.",
+        items: ["مشاوره‌ی بوتاکس", "مشاوره‌ی فیلر", "ارزیابی تناسب چهره", "برنامه‌ی جلسه‌ها"],
+        note: "این یک مشاوره‌ی پزشکی است، نه تضمین نتیجه؛ هر چهره جواب خودش را می‌دهد.",
+        svc: ["botox", "filler"],
+      },
+    },
+    analysis: {
+      greet: "اتاق آنالیز پوست. دوست دارید ببینید دستگاه چه چیزهایی را نگاه می‌کند؟",
+      chips: ["آنالیز پوست چیه؟", "پاکسازی پوست چنده؟", "مزوتراپی چند جلسه‌ست؟", "مشاوره رایگانه؟"],
+      panel: {
+        title: "آنالیز پیشرفته‌ی پوست",
+        sub: "پنج چیزی که دستگاه نگاه می‌کند",
+        body: "دستگاه آنالیز، پوست را در چند لایه عکس می‌گیرد و پنج چیز را اندازه می‌گیرد. نتیجه را دکتر برایتان می‌خواند.",
+        items: [],
+        note: "نمایش این صفحه آموزشی است و تشخیص پزشکی نیست؛ آنالیز واقعی حضوری و با دستگاه کلینیک انجام می‌شود.",
+      },
+      demo: [
+        ["رطوبت پوست", "پوست کم‌آب زودتر خط می‌افتد", 72],
+        ["بافت پوست", "صافی و یکدستی سطح پوست", 64],
+        ["لک و تیرگی", "پراکندگی رنگدانه‌ها", 48],
+        ["منافذ", "اندازه و بازی منافذ", 58],
+        ["خط‌های ریز", "خط‌های اولیه‌ی دور چشم و پیشانی", 41],
+      ],
+    },
+    facial: {
+      greet: "اتاق فیشال و جوان‌سازی. چه کاری برای پوستتان می‌خواهید؟",
+      chips: ["پاکسازی پوست چنده؟", "مزوتراپی چند جلسه‌ست؟", "بعدش چی کار کنم؟", "تخفیف دارید؟"],
+      panel: {
+        title: "فیشال و جوان‌سازی",
+        sub: "پاکسازی، آبرسانی و برنامه‌ی مراقبت",
+        body: "پاکسازی عمیق منافذ با ماسک آرام‌بخش، و برنامه‌ی مراقبتی که مال پوست خودتان است، نه یک نسخه‌ی عمومی.",
+        items: [],
+        note: "",
+        svc: ["clean", "meso"],
+      },
+    },
+    laser: {
+      greet: "اتاق لیزر. چه سؤالی درباره‌ی لیزر دارید؟",
+      chips: ["لیزر چند جلسه‌ست؟", "بعد لیزر چی کار کنم؟", "قرمزی طبیعیه؟", "تخفیف دارید؟"],
+      panel: {
+        title: "اتاق لیزر",
+        sub: "با عینک محافظ، زیر نظر پزشک",
+        body: "ناحیه را شب قبل با تیغ اصلاح می‌کنید، روز درمان بدون آرایش می‌آیید. در طول کار عینک محافظ روی چشمتان است.",
+        items: [],
+        note: "مشخصات و مدل دستگاه را فقط وقتی می‌نویسیم که از خود کلینیک تأیید شده باشد؛ اینجا چیزی از خودمان نساخته‌ایم.",
+        svc: ["laser"],
+      },
+    },
+    hair: {
+      greet: "اتاق احیای مو. درباره‌ی ریزش مو می‌خواهید بپرسید؟",
+      chips: ["ریزش مو چی کار کنم؟", "مزوتراپی چند جلسه‌ست؟", "مشاوره رایگانه؟", "قسطی هم می‌شه؟"],
+      panel: {
+        title: "احیای مو",
+        sub: "ریزش مو و ارزیابی پوست سر",
+        body: "اول علت ریزش را پیدا می‌کنیم: پوست سر، تغذیه، کم‌خونی یا هورمون. بعد برنامه‌ی درمان بسته می‌شود.",
+        items: ["ارزیابی پوست سر", "بررسی علت ریزش", "مزوتراپی تقویت مو", "برنامه‌ی مراقبت از مو"],
+        note: "هر ریزش مو درمان مخصوص خودش را دارد؛ جواب قطعی بعد از معاینه‌ی حضوری است.",
+        svc: ["meso", "consult"],
+      },
+    },
+    doctor: {
+      greet: "دفتر دکترهای کلینیک. درباره‌ی کدامشان می‌خواهید بدانید؟",
+      chips: ["دکتر کی هست؟", "مشاوره رایگانه؟", "نوبت دکتر چطور می‌گیرم؟", "آدرستون کجاست؟"],
+      panel: {
+        title: "دفتر دکتر",
+        sub: "دکترهای کلینیک و روزهای حضورشان",
+        body: "",
+        items: [],
+        note: "اطلاعات دکترها در این دمو نمونه است. مدرک و سابقه‌ی واقعی را خود کلینیک می‌دهد و تا آن موقع چیزی از خودمان نمی‌نویسیم.",
+      },
+    },
+  },
+};
+
+/* ── the clinic's own knowledge, back inside the app ───────────────────────────────────────────────────────────
+   Each entry: the question, the answer, which of the clinic's papers it came from, the words that match it, and
+   the room its advisor offers it in. faq: also listed on the prices page. Nothing here is invented — every price
+   and session count is the one in SERVICES and the care guide.
+   An empty room field means it belongs to no room in particular and is matched everywhere. */
+const KB = [
+  { room: "inject", q: "بوتاکس چنده؟", a: "بوتاکس هر ناحیه ۴٫۵ میلیون تومانه (پیشونی، دور چشم یا خط اخم). اثرش ۴ تا ۶ ماه می‌مونه و ترمیمش تا ۲ هفته رایگانه.", src: "تعرفه‌ی کلینیک", k: "بوتاکس قیمت هزینه تزریق چروک پیشونی اخم چنده", faq: true },
+  { room: "inject", q: "فیلر چنده؟", a: "فیلر هر سی‌سی ۶٫۵ میلیون تومانه و ۹ تا ۱۲ ماه می‌مونه. قسطی هم می‌شه.", src: "تعرفه‌ی کلینیک", k: "فیلر قیمت هزینه ژل لب گونه سی‌سی چنده" },
+  { room: "", q: "مشاوره رایگانه؟", a: "آره، مشاوره‌ی اول با دکتر رایگانه و ۲۰ دقیقه طول می‌کشه؛ حضوری، طبقه‌ی دوم. همین‌جا وقتش رو بگیر.", src: "تعرفه‌ی کلینیک", k: "مشاوره رایگان ویزیت اول هزینه مجانی", faq: true },
+  { room: "doctor", q: "دکتر کی هست؟", a: () => DOCTORS.map((x) => `${x.t} (${x.sub}) ${WEEKDAY[x.off[0]]}‌ها نیست`).join("؛ ") + "؛ بقیه‌ی روزها ۱۰ تا ۲۰ تو کلینیکن.", src: "برنامه‌ی دکترها", k: "دکتر کی هست روز حضور شیفت صالحی رادمهر کیانی پزشک متخصص", faq: true },
+  { room: "laser", q: "لیزر چند جلسه‌ست؟", a: "معمولاً ۶ تا ۸ جلسه، با فاصله‌ی ۴ تا ۶ هفته. هر جلسه از ۱٬۲۰۰٬۰۰۰ تومان، بسته به ناحیه.", src: "تعرفه‌ی کلینیک", k: "لیزر جلسه چند موهای زائد فاصله قیمت هزینه", faq: true },
+  { room: "lounge", q: "نوبتم کی بود؟", a: () => fillerAnswer(), src: "نوبت‌های تو", k: "نوبت کی بود نوبتم یادآوری تاریخ ساعت فیلر", faq: true },
+  { room: "gallery", q: "قبل و بعد دارید؟", a: "آره؛ آلبوم قبل و بعد هر درمان رو تو مشاوره‌ی حضوری نشونت می‌دیم. به احترام حریم مراجعه‌کننده‌ها، عکس‌ها آنلاین منتشر نمی‌شن.", src: "قوانین کلینیک", k: "قبل بعد نمونه عکس کار آلبوم نتیجه گالری", faq: true },
+  { room: "laser", q: "بعد لیزر چی کار کنم؟", a: "تا ۴۸ ساعت آفتاب و سونا نه؛ ضدآفتاب یادت نره. ناحیه رو اسکراب نکن و بین جلسه‌ها فقط تیغ بزن، موم و اپیلیدی نه.", src: "راهنمای مراقبت", k: "بعد لیزر مراقبت آفتاب سونا ضدآفتاب اسکراب موم", faq: true },
+  { room: "", q: "قسطی هم می‌شه؟", a: "آره؛ درمان‌های ۳ میلیون به بالا رو می‌شه ۴ قسط بدون کارمزد داد: قسط اول موقع رزرو، بقیه ماهی یه قسط.", src: "قوانین کلینیک", k: "قسط قسطی اقساط پرداخت کارمزد", faq: true },
+  { room: "derm", q: "قرمزی طبیعیه؟", a: "قرمزی و کمی تورم تا ۴۸ ساعت بعد از لیزر یا تزریق طبیعیه؛ کمپرس سرد کمک می‌کنه. اگه بیشتر موند، تو «مراقبت من» بگو تا دکتر خودش تماس بگیره.", src: "راهنمای مراقبت", k: "قرمزی طبیعی تورم ورم کبودی سوزش عادی", faq: true },
+  { room: "gallery", q: "تخفیف دارید؟", a: "مشاوره‌ی اول همیشه رایگانه. برای لیزر، پکیج ۶ جلسه‌ای ۱۵٪ تخفیف داره که تو مشاوره برات حسابش می‌کنیم.", src: "تعرفه‌ی کلینیک", k: "تخفیف آف پکیج بسته ارزان ارزون کمتر", faq: true },
+  { room: "booking", q: "بیعانه چقدره؟", a: "برای قطعی شدن نوبت درمان ۳۰۰ هزار تومان بیعانه می‌گیریم که از مبلغ نهایی کم می‌شه. مشاوره بیعانه نداره.", src: "قوانین کلینیک", k: "بیعانه پیش پرداخت ودیعه چقدر" },
+  { room: "booking", q: "نوبتم رو لغو کنم؟", a: "تا ۲۴ ساعت قبل از نوبت لغو کنی، بیعانه کامل برمی‌گرده؛ از «مراقبت من» با یه لمس.", src: "قوانین کلینیک", k: "لغو کنسل نوبت برگشت پول جابه‌جایی تغییر" },
+  { room: "facial", q: "پاکسازی پوست چنده؟", a: "پاکسازی عمیق با ماسک آرام‌بخش ۹۵۰ هزار تومانه و حدود ۱ ساعت طول می‌کشه؛ ماهی یه بار عالیه.", src: "تعرفه‌ی کلینیک", k: "پاکسازی پوست قیمت جوش منافذ فیشال چنده هزینه" },
+  { room: "facial", q: "مزوتراپی چند جلسه‌ست؟", a: "۴ جلسه، هر ۲ هفته یه بار؛ هر جلسه ۳٫۲ میلیون تومان. قسطی هم می‌شه.", src: "تعرفه‌ی کلینیک", k: "مزوتراپی مزو جلسه قیمت ریزش مو شادابی چنده" },
+  { room: "reception", q: "آدرستون کجاست؟", a: "خیابان نمونه، پلاک ۱۲، طبقه‌ی دوم. شنبه تا پنجشنبه ۱۰ تا ۲۰؛ جمعه‌ها تعطیل.", src: "اطلاعات کلینیک", k: "آدرس نشانی کجاست ساعت کاری تلفن شماره راه" },
+
+  /* the rooms the old list had nothing for */
+  { room: "analysis", q: "آنالیز پوست چیه؟", a: "دستگاه از پوستت تو چند لایه عکس می‌گیره و پنج چیز رو نگاه می‌کنه: رطوبت، بافت، لک، منافذ و خط‌های ریز. نتیجه رو دکتر برات می‌خونه و بعد درمان انتخاب می‌شه.", src: "اطلاعات کلینیک", k: "آنالیز انالیز اسکن دستگاه پوست بررسی تست سنجش چیه" },
+  { room: "analysis", q: "آنالیز هزینه داره؟", a: "آنالیز بخشی از همون مشاوره‌ی اوله، پس جداگانه پولی نمی‌گیریم. نوبت مشاوره رو بگیر و بگو می‌خوای پوستت آنالیز بشه.", src: "تعرفه‌ی کلینیک", k: "آنالیز انالیز هزینه قیمت پول رایگان چنده" },
+  { room: "hair", q: "ریزش مو چی کار کنم؟", a: "اول باید علتش پیدا بشه: پوست سر، تغذیه، کم‌خونی یا هورمون. تو مشاوره‌ی رایگان پوست سرت رو می‌بینیم و بعد برنامه بسته می‌شه؛ یکی از راه‌هاش مزوتراپی تقویت موئه، ۴ جلسه.", src: "راهنمای مراقبت", k: "ریزش مو کم پشتی موهام افتادن طاسی سر درمان" },
+  { room: "hair", q: "کاشت مو دارید؟", a: "اینجا کاشت مو انجام نمی‌شه. اتاق مو برای مشاوره، بررسی پوست سر و تقویت موئه؛ اگه کاشت لازم باشه دکتر خودش راهنماییت می‌کنه.", src: "اطلاعات کلینیک", k: "کاشت مو ترانسپلنت پیوند هزینه داری" },
+  { room: "derm", q: "جوش صورتم چی کار کنم؟", a: "جوش دلیلش یکی نیست، پس نسخه‌ی تلفنی برات نمی‌نویسم. تو مشاوره‌ی رایگان دکتر پوستت رو می‌بینه؛ خیلی وقت‌ها پاکسازی عمیق به‌علاوه‌ی مراقبت خانگی کافیه.", src: "راهنمای مراقبت", k: "جوش آکنه اکنه دونه صورت جای جوش چرب پوست" },
+  { room: "derm", q: "لک صورتم می‌ره؟", a: "لک انواع مختلف داره و درمان هرکدام فرق می‌کنه. اول باید نوعش مشخص بشه؛ تو مشاوره‌ی رایگان دکتر نگاه می‌کنه و راه درست رو می‌گه.", src: "راهنمای مراقبت", k: "لک کک مک تیرگی ملاسما سیاهی صورت روشن" },
+  { room: "inject", q: "تزریق درد داره؟", a: "قبلش کرم بی‌حسی می‌زنیم، پس بیشتر مراجعه‌کننده‌ها فقط یه فشار خیلی کم حس می‌کنن. تا ۴۸ ساعت کمی قرمزی یا ورم طبیعیه.", src: "راهنمای مراقبت", k: "تزریق درد دردناک بی‌حسی بیحسی سوزن میترسم ترس" },
+  { room: "laser", q: "لیزر درد داره؟", a: "حس کشیده‌شدن یه کِشِ نازک روی پوست؛ دستگاه سر خنک‌کننده داره. بعدش تا چند ساعت گرمی و قرمزی خیلی کم طبیعیه.", src: "راهنمای مراقبت", k: "لیزر درد دردناک میسوزه سوزش حس چطوره" },
+  { room: "laser", q: "قبل لیزر چی کار کنم؟", a: "ناحیه رو شب قبل با تیغ اصلاح کن؛ موم و برنزه نه. روز نوبت هم بدون آرایش و بدون کرم بیا.", src: "راهنمای مراقبت", k: "قبل لیزر اصلاح تیغ موم برنزه آماده آرایش" },
+  { room: "facial", q: "بعد پاکسازی چی کار کنم؟", a: "امروز آرایش نکن؛ صورتت رو فقط با آب ولرم بشور و ضدآفتاب بزن. تا ۲۴ ساعت استخر و سونا نه.", src: "راهنمای مراقبت", k: "بعد پاکسازی فیشال مراقبت آرایش ضدآفتاب شستن" },
+  { room: "facial", q: "هر چند وقت پاکسازی؟", a: "ماهی یه بار برای بیشتر پوست‌ها خوبه. اگه پوستت چربه دکتر ممکنه فاصله رو کمتر کنه.", src: "راهنمای مراقبت", k: "هر چند وقت پاکسازی فاصله دوره ماه تکرار" },
+  { room: "booking", q: "نوبت دکتر چطور می‌گیرم؟", a: "همین‌جا: خدمت رو انتخاب کن، بعد دکتر، بعد روز و ساعت از ساعت‌های خالی، آخر هم اسم و شماره. چیزی که می‌فرستی درخواست نوبته؛ پذیرش تأییدش می‌کنه.", src: "اطلاعات کلینیک", k: "نوبت گرفتن وقت رزرو چطور چگونه ثبت درخواست" },
+  { room: "lounge", q: "تا چقدر معطل می‌شم؟", a: "نوبت‌ها یک‌ساعته‌اند و معمولاً سر وقت صدا می‌زنیم. اگه دکتر عقب افتاد، پذیرش خودش به شما می‌گه.", src: "اطلاعات کلینیک", k: "معطل انتظار منتظر چقدر طول تاخیر صف" },
+  { room: "reception", q: "پارکینگ دارید؟", a: "این رو مطمئن نیستم و از خودم نمی‌سازم. از پذیرش بپرس یا با مشاور کلینیک تو تلگرام حرف بزن.", src: "", k: "پارکینگ پارک ماشین جای توقف" },
+  { room: "", q: "بارداری می‌شه؟", a: "موقع بارداری و شیردهی خیلی از درمان‌ها انجام نمی‌شه. این رو باید دکتر با دیدن شرایط شما بگه، نه من؛ نوبت مشاوره‌ی رایگان بگیر.", src: "قوانین کلینیک", k: "بارداری باردار حامله شیردهی شیر میدم بچه" },
+  { room: "", q: "با دکتر حرف بزنم؟", a: "آره؛ مشاوره‌ی اول رایگانه و ۲۰ دقیقه با خود دکتره. همین‌جا وقتش رو بگیر.", src: "تعرفه‌ی کلینیک", k: "دکتر حرف صحبت تماس ببینم ویزیت مشاوره" },
+];
 
 function toast(t) { const el = document.createElement("div"); el.className = "toast"; el.setAttribute("role", "status"); el.textContent = t; document.body.appendChild(el); setTimeout(() => el.remove(), 3200); }
 function setMain(text, fn) {
@@ -1074,11 +1739,10 @@ function careTodo() {
 function home() {
   const n = firstName(), nx = upcoming()[0];
   return `${topBar("")}
-    <div class="glass hero"><div class="on-photo"><span class="kicker">arnik beauty clinic</span><b>${esc(CLINIC.name)}</b><span class="hint">سلام${n ? " " + esc(n) : ""}! پوستت امروز چطوره؟</span>
-      <span class="pill">مشاوره‌ی اول رایگانه</span></div></div>
+    <button class="glass hero live" type="button" data-act="walk"><span class="heroslot" id="heroslot"></span><span class="on-photo"><span class="kicker">arnik beauty clinic</span><b>${esc(CLINIC.name)}</b><span class="hint">سلام${n ? " " + esc(n) : ""}! پوستت امروز چطوره؟</span>
+      <span class="pill">مشاوره‌ی اول رایگانه</span><span class="herogo">${C3I.walk}<i>قدم بزنید در کلینیک</i></span></span></button>
     <button class="w-open" type="button" data-act="wheel"><span class="ic">🎁</span><span class="v"><b>گردونه‌ی شانس</b><small>روزی یک بار بچرخان؛ جایزه‌ات همین‌جا</small></span><span class="chev">${ICON.chev}</span></button>
     <button class="d-open" type="button" data-act="dash"><span class="ic">${ICON.gridO}</span><span class="v"><b>داشبورد صاحب کسب‌وکار</b><small>چند نفر آمدند، چه دیدند، کجا برگشتند</small></span><span class="chev">${ICON.chev}</span></button>
-    <button class="t-open" type="button" data-act="tour"><img src="img/hero.jpg" alt=""><span class="v"><b>تور مجازی کلینیک</b><small>پذیرش، سالن انتظار، اتاق لیزر و درمان</small></span><span class="go">${ICON.chev}</span></button>
     <div class="shelf">${SERVICES.filter((s) => s.ph).map((s) => `<button type="button" data-booksvc="${s.id}" aria-label="${esc(s.t)}"><img src="img/${s.ph}.jpg" alt="" loading="lazy"><span class="lbl"><b>${s.t}</b><small>${s.free ? "رایگان" : priceText(s) + " تومان"}</small></span></button>`).join("")}</div>
     ${nx ? `<button class="nextap" type="button" data-go="care">${ICON.doctorI}<span class="v"><small>نوبت بعدی · ${relDay(nx.k)}</small><b>${svcOf(nx.svc).t} با ${docOf(nx.doc).t}</b><small>${faDate(toDate(nx.k))} · ساعت ${nx.at}</small></span><span class="chev" style="color:var(--mint-d);display:grid">${ICON.chev}</span></button>` : ""}
     <div class="tiles">
@@ -1316,6 +1980,7 @@ function render() {
   const r = route();
   $("#app").innerHTML = { home, book, care, prices }[r]();
   mainFor(r);
+  heroSync(r);
 }
 document.addEventListener("click", async (e) => {
   const el = e.target.closest("button"); if (!el) return;
@@ -1361,11 +2026,361 @@ document.addEventListener("click", async (e) => {
       if (IN_TG && tg.requestContact) tg.requestContact((ok, res) => { const p = ok && res && res.responseUnsafe && res.responseUnsafe.contact && res.responseUnsafe.contact.phone_number; if (p) { $("#ph").value = p; haptic("ok"); } });
       else { $("#ph").value = "09123456789"; toast("داخل تلگرام شماره‌ی خودت با یه لمس میاد (نمونه پر شد)."); }
       return;
+    case "walk": { haptic("light"); return startWalk(); }
     case "wheel": { haptic("light"); const h = $("#wheel"); if (h) startWheel(h, WHEEL); return; }
     case "dash": { haptic("light"); const h = $("#dash"); if (h) startDash(h, DASH); return; }
     case "tour": { haptic("light"); const h = $("#tour"); if (h) startTour(h, TOUR); return; }
     case "homescreen": if (IN_TG && tg.addToHomeScreen) tg.addToHomeScreen(); else toast("داخل تلگرام، آیکون کلینیک روی صفحه‌ی گوشی میاد."); return;
   }
+});
+
+/* ── the walkable clinic: the screen over the app ──────────────────────────────────────────────────────────────
+   The engine (js/clinic3d.js) owns the room, the walking and the markers. This owns everything the visitor reads:
+   the way in, the room panels, and the advisor who meets them in each room.
+
+   The advisor is rule-based, and says so. It matches what you type against the clinic's own knowledge (KB in
+   clinic-a.js), shows which paper each answer came from, and whatever it cannot answer it hands to the clinic's
+   real advisor bot in Telegram. The house ladder: rule first, the clinic's documents second, a human last. */
+
+/* Persian, as people really type it: ي for ی, ك for ک, Arabic and Persian digits, a half-space that is sometimes
+   a space and sometimes nothing, and vowel marks nobody types twice the same way. */
+const faNorm = (s) => String(s)
+  .replace(/[\u064B-\u0652\u0670\u0640]/g, "")      // harakat and tatweel
+  .replace(/[\u200c\u200f\u200e]/g, " ")             // the half-space counts as a word break
+  .replace(/[يیۍ]/g, "ی").replace(/[كک]/g, "ک").replace(/[أإآا]/g, "ا").replace(/[ؤو]/g, "و")
+  .replace(/[ۀهة]/g, "ه").replace(/[ژ]/g, "ژ")
+  .replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d))
+  .replace(/[۰-۹]/g, (d) => "۰۱۲۳۴۵۶۷۸۹".indexOf(d))
+  .replace(/[^\u0600-\u06FF0-9a-zA-Z]+/g, " ")
+  .replace(/\s+/g, " ").trim();
+
+const STOP = new Set("از به با در که را رو این اون چی چه برای تا هم یا ایا آیا می نمی شود میشه است هست بود یک یه من شما ما او هر و"
+  .split(" "));
+const toks = (s) => faNorm(s).split(" ").filter((w) => w.length > 1 && !STOP.has(w));
+
+/* How well an entry answers this question. A word that is in the entry's keywords counts double; a word that only
+   starts one of them counts single, so «قرمزی» still finds «قرمز». Being in the room you are standing in is worth
+   one word on its own — in the laser room, «چند جلسه» means the laser. */
+function kbScore(entry, qt, room) {
+  const hay = toks(entry.k + " " + entry.q);
+  let hits = 0;
+  for (const w of qt) {
+    if (hay.includes(w)) { hits += 2; continue; }
+    if (hay.some((h) => (h.length > 2 && w.startsWith(h)) || (w.length > 2 && h.startsWith(w)))) hits += 1;
+  }
+  if (!hits) return 0;
+  return hits / (qt.length * 2) + (entry.room && entry.room === room ? .22 : 0);
+}
+
+/* The ladder. An exact chip is answered at once; a good score is answered with its source; a weak score offers the
+   two nearest questions instead of guessing; nothing at all goes to the bot. */
+function kbAsk(q, room) {
+  const qt = toks(q);
+  if (!qt.length) return { kind: "none" };
+  const exact = KB.find((e) => faNorm(e.q) === faNorm(q));
+  if (exact) return { kind: "hit", entry: exact };
+  const ranked = KB.map((e) => ({ e, s: kbScore(e, qt, room) })).filter((x) => x.s > 0)
+                   .sort((a, b) => b.s - a.s);
+  if (!ranked.length) return { kind: "none" };
+  if (ranked[0].s >= .62) return { kind: "hit", entry: ranked[0].e };
+  if (ranked[0].s >= .3) return { kind: "near", near: ranked.slice(0, 2).map((x) => x.e) };
+  return { kind: "none" };
+}
+const kbText = (e) => (typeof e.a === "function" ? e.a() : e.a);
+
+/* ── the page ─────────────────────────────────────────────────────────────────────────────────────────────────── */
+let walk = null, walkRoom = "", walkDismissed = false, walkAsked = {};
+
+const C3I = {
+  home: '<svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>',
+  walk: '<svg viewBox="0 0 24 24"><circle cx="13" cy="4" r="2"/><path d="M11 21l1.5-6.5L10 12l-1 4"/><path d="M12.5 14.5 16 21"/><path d="M11.5 8 8 10.5l-2 4M11.5 8 15 10l2 3"/></svg>',
+  svc: '<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>',
+  doc: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg>',
+  gal: '<svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="m6 16 4-4.5 3 3 2.5-2.5L19 16"/><circle cx="15.5" cy="9" r="1.3"/></svg>',
+  cal: '<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>',
+  x: '<svg viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+  grid: '<svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>',
+  send: '<svg viewBox="0 0 24 24"><path d="M3 3l18 7.5-7 2.5-2.5 7z"/><path d="M3 3l11 10"/></svg>',
+  bot: '<svg viewBox="0 0 24 24"><rect x="4" y="7.5" width="16" height="12" rx="4"/><path d="M12 3.5v4M8.5 13h.01M15.5 13h.01M9.5 16.5h5"/></svg>',
+  src: '<svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>',
+  spark: '<svg viewBox="0 0 24 24"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg>',
+};
+
+const walkShell = () => `<canvas id="c3cv"></canvas><i class="c3vig"></i>
+  <div class="c3fps" id="c3fps"></div>
+  <header class="c3top">
+    <button class="c3ib" type="button" data-c3="close" aria-label="بستن">${C3I.x}</button>
+    <div class="c3where"><span class="c3eyebrow">${WALK3D.title}</span><b id="c3name">پذیرش بزرگ</b><small id="c3line">در حال باز شدن…</small></div>
+    <button class="c3ib" type="button" data-c3="rooms" aria-label="فهرست اتاق‌ها">${C3I.grid}</button>
+  </header>
+  <div class="c3pad" id="c3pad"><i></i></div>
+  <nav class="c3nav" id="c3nav">
+    <button type="button" data-c3="go-home">${C3I.home}خانه</button>
+    <button type="button" data-c3="rooms">${C3I.walk}اتاق‌ها</button>
+    <button type="button" data-c3="prices">${C3I.svc}خدمات</button>
+    <button type="button" data-c3="doctors">${C3I.doc}دکترها</button>
+    <button type="button" data-c3="gallery">${C3I.gal}گالری</button>
+    <button class="c3book" type="button" data-c3="book">${C3I.cal}نوبت</button>
+  </nav>
+  <div class="c3chips" id="c3chips"></div>
+  <div class="c3bot" id="c3bot"></div>
+  <div class="c3sheet" id="c3sheet"></div>
+  <div class="c3hint" id="c3hint"><b>${WALK3D.hint.t}</b><p>${WALK3D.hint.p}</p><button type="button" data-c3="gothint">فهمیدم</button></div>
+  <div class="c3load" id="c3load"><i class="c3ring"></i>در حال ساختن کلینیک…<small style="opacity:.6;font-size:11px">سنگ، مرمر و نور، همین‌جا در گوشی شما</small></div>
+  <div class="c3welcome" id="c3welcome">
+    <span class="c3wmark">${C3I.spark}</span>
+    <span class="c3eyebrow">${esc(CLINIC.name)}</span>
+    <h1>به استانداردِ تازه‌ای از <em>زیبایی</em> خوش آمدید</h1>
+    <p>قدم به قدم در کلینیک راه بروید، اتاق‌ها را ببینید، و هر جا سؤالی داشتید از مشاور همان اتاق بپرسید.</p>
+    <div class="c3wbtns">
+      <button type="button" data-c3="enter">${C3I.walk} ورود به کلینیک مجازی</button>
+      <button class="ghost" type="button" data-c3="prices">${C3I.svc} دیدن خدمات</button>
+      <button class="ghost" type="button" data-c3="book">${C3I.cal} گرفتن نوبت</button>
+    </div>
+    <p class="c3wfoot">این یک کلینیک نمونه است. اطلاعات، عکس‌ها و اسم دکترها نمونه‌اند تا کلینیک اطلاعات خودش را بدهد.</p>
+  </div>`;
+
+/* ── the living header ────────────────────────────────────────────────────────────────────────────────────────
+   The clinic IS the top of the home page, the way a hero photograph is the top of a website — only it is the real
+   room, breathing slowly, and touching it walks you in.
+
+   Two things make this affordable. The engine is fetched a moment AFTER the page is interactive, so the app still
+   opens instantly and the header simply comes alive a second later; until then the hero photograph is what you
+   see, and on a phone with no WebGL it is all you ever see. And the canvas is MOVED between renders rather than
+   rebuilt — render() replaces the whole page on every route change, and a new canvas would mean building the
+   eleven rooms again each time you came home. Moving the node keeps its WebGL context. */
+let heroShow = null, heroCv = null, heroTried = false;
+
+function heroSync(r) {
+  if (r !== "home") { if (heroShow) heroShow.pause(); return; }
+  const slot = $("#heroslot");
+  if (!slot) return;
+  if (!heroCv) { heroCv = document.createElement("canvas"); heroCv.id = "herocv"; }
+  slot.appendChild(heroCv);                       // the same canvas, in its new place
+  if (heroShow) { heroShow.resume(); heroShow.fit(); $("#heroslot").classList.add("on"); return; }
+  if (heroTried) return;
+  heroTried = true;
+  setTimeout(heroStart, 600);                     // let the page settle before fetching three.js
+}
+
+async function heroStart() {
+  if (route() !== "home" || !$("#heroslot")) return;
+  let mod;
+  try { mod = await import("./js/clinic3d.js"); } catch (e) { return; }
+  if (!mod.canWalk() || route() !== "home") return;
+  const slot = $("#heroslot");
+  if (!slot || !heroCv.isConnected) return;
+  heroShow = mod.startClinic(heroCv, {
+    showcase: true,
+    onReady: () => { const s = $("#heroslot"); if (s) s.classList.add("on"); },
+  });
+}
+
+async function startWalk() {
+  if (heroShow) heroShow.pause();                 // one WebGL context at a time on a phone
+  const h = $("#walk");
+  if (!h) return;
+  h.innerHTML = walkShell();
+  h.classList.add("on");
+  if (location.search.includes("fps")) h.classList.add("fps");
+  document.body.style.overflow = "hidden";
+  if (IN_TG) { try { tg.expand(); tg.disableVerticalSwipes && tg.disableVerticalSwipes(); } catch (e) {} }
+
+  let mod;
+  try { mod = await import("./js/clinic3d.js"); }
+  catch (e) { return walkNope("فایل‌های کلینیک سه‌بعدی نیامدند. اینترنت را چک کنید و دوباره امتحان کنید."); }
+  if (!h.classList.contains("on")) return;                 // they left while it was loading
+  if (!mod.canWalk()) return walkNope("گوشی یا مرورگر شما نمای سه‌بعدی را نشان نمی‌دهد. تور عکس‌های کلینیک را ببینید.");
+
+  const cv = $("#c3cv");
+  walk = mod.startClinic(cv, {
+    onRoom: (s) => {
+      walkRoom = s.key;
+      const n = $("#c3name"), l = $("#c3line");
+      if (n) n.textContent = s.nameFa;
+      if (l) l.textContent = s.lineFa;
+      document.querySelectorAll("#c3chips button").forEach((b) => {
+        b.classList.toggle("on", b.dataset.s === s.key);
+        if (b.dataset.s === s.key) b.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+      });
+      advisorEnter(s.key);
+    },
+    onHotspot: (hs) => { haptic("light"); walkOpen(hs); },
+    onReady: () => {
+      const load = $("#c3load");
+      if (load) { load.classList.add("gone"); setTimeout(() => load.remove(), 600); }
+      const chips = $("#c3chips");
+      if (chips) chips.innerHTML = walk.spaces.filter((s) => s.key !== "corridor")
+        .map((s) => `<button type="button" data-s="${s.key}">${ICON[s.icon] || ""}${s.nameFa}</button>`).join("");
+    },
+    onStat: (st) => { const f = $("#c3fps"); if (f) f.textContent = `${st.ms}ms · dpr ${st.dpr} · ${st.rooms}r · ${st.calls}c · ${(st.tris / 1000).toFixed(0)}k`; },
+  });
+}
+
+function walkNope(msg) {
+  const h = $("#walk"); if (!h) return;
+  h.innerHTML = `<div class="c3nope"><b style="font-size:16px">${WALK3D.title}</b><p>${msg}</p>
+    <button class="c3cta" type="button" data-c3="tour">${C3I.gal} تور عکس‌های کلینیک</button>
+    <button class="c3cta ghost" type="button" data-c3="close">بستن</button></div>`;
+}
+
+function closeWalk() {
+  const h = $("#walk"); if (!h) return;
+  if (walk) { walk.dispose(); walk = null; }
+  h.classList.remove("on", "rooms"); h.innerHTML = "";
+  document.body.style.overflow = "";
+  if (heroShow && route() === "home") { heroShow.resume(); heroShow.fit(); }
+  if (IN_TG) { try { tg.enableVerticalSwipes && tg.enableVerticalSwipes(); } catch (e) {} }
+}
+
+/* ── the panel a marker opens ─────────────────────────────────────────────────────────────────────────────────── */
+const svcLine = (s) => `<li><div><b>${s.t}</b> — ${s.free ? "رایگان" : priceText(s) + " تومان"}<div class="hint" style="font-size:11.5px">${s.sub}</div></div></li>`;
+
+function walkOpen(hs) {
+  const R = WALK3D.rooms[hs.room] || {};
+  const p = R.panel || { title: hs.title, sub: "", body: "", items: [], note: "" };
+  if (hs.opens === "booking") return walkGo("book");
+
+  let inner = "";
+  if (hs.opens === "demo" && R.demo) {
+    inner = `<div class="c3meters">${R.demo.map(([t, sub, v]) => `<div class="c3meter"><span><b>${t}</b><i style="font-style:normal;color:#8A7550">${fa(v)}٪</i></span><i style="--v:${v}%"></i><span style="font-size:11px;color:#8A7E70">${sub}</span></div>`).join("")}</div>`;
+  } else if (hs.opens === "doctors") {
+    inner = `<ul>${DOCTORS.map((d) => `<li><div><b>${d.t}</b> — ${d.sub}<div class="hint" style="font-size:11.5px">${WEEKDAY[d.off[0]]}‌ها نیست · بقیه‌ی روزها ${CLINIC.hours.replace("شنبه تا پنجشنبه ", "")}</div></div></li>`).join("")}</ul>`;
+  } else {
+    const ids = p.svc || [];
+    const list = ids.length ? ids.map(svcOf).filter(Boolean).map(svcLine).join("")
+                            : (p.items || []).map((t) => `<li>${t}</li>`).join("");
+    inner = list ? `<ul>${list}</ul>` : "";
+  }
+
+  $("#c3sheet").innerHTML = `<div class="c3grab"></div>
+    <h2>${p.title}</h2>${p.sub ? `<div class="c3sub">${p.sub}</div>` : ""}
+    ${p.body ? `<p>${p.body}</p>` : ""}${inner}
+    <div class="c3row">
+      <button class="c3cta" type="button" data-c3="book">${C3I.cal} گرفتن نوبت</button>
+      <button class="c3cta ghost" type="button" data-c3="sheetclose">بستن</button>
+    </div>
+    ${p.note ? `<div class="c3note">${p.note}</div>` : ""}`;
+  $("#c3sheet").classList.add("on");
+}
+const closeSheet3 = () => { const s = $("#c3sheet"); if (s) s.classList.remove("on"); };
+
+/* Leaving the walk for a page of the app: close it properly first, so the renderer is not left running. */
+function walkGo(r) { closeWalk(); go(r); window.scrollTo(0, 0); }
+
+/* ── the advisor ──────────────────────────────────────────────────────────────────────────────────────────────── */
+function advisorEnter(key) {
+  if (walkDismissed) return;
+  const R = WALK3D.rooms[key];
+  if (!R || !R.greet) return;
+  const box = $("#c3bot"); if (!box) return;
+  box.innerHTML = `<div class="c3bothead">
+      <span class="c3botav">${C3I.bot}</span>
+      <div><b>مشاور کلینیک</b><small>از روی اسناد خود کلینیک</small></div>
+      <button class="c3botx" type="button" data-c3="botoff" aria-label="بستن مشاور">${C3I.x}</button>
+    </div>
+    <div class="c3botlog" id="c3botlog"><div class="c3msg bot">${R.greet}</div></div>
+    <div class="c3botchips" id="c3botchips">${(R.chips || []).map((q) => `<button type="button" data-ask="${esc(q)}">${q}</button>`).join("")}</div>
+    <div class="c3botask">
+      <input id="c3botin" type="text" inputmode="text" placeholder="سؤالتان را بنویسید…" autocomplete="off">
+      <button type="button" data-c3="ask" aria-label="فرستادن">${C3I.send}</button>
+    </div>
+    <div class="c3botfoot">جواب‌ها از تعرفه و راهنمای خود کلینیک است، نه تشخیص پزشکی.</div>`;
+  setTimeout(() => box.classList.add("on"), 420);          // let the room arrive first
+}
+
+const botLog = (html) => {
+  const log = $("#c3botlog"); if (!log) return;
+  log.insertAdjacentHTML("beforeend", html);
+  log.scrollTop = log.scrollHeight;
+};
+
+function advisorAsk(q) {
+  q = String(q || "").trim();
+  if (!q) return;
+  const log = $("#c3botlog"); if (!log) return;
+  botLog(`<div class="c3msg me">${esc(q)}</div>`);
+  const inp = $("#c3botin"); if (inp) inp.value = "";
+  walkAsked[walkRoom] = (walkAsked[walkRoom] || 0) + 1;
+  botLog('<div class="c3msg bot c3typing" id="c3typ"><i></i><i></i><i></i></div>');
+  setTimeout(() => {
+    const t = $("#c3typ"); if (t) t.remove();
+    const r = kbAsk(q, walkRoom);
+    if (r.kind === "hit") {
+      const e = r.entry;
+      botLog(`<div class="c3msg bot">${kbText(e)}${e.src ? `<span class="c3src">${C3I.src}${e.src}</span>` : ""}</div>`);
+      haptic("ok");
+    } else if (r.kind === "near") {
+      botLog(`<div class="c3msg bot">مطمئن نیستم منظورتان کدام است؛ حدس نمی‌زنم. یکی از این‌ها را بزنید:</div>`);
+      const chips = $("#c3botchips");
+      if (chips) chips.innerHTML = r.near.map((e) => `<button type="button" data-ask="${esc(e.q)}">${e.q}</button>`).join("")
+        + `<button type="button" data-c3="tobot">از مشاور کلینیک بپرس</button>`;
+    } else {
+      botLog(`<div class="c3msg bot">این را نمی‌دانم و از خودم نمی‌سازم. مشاور کلینیک در تلگرام جوابش را دارد، یا در مشاوره‌ی حضوری بپرسید.</div>`);
+      const chips = $("#c3botchips");
+      if (chips) chips.innerHTML = `<button type="button" data-c3="tobot">${C3I.bot} پرسیدن از مشاور کلینیک</button>`
+        + `<button type="button" data-c3="book">گرفتن نوبت مشاوره</button>`;
+      haptic("medium");
+    }
+  }, 520);
+}
+
+/* The hand-off. A Telegram start parameter cannot carry Persian, so the question goes to the clipboard and the
+   bot's chat opens — the visitor pastes it in one move and the real advisor answers there. */
+async function advisorToBot() {
+  const inp = $("#c3botin");
+  const q = (inp && inp.value.trim()) || "";
+  const link = "https://t.me/" + CLINIC.bot;
+  if (q) { try { await navigator.clipboard.writeText(q); toast("سؤالت کپی شد؛ همان‌جا در تلگرام بفرست"); } catch (e) {} }
+  if (IN_TG && tg.openTelegramLink) tg.openTelegramLink(link);
+  else window.open(link, "_blank", "noopener");
+}
+
+document.addEventListener("click", (e) => {
+  const host = $("#walk");
+  if (!host || !host.classList.contains("on")) return;
+  const sheet = $("#c3sheet");
+  if (e.target && e.target.id === "c3cv" && sheet && sheet.classList.contains("on")) { sheet.classList.remove("on"); return; }
+  const el = e.target.closest("button[data-c3],button[data-ask],#c3chips button");
+  if (!el) return;
+  const d = el.dataset;
+  if (d.ask) { haptic("light"); return advisorAsk(d.ask); }
+  if (d.s && walk) { haptic("light"); host.classList.remove("rooms"); closeSheet3(); return walk.show(d.s); }
+  switch (d.c3) {
+    case "close": haptic("light"); return closeWalk();
+    case "enter": {
+      haptic("ok");
+      const w = $("#c3welcome"); if (w) { w.classList.add("gone"); setTimeout(() => w.remove(), 500); }
+      if (!store.get("walkhint")) { const hn = $("#c3hint"); if (hn) { hn.classList.add("on");
+        setTimeout(() => { hn.classList.add("gone"); setTimeout(() => hn.remove(), 500); }, 5200); }
+        store.set("walkhint", 1); }
+      return;
+    }
+    case "gothint": { const hn = $("#c3hint"); if (hn) { hn.classList.add("gone"); setTimeout(() => hn.remove(), 400); } return; }
+    case "rooms": haptic("light"); closeSheet3(); return host.classList.toggle("rooms");
+    case "sheetclose": haptic("light"); return closeSheet3();
+    case "botoff": { walkDismissed = true; const b = $("#c3bot"); if (b) b.classList.remove("on"); return; }
+    case "ask": return advisorAsk($("#c3botin") ? $("#c3botin").value : "");
+    case "tobot": haptic("light"); return advisorToBot();
+    case "book": haptic("ok"); return walkGo("book");
+    case "prices": haptic("light"); return walkGo("prices");
+    case "go-home": haptic("light"); return walkGo("home");
+    case "doctors": {
+      haptic("light"); host.classList.remove("rooms");
+      if (walk && walk.room !== "doctor") walk.show("doctor");
+      return walkOpen({ room: "doctor", title: "دکترهای کلینیک", opens: "doctors" });
+    }
+    case "gallery": {
+      haptic("light"); host.classList.remove("rooms");
+      if (walk && walk.room !== "gallery") walk.show("gallery");
+      return walkOpen({ room: "gallery", title: "گالری درمان‌ها", opens: "info" });
+    }
+    case "tour": { closeWalk(); const h = $("#tour"); if (h) startTour(h, TOUR); return; }
+  }
+});
+/* Enter in the advisor's box sends the question. */
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && e.target && e.target.id === "c3botin") { e.preventDefault(); advisorAsk(e.target.value); }
 });
 
 /* ── the tour ────────────────────────────────────────────────────────────────────────────────────────────────
