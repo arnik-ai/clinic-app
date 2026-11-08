@@ -685,6 +685,14 @@ textarea.input { resize: none; line-height: 1.7; }
 @keyframes c3dot { 0%, 60%, 100% { opacity: .3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
 @media (prefers-reduced-motion: reduce) { .c3typing i { animation: none; opacity: .6; } }
 
+.c3goto {
+  display: flex; align-items: center; gap: 7px; margin-top: 9px; width: 100%; cursor: pointer;
+  font: inherit; font-size: 12.5px; font-weight: 600; padding: 9px 12px; border-radius: 11px;
+  color: #241E17; background: var(--c3-champagne); border: 1px solid var(--c3-gold);
+}
+.c3goto svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.1;
+  stroke-linecap: round; stroke-linejoin: round; }
+
 .c3botchips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 8px 12px 0; }
 .c3botchips::-webkit-scrollbar { display: none; }
 .c3botchips button {
@@ -971,6 +979,19 @@ textarea.input { resize: none; line-height: 1.7; }
 .sec svg, .fr { color: var(--accent-ink); }
 .sec .cnt { color: var(--accent-ink); background: var(--accent-soft); border-color: var(--accent-line); }
 .wiz .on, .wiz button.on i { color: var(--accent-ink); }
+
+/* The home page keeps one tile. A single half-width card beside an empty column reads as a mistake, so it
+   lies down into a row like the cards above it. (This has to live here rather than in clinic3d.css: only
+   <app>-theme.css is inlined after _theme.css, and anything earlier loses to the house layer on equal
+   specificity.) */
+.tiles { grid-template-columns: 1fr; }
+.tiles .tile {
+  display: flex; flex-direction: row; align-items: center; gap: 14px;
+  padding: 16px 18px; text-align: start;
+}
+.tiles .tile .ring { margin: 0; flex-shrink: 0; }
+.tiles .tile b { flex-shrink: 0; }
+.tiles .tile span:not(.ring) { margin-inline-start: auto; text-align: end; }
 
 /* the way into the walkable clinic, on the home page: the photo tour's card, one step above it */
 .t-open[data-act="walk"] .v b::after {
@@ -1577,14 +1598,14 @@ const KB = [
   { room: "", q: "مشاوره رایگانه؟", a: "آره، مشاوره‌ی اول با دکتر رایگانه و ۲۰ دقیقه طول می‌کشه؛ حضوری، طبقه‌ی دوم. همین‌جا وقتش رو بگیر.", src: "تعرفه‌ی کلینیک", k: "مشاوره رایگان ویزیت اول هزینه مجانی", faq: true },
   { room: "doctor", q: "دکتر کی هست؟", a: () => DOCTORS.map((x) => `${x.t} (${x.sub}) ${WEEKDAY[x.off[0]]}‌ها نیست`).join("؛ ") + "؛ بقیه‌ی روزها ۱۰ تا ۲۰ تو کلینیکن.", src: "برنامه‌ی دکترها", k: "دکتر کی هست روز حضور شیفت صالحی رادمهر کیانی پزشک متخصص", faq: true },
   { room: "laser", q: "لیزر چند جلسه‌ست؟", a: "معمولاً ۶ تا ۸ جلسه، با فاصله‌ی ۴ تا ۶ هفته. هر جلسه از ۱٬۲۰۰٬۰۰۰ تومان، بسته به ناحیه.", src: "تعرفه‌ی کلینیک", k: "لیزر جلسه چند موهای زائد فاصله قیمت هزینه", faq: true },
-  { room: "lounge", q: "نوبتم کی بود؟", a: () => fillerAnswer(), src: "نوبت‌های تو", k: "نوبت کی بود نوبتم یادآوری تاریخ ساعت فیلر", faq: true },
+  { room: "lounge", q: "نوبتم کی بود؟", a: () => fillerAnswer(), src: "نوبت‌های تو", k: "نوبت کی بود نوبتم یادآوری تاریخ ساعت فیلر", faq: true, go: "care" },
   { room: "gallery", q: "قبل و بعد دارید؟", a: "آره؛ آلبوم قبل و بعد هر درمان رو تو مشاوره‌ی حضوری نشونت می‌دیم. به احترام حریم مراجعه‌کننده‌ها، عکس‌ها آنلاین منتشر نمی‌شن.", src: "قوانین کلینیک", k: "قبل بعد نمونه عکس کار آلبوم نتیجه گالری", faq: true },
-  { room: "laser", q: "بعد لیزر چی کار کنم؟", a: "تا ۴۸ ساعت آفتاب و سونا نه؛ ضدآفتاب یادت نره. ناحیه رو اسکراب نکن و بین جلسه‌ها فقط تیغ بزن، موم و اپیلیدی نه.", src: "راهنمای مراقبت", k: "بعد لیزر مراقبت آفتاب سونا ضدآفتاب اسکراب موم", faq: true },
+  { room: "laser", q: "بعد لیزر چی کار کنم؟", a: "تا ۴۸ ساعت آفتاب و سونا نه؛ ضدآفتاب یادت نره. ناحیه رو اسکراب نکن و بین جلسه‌ها فقط تیغ بزن، موم و اپیلیدی نه.", src: "راهنمای مراقبت", k: "بعد لیزر مراقبت آفتاب سونا ضدآفتاب اسکراب موم", faq: true, go: "care" },
   { room: "", q: "قسطی هم می‌شه؟", a: "آره؛ درمان‌های ۳ میلیون به بالا رو می‌شه ۴ قسط بدون کارمزد داد: قسط اول موقع رزرو، بقیه ماهی یه قسط.", src: "قوانین کلینیک", k: "قسط قسطی اقساط پرداخت کارمزد", faq: true },
-  { room: "derm", q: "قرمزی طبیعیه؟", a: "قرمزی و کمی تورم تا ۴۸ ساعت بعد از لیزر یا تزریق طبیعیه؛ کمپرس سرد کمک می‌کنه. اگه بیشتر موند، تو «مراقبت من» بگو تا دکتر خودش تماس بگیره.", src: "راهنمای مراقبت", k: "قرمزی طبیعی تورم ورم کبودی سوزش عادی", faq: true },
+  { room: "derm", q: "قرمزی طبیعیه؟", a: "قرمزی و کمی تورم تا ۴۸ ساعت بعد از لیزر یا تزریق طبیعیه؛ کمپرس سرد کمک می‌کنه. اگه بیشتر موند، تو «مراقبت من» بگو تا دکتر خودش تماس بگیره.", src: "راهنمای مراقبت", k: "قرمزی طبیعی تورم ورم کبودی سوزش عادی", faq: true, go: "care" },
   { room: "gallery", q: "تخفیف دارید؟", a: "مشاوره‌ی اول همیشه رایگانه. برای لیزر، پکیج ۶ جلسه‌ای ۱۵٪ تخفیف داره که تو مشاوره برات حسابش می‌کنیم.", src: "تعرفه‌ی کلینیک", k: "تخفیف آف پکیج بسته ارزان ارزون کمتر", faq: true },
   { room: "booking", q: "بیعانه چقدره؟", a: "برای قطعی شدن نوبت درمان ۳۰۰ هزار تومان بیعانه می‌گیریم که از مبلغ نهایی کم می‌شه. مشاوره بیعانه نداره.", src: "قوانین کلینیک", k: "بیعانه پیش پرداخت ودیعه چقدر" },
-  { room: "booking", q: "نوبتم رو لغو کنم؟", a: "تا ۲۴ ساعت قبل از نوبت لغو کنی، بیعانه کامل برمی‌گرده؛ از «مراقبت من» با یه لمس.", src: "قوانین کلینیک", k: "لغو کنسل نوبت برگشت پول جابه‌جایی تغییر" },
+  { room: "booking", q: "نوبتم رو لغو کنم؟", a: "تا ۲۴ ساعت قبل از نوبت لغو کنی، بیعانه کامل برمی‌گرده؛ از «مراقبت من» با یه لمس.", src: "قوانین کلینیک", k: "لغو کنسل نوبت برگشت پول جابه‌جایی تغییر", go: "care" },
   { room: "facial", q: "پاکسازی پوست چنده؟", a: "پاکسازی عمیق با ماسک آرام‌بخش ۹۵۰ هزار تومانه و حدود ۱ ساعت طول می‌کشه؛ ماهی یه بار عالیه.", src: "تعرفه‌ی کلینیک", k: "پاکسازی پوست قیمت جوش منافذ فیشال چنده هزینه" },
   { room: "facial", q: "مزوتراپی چند جلسه‌ست؟", a: "۴ جلسه، هر ۲ هفته یه بار؛ هر جلسه ۳٫۲ میلیون تومان. قسطی هم می‌شه.", src: "تعرفه‌ی کلینیک", k: "مزوتراپی مزو جلسه قیمت ریزش مو شادابی چنده" },
   { room: "reception", q: "آدرستون کجاست؟", a: "خیابان نمونه، پلاک ۱۲، طبقه‌ی دوم. شنبه تا پنجشنبه ۱۰ تا ۲۰؛ جمعه‌ها تعطیل.", src: "اطلاعات کلینیک", k: "آدرس نشانی کجاست ساعت کاری تلفن شماره راه" },
@@ -1599,9 +1620,9 @@ const KB = [
   { room: "inject", q: "تزریق درد داره؟", a: "قبلش کرم بی‌حسی می‌زنیم، پس بیشتر مراجعه‌کننده‌ها فقط یه فشار خیلی کم حس می‌کنن. تا ۴۸ ساعت کمی قرمزی یا ورم طبیعیه.", src: "راهنمای مراقبت", k: "تزریق درد دردناک بی‌حسی بیحسی سوزن میترسم ترس" },
   { room: "laser", q: "لیزر درد داره؟", a: "حس کشیده‌شدن یه کِشِ نازک روی پوست؛ دستگاه سر خنک‌کننده داره. بعدش تا چند ساعت گرمی و قرمزی خیلی کم طبیعیه.", src: "راهنمای مراقبت", k: "لیزر درد دردناک میسوزه سوزش حس چطوره" },
   { room: "laser", q: "قبل لیزر چی کار کنم؟", a: "ناحیه رو شب قبل با تیغ اصلاح کن؛ موم و برنزه نه. روز نوبت هم بدون آرایش و بدون کرم بیا.", src: "راهنمای مراقبت", k: "قبل لیزر اصلاح تیغ موم برنزه آماده آرایش" },
-  { room: "facial", q: "بعد پاکسازی چی کار کنم؟", a: "امروز آرایش نکن؛ صورتت رو فقط با آب ولرم بشور و ضدآفتاب بزن. تا ۲۴ ساعت استخر و سونا نه.", src: "راهنمای مراقبت", k: "بعد پاکسازی فیشال مراقبت آرایش ضدآفتاب شستن" },
+  { room: "facial", q: "بعد پاکسازی چی کار کنم؟", a: "امروز آرایش نکن؛ صورتت رو فقط با آب ولرم بشور و ضدآفتاب بزن. تا ۲۴ ساعت استخر و سونا نه.", src: "راهنمای مراقبت", k: "بعد پاکسازی فیشال مراقبت آرایش ضدآفتاب شستن", go: "care" },
   { room: "facial", q: "هر چند وقت پاکسازی؟", a: "ماهی یه بار برای بیشتر پوست‌ها خوبه. اگه پوستت چربه دکتر ممکنه فاصله رو کمتر کنه.", src: "راهنمای مراقبت", k: "هر چند وقت پاکسازی فاصله دوره ماه تکرار" },
-  { room: "booking", q: "نوبت دکتر چطور می‌گیرم؟", a: "همین‌جا: خدمت رو انتخاب کن، بعد دکتر، بعد روز و ساعت از ساعت‌های خالی، آخر هم اسم و شماره. چیزی که می‌فرستی درخواست نوبته؛ پذیرش تأییدش می‌کنه.", src: "اطلاعات کلینیک", k: "نوبت گرفتن وقت رزرو چطور چگونه ثبت درخواست" },
+  { room: "booking", q: "نوبت دکتر چطور می‌گیرم؟", a: "همین‌جا: خدمت رو انتخاب کن، بعد دکتر، بعد روز و ساعت از ساعت‌های خالی، آخر هم اسم و شماره. چیزی که می‌فرستی درخواست نوبته؛ پذیرش تأییدش می‌کنه.", src: "اطلاعات کلینیک", k: "نوبت گرفتن وقت رزرو چطور چگونه ثبت درخواست", go: "care" },
   { room: "lounge", q: "تا چقدر معطل می‌شم؟", a: "نوبت‌ها یک‌ساعته‌اند و معمولاً سر وقت صدا می‌زنیم. اگه دکتر عقب افتاد، پذیرش خودش به شما می‌گه.", src: "اطلاعات کلینیک", k: "معطل انتظار منتظر چقدر طول تاخیر صف" },
   { room: "reception", q: "پارکینگ دارید؟", a: "این رو مطمئن نیستم و از خودم نمی‌سازم. از پذیرش بپرس یا با مشاور کلینیک تو تلگرام حرف بزن.", src: "", k: "پارکینگ پارک ماشین جای توقف" },
   { room: "", q: "بارداری می‌شه؟", a: "موقع بارداری و شیردهی خیلی از درمان‌ها انجام نمی‌شه. این رو باید دکتر با دیدن شرایط شما بگه، نه من؛ نوبت مشاوره‌ی رایگان بگیر.", src: "قوانین کلینیک", k: "بارداری باردار حامله شیردهی شیر میدم بچه" },
@@ -1754,8 +1775,6 @@ function home() {
     ${nx ? `<button class="nextap" type="button" data-go="care">${ICON.doctorI}<span class="v"><small>نوبت بعدی · ${relDay(nx.k)}</small><b>${svcOf(nx.svc).t} با ${docOf(nx.doc).t}</b><small>${faDate(toDate(nx.k))} · ساعت ${nx.at}</small></span><span class="chev" style="color:var(--mint-d);display:grid">${ICON.chev}</span></button>` : ""}
     <div class="tiles">
       <button class="tile t-lilac" type="button" data-go="book"><span class="ring">${ICON.calO}</span><b>نوبت دکتر</b><span>خدمت، دکتر، ساعت</span></button>
-      <button class="tile t-sky" type="button" data-go="care"><span class="ring">${ICON.heartO}</span><b>مراقبت من</b><span>${careTodo()}</span></button>
-      <button class="tile t-peach" type="button" data-go="prices"><span class="ring">${ICON.tagO}</span><b>تعرفه‌ها</b><span>بوتاکس، لیزر، فیلر…</span></button>
     </div>
     <div class="mini"><button type="button" data-act="freeconsult">${ICON.gift}مشاوره‌ی رایگان ۲۰ دقیقه‌ای · قسطی هم می‌شه</button></div>`;
 }
@@ -2156,6 +2175,9 @@ const walkShell = () => `<canvas id="c3cv"></canvas><i class="c3vig"></i>
    see, and on a phone with no WebGL it is all you ever see. And the canvas is MOVED between renders rather than
    rebuilt — render() replaces the whole page on every route change, and a new canvas would mean building the
    eleven rooms again each time you came home. Moving the node keeps its WebGL context. */
+/* The pages an answer can take you to, when the answer is about something you have to DO rather than know. */
+const GOTO = { care: "باز کردن «مراقبت من»", prices: "دیدن تعرفه‌ها", book: "گرفتن نوبت" };
+
 let heroShow = null, heroCv = null, heroTried = false;
 
 function heroSync(r) {
@@ -2320,7 +2342,7 @@ function advisorAsk(q) {
     const r = kbAsk(q, walkRoom);
     if (r.kind === "hit") {
       const e = r.entry;
-      botLog(`<div class="c3msg bot">${kbText(e)}${e.src ? `<span class="c3src">${C3I.src}${e.src}</span>` : ""}</div>`);
+      botLog(`<div class="c3msg bot">${kbText(e)}${e.src ? `<span class="c3src">${C3I.src}${e.src}</span>` : ""}${e.go ? `<button class="c3goto" type="button" data-goto="${e.go}">${C3I.her} ${GOTO[e.go] || "باز کردن"}</button>` : ""}</div>`);
       haptic("ok");
     } else if (r.kind === "near") {
       botLog(`<div class="c3msg bot">مطمئن نیستم منظورتان کدام است؛ حدس نمی‌زنم. یکی از این‌ها را بزنید:</div>`);
@@ -2357,6 +2379,7 @@ document.addEventListener("click", (e) => {
   if (!el) return;
   const d = el.dataset;
   if (d.ask) { haptic("light"); return advisorAsk(d.ask); }
+  if (d.goto) { haptic("ok"); return walkGo(d.goto); }
   if (d.s && walk) { haptic("light"); host.classList.remove("rooms"); closeSheet3(); return walk.show(d.s); }
   switch (d.c3) {
     case "close": haptic("light"); return closeWalk();
