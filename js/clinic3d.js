@@ -351,6 +351,9 @@ function makeMaterials(T) {
     cove: new THREE.MeshBasicMaterial({ color: 0xFFF1DC, toneMapped: false, fog: false }),
     bezel: new THREE.MeshStandardMaterial({ color: 0x3A342D, roughness: .4, metalness: .2, envMapIntensity: .4, side: S }),
     botanical: new THREE.MeshStandardMaterial({ color: 0xCDB78E, roughness: .8, metalness: 0, envMapIntensity: .3, side: D }),
+    // A rug stops the stone running wall to wall, which is what makes a floor look like a floor plan.
+    rug: new THREE.MeshStandardMaterial({ color: 0xBFB4A1, roughness: .97, metalness: 0, envMapIntensity: .18,
+      side: S, normalMap: T.toothN, normalScale: v2(.5, .5), vertexColors: true }),
     // the guide. Skin is the one colour here that is not derived from the stone palette, but it is chosen inside
     // the same warm family so she belongs to the room rather than being pasted onto it.
     skin: new THREE.MeshStandardMaterial({ color: 0xD9B493, roughness: .74, metalness: 0, envMapIntensity: .28, side: S }),
@@ -552,6 +555,43 @@ function kit(M) {
       solids.push({ x0: x - sx / 2 - .03, x1: x + sx / 2 + .03, z0: z - sz / 2 - .03, z1: z + sz / 2 + .03, h });
     },
 
+    // Reeded timber panelling: close-set half-round staves with a gold reveal top and bottom.
+    flute(out, x, z, w, h, rotY = 0) {
+      const along = rotY % 180 === 0;
+      const n = Math.max(6, Math.round(w / .085));
+      const g = new THREE.CylinderGeometry(.032, .032, h - .16, 6, 1, false, 0, Math.PI);
+      for (let i = 0; i < n; i++) {
+        const o = -w / 2 + (i + .5) * (w / n);
+        const m = put(out, g, M.wood, x + (along ? o : 0), (h - .16) / 2 + .08, z + (along ? 0 : o));
+        m.rotation.y = (along ? 0 : Math.PI / 2) + (rotY < 0 ? Math.PI : 0);
+      }
+      for (const y of [.055, h - .055]) {
+        put(out, box(along ? w : .05, .035, along ? .05 : w), M.gold, x, y, z);
+      }
+    },
+
+    // One pendant: thin champagne rods at staggered lengths with lit tips.
+    pendant(out, x, z, y0) {
+      const seed = [0, .34, .62, .18, .5, .76, .28, .58];
+      for (let i = 0; i < 8; i++) {
+        const a = i / 8 * Math.PI * 2, rr = .16 + (i % 3) * .07;
+        const px = x + Math.cos(a) * rr, pz = z + Math.sin(a) * rr;
+        const len = .5 + seed[i] * .95;
+        put(out, new THREE.CylinderGeometry(.008, .008, len, 5), M.metal, px, y0 - len / 2, pz);
+        const tip = put(out, new THREE.CylinderGeometry(.026, .018, .09, 7), M.cove, px, y0 - len - .04, pz);
+        tip.renderOrder = 1;
+      }
+      put(out, new THREE.CylinderGeometry(.09, .09, .035, 10), M.metal, x, y0 + .015, z);
+    },
+
+    // A rug, lifted a millimetre so it never fights the floor for the same pixels.
+    rug(out, x, z, w, d) {
+      put(out, tileUV(new THREE.PlaneGeometry(w, d, Math.ceil(w / .5), Math.ceil(d / .5)), w / 1.4, d / 1.4), M.rug, x, .004, z)
+        .rotation.x = -Math.PI / 2;
+      put(out, box(w + .03, .004, .03), M.gold, x, .006, z - d / 2);
+      put(out, box(w + .03, .004, .03), M.gold, x, .006, z + d / 2);
+    },
+
     shelf(out, solids, blobs, x, z, w, rotY = 0) {
       for (let i = 0; i < 3; i++) put(out, tileUV(box(w, .04, .26), w / 1.6, 1), M.marble, x, .7 + i * .48, z, rotY);
       put(out, box(.05, 1.7, .28), M.joinery, x - (rotY ? 0 : w / 2), .85, z + (rotY ? w / 2 : 0), rotY);
@@ -622,6 +662,16 @@ function buildRoom(key, M, K) {
       else { m.position.set(at, DOOR_H + hh / 2, c); m.rotation.y = facing > 0 ? Math.PI / 2 : -Math.PI / 2; }
       parts.push(m);
     }
+    // The shadow gap. In a photograph of a real interior the wall never simply meets the floor: there is a dark
+    // recess at its base, and that line is what tells the eye the wall is a built surface and not a painted
+    // plane. Two centimetres of geometry, and the largest single gain in this whole pass.
+    for (const [a, b] of segmentsOf(lo, hi, gaps)) {
+      const ww = b - a, cc = (a + b) / 2, off = facing > 0 ? .018 : -.018;
+      const m = new THREE.Mesh(
+        new THREE.BoxGeometry(axis === "x" ? ww : .035, .055, axis === "x" ? .035 : ww), M.joinery);
+      m.position.set(axis === "x" ? cc : at + off, .028, axis === "x" ? at + off : cc);
+      parts.push(m);
+    }
     // a champagne reveal down each doorway edge: the detail that makes an opening look built
     for (const [a, b] of gaps) for (const e of [a, b]) {
       const m = new THREE.Mesh(new THREE.BoxGeometry(.06, DOOR_H, .06), M.metal);
@@ -641,6 +691,32 @@ function buildRoom(key, M, K) {
     strip.renderOrder = 1; parts.push(strip);
   }
 
+  // A tray ceiling: a border dropped round the perimeter, so the cove sits in a recess the way cove lighting
+  // actually does, and the ceiling has an edge instead of being a lid.
+  const TRAY = .62, DROP = .14;
+  for (const [cx, cz, bw, bd] of [
+    [r.x, R.z0 + TRAY / 2, r.w, TRAY], [r.x, R.z1 - TRAY / 2, r.w, TRAY],
+    [R.x0 + TRAY / 2, r.z, TRAY, r.d - TRAY * 2], [R.x1 - TRAY / 2, r.z, TRAY, r.d - TRAY * 2],
+  ]) {
+    if (bw <= .02 || bd <= .02) continue;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(bw, DROP, bd), M.ceiling);
+    m.position.set(cx, r.h - DROP / 2, cz);
+    parts.push(m);
+  }
+
+  // Downlights. Unlit discs, so they cost nothing and the ceiling stops reading as a blank lid.
+  const dlGeo = new THREE.CylinderGeometry(.052, .052, .012, 10);
+  const longWay = r.w >= r.d;
+  const run = (longWay ? r.w : r.d) - 2.2;
+  const n = Math.max(2, Math.min(6, Math.round(run / 1.5)));
+  for (let i = 0; i < n; i++) {
+    const t = n === 1 ? .5 : i / (n - 1);
+    const p = -run / 2 + run * t;
+    const m = new THREE.Mesh(dlGeo, M.cove);
+    m.position.set(longWay ? r.x + p : r.x, r.h - .018, longWay ? r.z : r.z + p);
+    m.renderOrder = 1; parts.push(m);
+  }
+
   return { r, R, box3, parts, solids, blobs, screens, K, M };
 }
 
@@ -651,6 +727,12 @@ function furnish(ctx, key) {
   const mid = (a, b) => (a + b) / 2;
 
   if (key === "reception") {
+    // A fluted timber wall behind the counter — reeded panelling is the detail of this decade, and this is the
+    // one surface a visitor looks at longest.
+    K.flute(P, R.x1 - .07, 6.0, 4.4, 3.2, -90);
+    // and one sculptural object over the middle, which is worth more than ten decorative ones
+    K.pendant(P, -1.0, 6.4, 4.0);
+    K.rug(P, -2.6, 6.6, 3.2, 3.4);
     // the counter along the east side, so the way through to the corridor stays clear
     K.counter(P, S, B, 2.9, 6.0, 3.2, 90);
     K.screen(P, R.x1 - .06, 2.4, 6.0, -90, 2.2, 1.24, "کلینیک زیبایی آرنیک", ["پوست، مو و زیبایی", "خوش آمدید"]);
@@ -675,6 +757,8 @@ function furnish(ctx, key) {
     K.sofa(P, S, B, R.x0 + 1.0, 4.8, 2.0, 90);
     K.put(P, new THREE.CylinderGeometry(.42, .38, .36, 12), M.marble, -7.5, .18, 4.4);
     B.push([-7.5, 4.4, .98, .98]);
+    K.flute(P, -7.5, R.z0 + .07, 4.2, 3.2, 0);
+    K.rug(P, -7.5, 4.3, 3.6, 3.0);
     K.shelf(P, S, B, R.x1 - .2, 6.2, 1.6, -90);          // the refreshment corner
     K.planter(P, S, B, -9.8, 6.6); K.planter(P, S, B, -5.2, 6.6);
     K.screen(P, -7.5, 1.95, R.z0 + .05, 0, 1.9, 1.07, "آسودگی شما", ["بخشی از مراقبت ماست"]);
