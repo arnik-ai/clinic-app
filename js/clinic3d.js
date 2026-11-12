@@ -46,7 +46,10 @@ import * as THREE from "./three.module.min.js";
    └────────┘  └────────────────────────────────────────────┘  └──────────┘                                     */
 
 const EYE = 1.62;          // eye height: a standing adult, never bobbing
-const RADIUS = 0.26;       // how wide the walker is, for collisions
+/* How wide the walker is. 0.34, not 0.26: at a quarter of a metre the camera could put its near plane into the
+   wall and you spent the walk with your nose in the plaster. A third of a metre is where a person stops.
+   The narrowest doorway is 1.5 m, so this still leaves 0.8 m of clear opening to walk through. */
+const RADIUS = 0.34;
 const DOOR_H = 2.2;        // every doorway opening is this tall; the wall above it is a header
 
 /* x, z are the room's CENTRE; w runs along x and d along z. `light` is the per-room rig (see lightRoom). */
@@ -54,7 +57,7 @@ export const ROOMS = {
   reception: {
     nameFa: "پذیرش بزرگ", nameEn: "Grand Reception", lineFa: "سنگ تراورتن، مرمر و نور طلایی", icon: "pinI",
     x: 0, z: 5.5, w: 9, d: 7, h: 4.0, spawn: [-0.8, 8.3], yaw: 315,
-    floor: "polished", wall: "wall", light: { key: 1.45, hemi: 0.60, a: [0, 3.2, 3.4, 18, 0xFFE2BC], b: [0, 3.2, 7.6, 12, 0xFFEDD6] },
+    floor: "polished", wall: "wall", light: { key: 1.52, hemi: 0.62, a: [0, 3.6, 3.4, 14, 0xFFE2BC], b: [0, 3.6, 7.6, 10, 0xFFEDD6] },
   },
   lounge: {
     nameFa: "لانژ انتظار VIP", nameEn: "VIP Waiting Lounge", lineFa: "مبل‌های نرم و میز سنگی", icon: "heartS",
@@ -79,32 +82,32 @@ export const ROOMS = {
   derm: {
     nameFa: "مشاوره‌ی پوست", nameEn: "Dermatology Consultation", lineFa: "میز دکتر و نمایشگر پوست", icon: "consultS",
     x: -3.55, z: -3, w: 4.5, d: 4, h: 3.0, spawn: [-1.9, -3], yaw: 90,
-    floor: "stone", wall: "wall", light: { key: 0.7, hemi: 0.48, a: [-3.55, 2.5, -3, 18, 0xFFF2E2], b: [-5.2, 2.5, -4.2, 6, 0xFFE2BC] },
+    floor: "stone", wall: "wall", light: { key: 0.80, hemi: 0.50, a: [-3.55, 2.74, -3, 12, 0xFFF2E2], b: [-5.2, 2.5, -4.2, 5, 0xFFE2BC] },
   },
   inject: {
     nameFa: "مشاوره‌ی تزریق", nameEn: "Injectable Consultation", lineFa: "فضایی آرام و خصوصی", icon: "syringe",
     x: 3.55, z: -3, w: 4.5, d: 4, h: 3.0, spawn: [1.9, -3], yaw: 270,
-    floor: "stone", wall: "wallWarm", light: { key: 0.65, hemi: 0.46, a: [3.55, 2.5, -3, 18, 0xFFF2E2], b: [5.2, 2.5, -1.8, 6, 0xFFE2BC] },
+    floor: "stone", wall: "wallWarm", light: { key: 0.78, hemi: 0.49, a: [3.55, 2.74, -3, 12, 0xFFF2E2], b: [5.2, 2.5, -1.8, 5, 0xFFE2BC] },
   },
   analysis: {
     nameFa: "آنالیز پیشرفته‌ی پوست", nameEn: "Advanced Skin Analysis", lineFa: "دستگاه آنالیز و نمایشگر بزرگ", icon: "spark",
     x: -3.55, z: -7.2, w: 4.5, d: 4, h: 3.0, spawn: [-1.9, -7.2], yaw: 90,
-    floor: "stone", wall: "wallWarm", light: { key: 0.6, hemi: 0.45, a: [-3.55, 2.5, -7.2, 20, 0xFFF2E2], b: [-5.2, 2.5, -8.4, 6, 0xFFE2BC] },
+    floor: "stone", wall: "wallWarm", light: { key: 0.76, hemi: 0.48, a: [-3.55, 2.74, -7.2, 13, 0xFFF2E2], b: [-5.2, 2.5, -8.4, 5, 0xFFE2BC] },
   },
   facial: {
     nameFa: "فیشال و جوان‌سازی", nameEn: "Facial & Rejuvenation", lineFa: "تخت درمان و نور ملایم", icon: "cleanI",
     x: 3.55, z: -7.2, w: 4.5, d: 4, h: 3.0, spawn: [1.9, -7.2], yaw: 270,
-    floor: "stone", wall: "wall", light: { key: 0.55, hemi: 0.45, a: [3.55, 2.5, -7.2, 22, 0xFFF2E2], b: [5.2, 2.5, -6, 6, 0xFFE2BC] },
+    floor: "stone", wall: "wall", light: { key: 0.74, hemi: 0.48, a: [3.55, 2.74, -7.2, 13, 0xFFF2E2], b: [5.2, 2.5, -6, 5, 0xFFE2BC] },
   },
   laser: {
     nameFa: "اتاق لیزر", nameEn: "Laser Treatment", lineFa: "دستگاه لیزر و تخت درمان", icon: "laserI",
     x: -3.55, z: -11.7, w: 4.5, d: 4.6, h: 3.0, spawn: [-1.9, -11.7], yaw: 90,
-    floor: "stone", wall: "wall", light: { key: 0.55, hemi: 0.44, a: [-3.55, 2.5, -11.7, 22, 0xFFF2E2], b: [-5.2, 2.5, -13, 6, 0xFFE2BC] },
+    floor: "stone", wall: "wall", light: { key: 0.74, hemi: 0.47, a: [-3.55, 2.74, -11.7, 13, 0xFFF2E2], b: [-5.2, 2.5, -13, 5, 0xFFE2BC] },
   },
   hair: {
     nameFa: "احیای مو", nameEn: "Hair Restoration", lineFa: "آنالیز پوست سر و مشاوره", icon: "mesoI",
     x: 3.55, z: -11.7, w: 4.5, d: 4.6, h: 3.0, spawn: [1.9, -11.7], yaw: 270,
-    floor: "stone", wall: "wallWarm", light: { key: 0.6, hemi: 0.46, a: [3.55, 2.5, -11.7, 20, 0xFFF2E2], b: [5.2, 2.5, -10.4, 6, 0xFFE2BC] },
+    floor: "stone", wall: "wallWarm", light: { key: 0.78, hemi: 0.49, a: [3.55, 2.74, -11.7, 13, 0xFFF2E2], b: [5.2, 2.5, -10.4, 5, 0xFFE2BC] },
   },
   doctor: {
     nameFa: "دفتر دکتر", nameEn: "Doctor's Office", lineFa: "دکترهای کلینیک", icon: "doctorI",
@@ -137,10 +140,13 @@ export const spaceInfo = (k) => ({ key: k, ...ROOMS[k] });
 /* Where the guide will stand, in the order she tries them: [how far ahead, how far to the side]. The first is
    the one that composes best — a conversation's distance, a little off centre so she is beside what you came to
    look at. The rest are what you do when someone is standing behind a pillar. */
+/* Well off to the side. At ±0.55 m she was 3 m dead ahead of the camera — in a 4.5 m treatment room that is
+   the middle of the only view there is, and the bed and the machine you came to see were behind her. */
 const GUIDE_SPOTS = [
-  [3.0, .55], [3.0, -.55], [2.6, 1.0], [2.6, -1.0], [3.2, .15], [3.2, -.15],
-  [2.2, .7], [2.2, -.7], [1.9, .3], [1.9, -.3],
+  [2.9, 1.45], [2.9, -1.45], [2.5, 1.75], [2.5, -1.75], [3.3, 1.1], [3.3, -1.1],
+  [2.3, 1.6], [2.3, -1.6], [3.4, .85], [3.4, -.85],
 ];
+const GUIDE_NEAR = 2.05;   // she never comes closer than this: at arm's length a drawn face goes uncanny
 
 const RAD = Math.PI / 180;
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -257,6 +263,31 @@ function blobCanvas() {
   return c;
 }
 
+/* What is outside the entrance. Not a picture of a street — a clinic does not want one — but the bright,
+   featureless warmth of a glazed façade seen from inside, which is all the eye needs to read "daylight" and
+   is what gives the travertine in the lobby something to catch. */
+function dayCanvas() {
+  const c = document.createElement("canvas"); c.width = 64; c.height = 256;
+  const x = c.getContext("2d"), g = x.createLinearGradient(0, 0, 0, 256);
+  g.addColorStop(0, "#FFFDF8"); g.addColorStop(.46, "#FDF6E9");
+  g.addColorStop(.62, "#F0E3CB");                      // the horizon the city would be on
+  g.addColorStop(1, "#DFD2BB");
+  x.fillStyle = g; x.fillRect(0, 0, 64, 256);
+  return c;
+}
+
+/* The soft round haze around a light fitting. There is no bloom pass here — no EffectComposer is vendored and
+   one would cost a full extra pass — so every cove and downlight carries its own additive halo instead, and all
+   of a room's halos are one draw call. A light with no glow around it reads as a painted disc. */
+function glowCanvas() {
+  const c = document.createElement("canvas"); c.width = c.height = 64;
+  const x = c.getContext("2d"), g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, "rgba(255,246,228,.95)"); g.addColorStop(.35, "rgba(255,234,200,.42)");
+  g.addColorStop(1, "rgba(255,228,188,0)");
+  x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+  return c;
+}
+
 // The light a ceiling cove throws down the wall. Additive, so it brightens rather than paints.
 function spillCanvas() {
   const c = document.createElement("canvas"); c.width = 4; c.height = 128;
@@ -307,6 +338,8 @@ function makeTextures(renderer) {
     grainN: tex(normalFromHeight(brushedCanvas(256, .5), .7)),
     blob: tex(blobCanvas(), { srgb: true, mips: false }),
     spill: tex(spillCanvas(), { srgb: true, mips: false }),
+    day: tex(dayCanvas(), { srgb: true, mips: false }),
+    glow: tex(glowCanvas(), { srgb: true, mips: false }),
   };
 }
 
@@ -345,10 +378,21 @@ function makeMaterials(T) {
     gold: new THREE.MeshStandardMaterial({ color: 0xB89A68, roughness: .17, metalness: 1, envMapIntensity: 1.75, side: S }),
     joinery: new THREE.MeshPhysicalMaterial({ color: 0x51483F, roughness: .4, metalness: 0, envMapIntensity: .75,
       side: S, clearcoat: .55, clearcoatRoughness: .16, normalMap: T.grainN, normalScale: v2(.22, .22), vertexColors: true }),
-    fabric: new THREE.MeshStandardMaterial({ color: 0xD1C7B6, roughness: .78, metalness: 0, envMapIntensity: .5,
-      side: S, normalMap: T.toothN, normalScale: v2(.3, .3), vertexColors: true }),
+    // Sheen is what upholstery has and a painted box does not: the pale rim where a weave catches the light
+    // across the arm of a sofa. One extra material feature, on the one material it actually changes.
+    fabric: new THREE.MeshPhysicalMaterial({ color: 0xD1C7B6, roughness: .78, metalness: 0, envMapIntensity: .5,
+      side: S, normalMap: T.toothN, normalScale: v2(.3, .3), vertexColors: true,
+      sheen: .6, sheenRoughness: .72, sheenColor: new THREE.Color(0xF2E6D2) }),
     // toneMapped:false keeps a cove strip at full value, so it reads as a light and not as painted plastic.
     cove: new THREE.MeshBasicMaterial({ color: 0xFFF1DC, toneMapped: false, fog: false }),
+    // Daylight behind the entrance glazing, and the pool of it that lands on the floor inside. Both unlit and
+    // unfogged: they ARE the light, so nothing may shade them.
+    day: new THREE.MeshBasicMaterial({ map: T.day, toneMapped: false, fog: false, side: S }),
+    sun: new THREE.MeshBasicMaterial({ map: T.spill, transparent: true, opacity: .5, depthWrite: false,
+      blending: THREE.AdditiveBlending, toneMapped: false, fog: false, side: S }),
+    // Back-lit stone: the reveal in the front of a reception counter, and the one detail that separates a
+    // hotel lobby from an office desk. A thin unlit panel, warm, with gold hairlines top and bottom.
+    onyx: new THREE.MeshBasicMaterial({ color: 0xF3DFBC, toneMapped: false, fog: false, side: S }),
     bezel: new THREE.MeshStandardMaterial({ color: 0x3A342D, roughness: .4, metalness: .2, envMapIntensity: .4, side: S }),
     botanical: new THREE.MeshStandardMaterial({ color: 0xCDB78E, roughness: .8, metalness: 0, envMapIntensity: .3, side: D }),
     // A rug stops the stone running wall to wall, which is what makes a floor look like a floor plan.
@@ -382,7 +426,7 @@ const plane = (w, h) => new THREE.PlaneGeometry(w, h, Math.max(1, Math.ceil(w / 
 
 // Corner darkening, floor contact and large-scale unevenness, baked into vertex colours once. Free at render time,
 // and it is what keeps eleven rooms from looking like one room lit by one lamp.
-function bakeAO(geo, box, { floorFade = .9, cornerFade = 1.1, min = .62 } = {}) {
+function bakeAO(geo, box, { floorFade = .95, cornerFade = 1.4, min = .54 } = {}) {
   const p = geo.attributes.position, n = geo.attributes.normal;
   const col = new Float32Array(p.count * 3);
   for (let i = 0; i < p.count; i++) {
@@ -446,13 +490,20 @@ function kit(M) {
     put, solid, box,
 
     // a counter: marble top on a taupe body with a champagne reveal and a gold shadow-gap line
-    counter(out, solids, blobs, x, z, w, rotY = 0) {
+    /* `front` is which local side the visitor stands on: +1 for the counter's own +z, -1 for the other. The
+       lit reveal and the gold hairlines all go on that face, and nothing on the face against the wall. */
+    counter(out, solids, blobs, x, z, w, rotY = 0, front = 1) {
       const d = .65;
       const bodyW = rotY % 180 === 0 ? w : d, bodyD = rotY % 180 === 0 ? d : w;
+      const f = front * (d / 2);
       put(out, box(w, 1.0, d), M.joinery, x, .50, z, rotY);
       put(out, tileUV(box(w + .08, .05, d + .08), w / 1.6, 1), M.marble, x, 1.03, z, rotY);
-      put(out, box(w - .1, .06, .02), M.metal, x, .18, z + (rotY ? 0 : d / 2 + .01), rotY);
-      put(out, box(w - .3, .012, .012), M.gold, x, .92, z + (rotY ? 0 : d / 2 + .02), rotY);
+      // the back-lit stone reveal, with a champagne plinth shadow-gap under it
+      put(out, box(w - .42, .3, .012), M.onyx, x, .50, z, rotY).translateZ(f + front * .009);
+      put(out, box(w - .36, .014, .014), M.gold, x, .665, z, rotY).translateZ(f + front * .014);
+      put(out, box(w - .36, .014, .014), M.gold, x, .335, z, rotY).translateZ(f + front * .014);
+      put(out, box(w - .1, .06, .02), M.metal, x, .13, z, rotY).translateZ(f + front * .006);
+      put(out, box(w - .3, .012, .012), M.gold, x, .92, z, rotY).translateZ(f + front * .02);
       solid(solids, x, z, bodyW, bodyD);
       blobs.push([x, z, bodyW + .5, bodyD + .5]);
     },
@@ -509,6 +560,17 @@ function kit(M) {
       m.translateZ(.025);
       put(out, box(w, .012, .012), M.gold, x, y - h / 2 - .06, z, rotY).translateZ(.02);
       return m;
+    },
+
+    /* A lit recess. A large blank wall is the quietest reason a room reads as unfinished, and a niche is five
+       boxes: a dark reveal, a stone panel set into it, gold hairlines at its edges, and a strip of cove light
+       hidden in the head so the stone is washed from above rather than lit from the room. */
+    niche(out, x, z, w, h, rotY = 0, y0 = .62) {
+      put(out, box(w, h, .06), M.joinery, x, y0 + h / 2, z, rotY);
+      put(out, tileUV(new THREE.PlaneGeometry(w - .16, h - .16), (w - .16) / 1.6, (h - .16) / 1.6),
+          M.marble, x, y0 + h / 2, z, rotY).translateZ(.04);
+      for (const yy of [y0, y0 + h]) put(out, box(w + .06, .018, .018), M.gold, x, yy, z, rotY).translateZ(.05);
+      put(out, box(w - .22, .022, .03), M.cove, x, y0 + h - .07, z, rotY).translateZ(.085);
     },
 
     // floor-to-ceiling joinery: a slatted wood screen, the quiet luxury move
@@ -628,7 +690,7 @@ function segmentsOf(from, to, gaps) {
 
 function buildRoom(key, M, K) {
   const r = ROOMS[key], R = rect(r);
-  const parts = [], solids = [], blobs = [], screens = [];
+  const parts = [], solids = [], blobs = [], screens = [], glows = [];
   const wallMat = M[r.wall] || M.wall;
   const box3 = new THREE.Box3(new THREE.Vector3(R.x0, 0, R.z0), new THREE.Vector3(R.x1, r.h, R.z1));
 
@@ -689,6 +751,12 @@ function buildRoom(key, M, K) {
     const strip = new THREE.Mesh(new THREE.BoxGeometry(axis === "x" ? len : .06, .03, axis === "x" ? .06 : len), M.cove);
     strip.position.set(axis === "x" ? c : at, r.h - .09, axis === "x" ? at : c);
     strip.renderOrder = 1; parts.push(strip);
+    // a halo every 70 cm along the run, so the cove glows instead of being a painted line
+    const nh = Math.max(2, Math.round(len / 1.1));
+    for (let i = 0; i < nh; i++) {
+      const p = a + (i + .5) * (len / nh);
+      glows.push(axis === "x" ? p : at, r.h - .12, axis === "x" ? at : p, .9);
+    }
   }
 
   // A tray ceiling: a border dropped round the perimeter, so the cove sits in a recess the way cove lighting
@@ -715,9 +783,10 @@ function buildRoom(key, M, K) {
     const m = new THREE.Mesh(dlGeo, M.cove);
     m.position.set(longWay ? r.x + p : r.x, r.h - .018, longWay ? r.z : r.z + p);
     m.renderOrder = 1; parts.push(m);
+    glows.push(longWay ? r.x + p : r.x, r.h - .07, longWay ? r.z : r.z + p, 1.35);
   }
 
-  return { r, R, box3, parts, solids, blobs, screens, K, M };
+  return { r, R, box3, parts, solids, blobs, screens, glows, K, M };
 }
 
 /* What stands in each room. Kept apart from the shell so the owner can move a bed without touching a wall. */
@@ -727,14 +796,29 @@ function furnish(ctx, key) {
   const mid = (a, b) => (a + b) / 2;
 
   if (key === "reception") {
+    /* The entrance, glazed. A clinic with no window anywhere is the quietest reason a space reads as a set
+       rather than a place: there is nowhere for the light to be coming from. Here the whole entrance wall is a
+       façade — champagne mullions, a bright unlit plane behind them for the morning outside, and a pool of
+       that daylight lying on the travertine inside. It is behind you as you come in, and it is the reason the
+       stone has anything to catch when you turn round. */
+    const zf = R.z1 - .05;
+    K.put(P, new THREE.PlaneGeometry(7.6, 3.0), M.day, 0, 1.6, zf, 180);
+    for (let i = -3; i <= 3; i++) K.put(P, K.box(.075, 3.0, .085), M.metal, i * 1.27, 1.6, zf - .05);
+    K.put(P, K.box(7.8, .1, .11), M.metal, 0, 3.14, zf - .05);          // head
+    K.put(P, K.box(7.8, .11, .13), M.metal, 0, .055, zf - .05);         // sill
+    K.put(P, new THREE.PlaneGeometry(7.6, 3.0), M.glass, 0, 1.6, zf - .1);
+    K.put(P, new THREE.PlaneGeometry(7.2, 3.1), M.sun, 0, .014, R.z1 - 1.75).rotation.x = -Math.PI / 2;
     // A fluted timber wall behind the counter — reeded panelling is the detail of this decade, and this is the
     // one surface a visitor looks at longest.
     K.flute(P, R.x1 - .07, 6.0, 4.4, 3.2, -90);
     // and one sculptural object over the middle, which is worth more than ten decorative ones
     K.pendant(P, -1.0, 6.4, 4.0);
     K.rug(P, -2.6, 6.6, 3.2, 3.4);
-    // the counter along the east side, so the way through to the corridor stays clear
-    K.counter(P, S, B, 2.9, 6.0, 3.2, 90);
+    // the counter along the east side, so the way through to the corridor stays clear. Its lit face looks west,
+    // towards the room: the other side is a metre from the fluted wall and nobody ever stands there.
+    K.counter(P, S, B, 2.9, 6.0, 3.2, 90, -1);
+    // the blank stretch of the far wall, which had nothing on it at all
+    K.niche(P, -3.0, R.z0 + .06, 1.7, 1.95, 0);
     K.screen(P, R.x1 - .06, 2.4, 6.0, -90, 2.2, 1.24, "کلینیک زیبایی آرنیک", ["پوست، مو و زیبایی", "خوش آمدید"]);
     hot.push(["intro", "آشنایی با کلینیک", 2.5, 1.3, 6.0, "info"]);
     // the waiting side: two sofas facing each other across a glass partition, west of the walk-through
@@ -782,12 +866,16 @@ function furnish(ctx, key) {
   if (key === "corridor") {
     K.slats(P, R.x0 + .05, -5.1, 1.2, 2.9, 90);
     K.slats(P, R.x1 - .05, -9.3, 1.2, 2.9, -90);
+    // the long blank runs between the doorways: a lit niche in each, so the walk down has something to pass
+    K.niche(P, R.x0 + .05, -1.0, 1.1, 1.5, 90, .75);
+    K.niche(P, R.x1 - .05, -5.2, 1.1, 1.5, -90, .75);
+    K.niche(P, R.x0 + .05, -9.4, 1.1, 1.5, 90, .75);
     K.planter(P, S, B, -0.78, -0.4, true);      // soft: a 2.6 m corridor has no room for a solid one
     K.planter(P, S, B, 0.78, -13.0, true);
   }
 
   if (key === "booking") {
-    K.counter(P, S, B, 3.55, R.z0 + .5, 2.6, 0);
+    K.counter(P, S, B, 3.55, R.z0 + .5, 2.6, 0, 1);
     K.screen(P, 3.55, 2.05, R.z0 + .05, 0, 2.0, 1.12, "نوبت و تماس", ["انتخاب خدمت، دکتر، روز و ساعت", "درخواست نوبت، نه نوبت قطعی"]);
     K.chair(P, S, B, 2.7, 1.6, 180); K.chair(P, S, B, 4.4, 1.6, 180);
     hot.push(["bk", "گرفتن نوبت", 3.55, 1.3, R.z0 + .8, "booking"]);
@@ -803,6 +891,7 @@ function furnish(ctx, key) {
       key === "derm" ? "مشاوره‌ی پوست" : "مشاوره‌ی تزریق",
       key === "derm" ? ["آکنه، جای جوش و لک", "ارزیابی سلامت پوست"] : ["بوتاکس و فیلر", "مشاوره‌ی پزشکی، نه تضمین نتیجه"]);
     K.shelf(P, S, B, r.x + s * 1.9, r.z + 1.2, 1.4, s > 0 ? -90 : 90);
+    K.niche(P, s > 0 ? R.x1 - .05 : R.x0 + .05, r.z - 1.1, 1.2, 1.55, s > 0 ? -90 : 90, .72);
     K.planter(P, S, B, r.x - s * 1.7, R.z1 - .6);
     hot.push([key, ROOMS[key].nameFa, r.x, 1.3, r.z - .4, "services"]);
   }
@@ -812,22 +901,27 @@ function furnish(ctx, key) {
     K.chair(P, S, B, r.x + .5, r.z - .6, 270);
     K.screen(P, r.x, 1.95, R.z0 + .05, 0, 2.2, 1.24, "آنالیز پوست", ["رطوبت، بافت، لک، منافذ، خط‌های ریز", "نمایش آموزشی است، تشخیص پزشکی نیست"]);
     K.shelf(P, S, B, R.x0 + .2, r.z + 1.1, 1.4, 90);
+    K.niche(P, R.x0 + .05, R.z0 + 1.1, 1.2, 1.55, 90, .72);
     hot.push(["scan", "نمایش آنالیز پوست", r.x - 1.1, 1.5, r.z - .6, "demo"]);
   }
 
   if (key === "laser") {
-    K.bed(P, S, B, r.x + .2, r.z, 0);
-    K.machine(P, S, B, R.x0 + .9, r.z - 1.2, 0);
+    // Against the far wall, not across the middle. A bed in the centre of a four-metre room leaves nowhere to
+    // stand and nothing to see but the bed, which is exactly what the camera used to arrive looking at.
+    K.bed(P, S, B, R.x0 + 1.5, r.z + .1, 0);
+    K.machine(P, S, B, R.x0 + .85, R.z0 + .9, 0);
+    K.niche(P, R.x0 + .05, R.z0 + 1.2, 1.2, 1.55, 90, .72);
     K.screen(P, r.x, 1.9, R.z0 + .05, 0, 1.8, 1.01, "اتاق لیزر", ["لیزر موهای زائد", "با عینک محافظ، زیر نظر پزشک"]);
     K.shelf(P, S, B, R.x1 - .2, r.z + 1.4, 1.2, -90);
     hot.push(["laser", "دستگاه لیزر", R.x0 + .9, 1.5, r.z - 1.2, "services"]);
   }
 
   if (key === "facial") {
-    K.bed(P, S, B, r.x - .2, r.z, 0);
+    K.bed(P, S, B, R.x1 - 1.5, r.z + .1, 0);
     K.put(P, new THREE.CylinderGeometry(.22, .18, .8, 10), M.metal, R.x1 - .9, .4, r.z - 1.3);
     B.push([R.x1 - .9, r.z - 1.3, .72, .72]);
     K.shelf(P, S, B, R.x1 - .2, r.z + 1.3, 1.4, -90);
+    K.niche(P, R.x1 - .05, r.z - 1.2, 1.2, 1.55, -90, .72);
     K.screen(P, r.x, 1.9, R.z0 + .05, 0, 1.8, 1.01, "فیشال و جوان‌سازی", ["پاکسازی، آبرسانی", "برنامه‌ی مراقبت شخصی"]);
     K.planter(P, S, B, R.x0 + .7, R.z1 - .7);
     hot.push(["facial", "خدمات این اتاق", r.x, 1.3, r.z - 1.0, "services"]);
@@ -837,6 +931,7 @@ function furnish(ctx, key) {
     K.desk(P, S, B, r.x, r.z + .6, 90);
     K.chair(P, S, B, r.x - .9, r.z + .6, 90); K.chair(P, S, B, r.x + .8, r.z + .6, 270);
     K.machine(P, S, B, r.x - .3, r.z - 1.4, 0);
+    K.niche(P, R.x1 - .05, R.z0 + 1.2, 1.2, 1.55, -90, .72);
     K.screen(P, r.x, 1.95, R.z0 + .05, 0, 2.0, 1.12, "احیای مو", ["ریزش مو و ارزیابی پوست سر", "برنامه‌ی مراقبت از مو"]);
     hot.push(["hair", "آنالیز پوست سر", r.x - .3, 1.5, r.z - 1.4, "services"]);
   }
@@ -1105,6 +1200,11 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
   const rooms = new Map();
   const HOTSPOTS = [];
   const solids = [];
+  /* One shared halo material for the whole clinic. Each room gets its own Points object so the portal cull
+     takes a room's halos away with the room — a glow is not occluded by a wall that was never drawn. */
+  const glowMat = new THREE.PointsMaterial({ map: T.glow, color: 0xFFE7C4, size: .34, sizeAttenuation: true,
+    transparent: true, opacity: .42, depthWrite: false, blending: THREE.AdditiveBlending, fog: false,
+    toneMapped: false });
   for (const key of Object.keys(ROOMS)) {
     const ctx = buildRoom(key, M, K);
     const hot = furnish(ctx, key);
@@ -1112,6 +1212,21 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     for (const mesh of mergeByMaterial(ctx.parts)) {
       if (mesh.material.vertexColors) bakeAO(mesh.geometry, ctx.box3);
       group.add(mesh);
+    }
+    if (ctx.glows.length) {
+      // PointsMaterial takes one size for all of them — it is a uniform, not an attribute — so the fourth
+      // number of each glow is how much of a halo it wants, and it is spent on opacity by way of repeats:
+      // a brighter fitting simply gets its point written twice. Cheaper than a second material.
+      const want = [];
+      for (let i = 0; i < ctx.glows.length; i += 4) {
+        want.push(ctx.glows[i], ctx.glows[i + 1], ctx.glows[i + 2]);
+        if (ctx.glows[i + 3] > 1.2) want.push(ctx.glows[i], ctx.glows[i + 1], ctx.glows[i + 2]);
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(want), 3));
+      const pts = new THREE.Points(g, glowMat);
+      pts.renderOrder = 3; pts.frustumCulled = false;
+      group.add(pts);
     }
     group.matrixAutoUpdate = false; group.updateMatrix();
     scene.add(group);
@@ -1122,7 +1237,14 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     }
     for (const s of ctx.solids) solids.push(s);
     for (const [hk, title, x, y, z, opens] of hot) HOTSPOTS.push({ key: hk, room: key, title, pos: new THREE.Vector3(x, y, z), opens });
-    rooms.set(key, { group, box: ctx.box3, R: ctx.R, portals: [] });
+    /* Where the room actually has something in it. Every piece of furniture already declares its footprint for
+       its contact shadow, so the area-weighted centre of those footprints is the room's centre of interest —
+       the bed and the machine in a treatment room, the counter and the seating in reception. Facing that, at
+       arrival, is the difference between being shown a room and being shown the wall behind it. */
+    let fx = 0, fz = 0, fw = 0;
+    for (const [bx, bz, sx, sz] of ctx.blobs) { const a = sx * sz; fx += bx * a; fz += bz * a; fw += a; }
+    const focus = fw > .5 ? { x: fx / fw, z: fz / fw } : { x: ctx.r.x, z: ctx.r.z };
+    rooms.set(key, { group, box: ctx.box3, R: ctx.R, focus, portals: [] });
   }
   blobs.count = blobN; blobs.instanceMatrix.needsUpdate = true;
 
@@ -1147,7 +1269,9 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
   // ── where the visitor is
   const first = ROOMS[startAt] ? startAt : "reception";
   let at = { x: ROOMS[first].spawn[0], z: ROOMS[first].spawn[1] };
-  let yaw = ROOMS[first].yaw, pitch = -4;
+  // Eight degrees down, not four. At four, a 3 m ceiling filled the top third of a tall phone screen and the
+  // furniture — which is the whole reason to be in the room — was crowded into the bottom.
+  let yaw = ROOMS[first].yaw, pitch = -8;
   let vx = 0, vz = 0;                       // walking velocity, in metres a second
   let room = first;
   lightRoom(room);
@@ -1169,18 +1293,36 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     }
     return true;
   };
-  const step = (dx, dz) => {
-    if (legal(at.x + dx, at.z + dz)) { at.x += dx; at.z += dz; return; }
-    if (legal(at.x + dx, at.z)) { at.x += dx; return; }               // slide along a wall
-    if (legal(at.x, at.z + dz)) { at.z += dz; return; }
-    // Both axes blocked at once is a corner, and the old code simply stopped there with the arrow still held.
-    // Try a short sidestep along whichever wall is being pressed into, so the corner releases you.
-    const s = Math.hypot(dx, dz) * .7;
-    if (s < 1e-5) return;
+  /* Moving the way a game moves.
+
+     One test of the whole step was the problem: press diagonally towards a wall and the single test failed, so
+     the walk stopped dead at it — and in a corner, where both axes fail at once, it stopped and stayed stopped
+     while the stick was still held. Three things fix it, and together they are what "walks like a game" means:
+
+       · the move is resolved in six-centimetre slices, so a long step cannot jump through a doorframe and a
+         slice that fails costs six centimetres rather than the whole frame;
+       · a slice that cannot go diagonally still goes along whichever axis IS free, which is sliding along a
+         wall — and the second axis is re-tested after the first has moved, so a corner is never cut;
+       · and a slice that is blocked on both at once tries a short step along the wall it is pressed against,
+         in whichever of the two directions is free. That is the corner releasing you. */
+  const SLICE = .06;
+  const slide = (dx, dz) => {
+    if (legal(at.x + dx, at.z + dz)) { at.x += dx; at.z += dz; return true; }
+    let moved = false;
+    if (legal(at.x + dx, at.z)) { at.x += dx; moved = true; }
+    if (legal(at.x, at.z + dz)) { at.z += dz; moved = true; }
+    if (moved) return true;
+    const s = Math.hypot(dx, dz) * .8;
+    if (s < 1e-6) return false;
     for (const [ox, oz] of [[dz, -dx], [-dz, dx]]) {
       const k = s / Math.hypot(ox, oz);
-      if (legal(at.x + ox * k, at.z + oz * k)) { at.x += ox * k; at.z += oz * k; return; }
+      if (legal(at.x + ox * k, at.z + oz * k)) { at.x += ox * k; at.z += oz * k; return true; }
     }
+    return false;
+  };
+  const step = (dx, dz) => {
+    const n = clamp(Math.ceil(Math.hypot(dx, dz) / SLICE), 1, 12);
+    for (let i = 0; i < n; i++) if (!slide(dx / n, dz / n)) break;
   };
   // Crossing a threshold, drift onto its centre line. A person aims for a gap without thinking about it; four
   // arrow buttons cannot, and clipping the frame was what made walking feel like fighting.
@@ -1200,7 +1342,10 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
 
   // ── looking and walking
   let dragging = false, px = 0, py = 0, moved = 0, downAt = 0;
-  const held = { f: 0, b: 0, l: 0, r: 0 };  // which arrows are being pressed
+  // Where the thumb has pushed the stick: -1 … 1 on each axis, x to the right, y forward. Analog, because a
+  // button can only ever say "all the way" or "not at all", and a thumb on a moving phone wants neither.
+  const stick = { x: 0, y: 0 };
+  let spin = 0, lastMove = 0;               // how fast the last look-drag was turning, for the glide after it
   const keys = new Set();
   let walking = null;                        // an automatic walk: { fx, fz, tx, tz, t, dur, after }
   let tour = null;                           // the guided walk: a list of room keys
@@ -1227,15 +1372,21 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     if (!dragging) return;
     const dx = p.clientX - px, dy = p.clientY - py;
     px = p.clientX; py = p.clientY; moved += Math.abs(dx) + Math.abs(dy);
-    yaw -= dx * .16;                                   // a slow, confident turn, not a shooter's flick
-    pitch = clamp(pitch - dy * .14, -38, 38);          // ±38°, not ±85°: a person does not crane like that
+    yaw -= dx * .19;                                   // a confident turn, not a shooter's flick
+    pitch = clamp(pitch - dy * .15, -38, 38);          // ±38°, not ±85°: a person does not crane like that
+    // How fast that drag was turning, in degrees a second, smoothed. A view that stops dead the instant the
+    // finger lifts is what makes a phone scene feel like a diagram; a head carries on a little.
+    const tn = performance.now(), dtm = clamp((tn - lastMove) / 1000, .008, .05); lastMove = tn;
+    spin = clamp(spin * .5 + (-dx * .19 / dtm) * .5, -240, 240);
     idle = 0;
     if (e.cancelable) e.preventDefault();
   };
   const onUp = (e) => {
     if (dragging && moved < 10 && performance.now() - downAt < 420) tapped(e);
+    else if (dragging && moved < 14) spin = 0;         // a short drag was aiming, not throwing
     dragging = false;
   };
+  const ptOf = (e) => (e.changedTouches && e.changedTouches[0]) || (e.touches && e.touches[0]) || e;
 
   // ── markers: the taps that open something. A showcase has nothing to press, so it builds none.
   const layer = document.createElement("div");
@@ -1263,9 +1414,57 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     if (h && onHotspot) onHotspot(h);
   });
 
+  /* Touch the floor, and walk there. This is the move that makes a clinic walkable with one thumb: you see the
+     counter you want to stand at, you touch it, and you go — no aiming, nothing held down.
+
+     The ray from the tap is met with the floor plane at y = 0, and then — because an automatic walk does not
+     collide with anything — the straight line from here to there is stepped along and stopped at the last point
+     that is genuinely legal. Checking only the destination is not enough: a spot can be perfectly legal and
+     still be on the other side of a wall. */
+  const _nd = new THREE.Vector3();
+  const tapWalk = (clientX, clientY) => {
+    const r = canvas.getBoundingClientRect();
+    if (!r.width || !r.height) return false;
+    _nd.set(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1, .5)
+       .unproject(camera).sub(camera.position).normalize();
+    // unproject gives a point at an arbitrary depth, so the vector has to be normalised before its slope means
+    // anything: unnormalised, a tap below the horizon measured as 0.02 down and was read as a tap at the sky.
+    if (_nd.y > -.09) return false;                    // above the horizon: the ceiling, or a wall far off
+    const t = -EYE / _nd.y;
+    const hx = at.x + _nd.x * t, hz = at.z + _nd.z * t;
+    const d = Math.hypot(hx - at.x, hz - at.z);
+    if (d < .45) return false;
+    const k0 = Math.min(1, 7 / d);                     // seven metres is already a long walk for one tap
+    const n = clamp(Math.ceil(d * k0 / .22), 2, 48);
+    let tx = at.x, tz = at.z, got = false;
+    for (let i = 1; i <= n; i++) {
+      const k = i / n * k0;
+      const qx = at.x + (hx - at.x) * k, qz = at.z + (hz - at.z) * k;
+      if (!legal(qx, qz)) break;
+      tx = qx; tz = qz; got = true;
+    }
+    if (!got) return false;
+    // Stop half a metre short of whatever stopped the scan. Walking until the collision radius touches the
+    // counter leaves your nose against it, looking at nothing — a person stops where they can see the thing.
+    const far = Math.hypot(tx - at.x, tz - at.z);
+    if (far < .6) return false;
+    const back = Math.min(.55, far - .4);
+    tx -= (tx - at.x) / far * back; tz -= (tz - at.z) / far * back;
+    walkTo(tx, tz, null, true);
+    ping(clientX - r.left, clientY - r.top);
+    return true;
+  };
+  // a ring where the finger landed, so a tap that started a walk visibly started one
+  const ping = (x, y) => {
+    const i = document.createElement("i");
+    i.className = "c3ping"; i.style.left = x.toFixed(0) + "px"; i.style.top = y.toFixed(0) + "px";
+    layer.appendChild(i);
+    setTimeout(() => i.remove(), 640);
+  };
   const tapped = (e) => {
-    // a tap on the canvas, not on a marker: nothing to do but stop a guided walk
-    if (tour) { tour = null; walking = null; }
+    if (tour) { tour = null; walking = null; return; }  // a tap during the guided walk takes the wheel back
+    const p = ptOf(e);
+    if (p) tapWalk(p.clientX, p.clientY);
   };
 
   // ── automatic walking: a doorway, a chip, or the guided tour
@@ -1282,22 +1481,36 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
   const show = (k) => {
     const s = ROOMS[k];
     // step into the room through its own doorway, so it is a walk and not a jump
-    at.x = s.spawn[0]; at.z = s.spawn[1]; yaw = s.yaw; pitch = -4;
+    at.x = s.spawn[0]; at.z = s.spawn[1]; yaw = s.yaw; pitch = -8;
     walking = null;
     setRoom(k);
-    // walk towards the middle, but stop at the last point that is not inside a bed, a desk or a sofa: the
-    // automatic walk does not collide with anything, so the target itself has to be somewhere you could stand
+    /* One stride in, not into the middle. A treatment room is four metres across, and walking to its centre
+       puts the camera on top of the bed with its nose in a corner. A person shown a room stops just inside it,
+       where the whole room is still in front of them. */
     const c = rect(s);
     const cx = clamp(s.x, c.x0 + .9, c.x1 - .9), cz = clamp(s.z, c.z0 + .9, c.z1 - .9);
+    const span = Math.hypot(cx - s.spawn[0], cz - s.spawn[1]) || 1;
+    const step0 = Math.min(1, Math.min(.8, span * .35) / span);
     let tx = s.spawn[0], tz = s.spawn[1];
     for (let i = 0; i <= 12; i++) {
-      const t = 1 - i / 12;
+      const t = step0 * (1 - i / 12);
       const px = s.spawn[0] + (cx - s.spawn[0]) * t, pz = s.spawn[1] + (cz - s.spawn[1]) * t;
       if (legal(px, pz)) { tx = px; tz = pz; break; }
     }
-    // and face what the room was built to show — its first marker — rather than a wall
-    const h = HOTSPOTS.find((x) => x.room === k);
-    if (h) yaw = Math.atan2(tx - h.pos.x, tz - h.pos.z) / RAD;
+    /* And look ACROSS the room, on its diagonal.
+
+       A treatment room is four metres square, and from inside it the camera can face a wall two metres off or
+       the far corner four metres off — those are the only two choices, and only one of them is a photograph.
+       Facing a wall square-on is what every one of these rooms used to do: the bed was a metre away and below
+       the frame, and the screen filled with plaster. The far corner is the longest sight line the room has, it
+       shows two walls meeting instead of one wall flat on, and everything standing in the room falls between
+       here and there. Blended with the furniture's own centre of gravity so the aim still lands on the bed and
+       the machine rather than on an empty corner. */
+    const f = (rooms.get(k) || {}).focus || { x: cx, z: cz };
+    const farX = tx < (c.x0 + c.x1) / 2 ? c.x1 - .8 : c.x0 + .8;
+    const farZ = tz < (c.z0 + c.z1) / 2 ? c.z1 - .8 : c.z0 + .8;
+    const lx = (f.x + farX) / 2, lz = (f.z + farZ) / 2;
+    if (Math.hypot(tx - lx, tz - lz) > .5) yaw = Math.atan2(tx - lx, tz - lz) / RAD;
     walkTo(tx, tz, null, false);
   };
   const setRoom = (k) => {
@@ -1333,7 +1546,7 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
       at.x = home0.x + Math.sin(drift * .085) * .85;
       at.z = home0.z + Math.sin(drift * .061 + 1.1) * .65;
       yaw = home0.yaw + Math.sin(drift * .049 + .4) * 11;
-      pitch = -3 + Math.sin(drift * .037) * 1.8;
+      pitch = -6 + Math.sin(drift * .037) * 1.8;
     } else if (walking) {
       walking.t += dt;
       const k = ease(clamp(walking.t / walking.dur, 0, 1));
@@ -1350,13 +1563,27 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     } else {
       // the arrows and the keyboard feed the same numbers. Left and right TURN rather than slide sideways:
       // turning is what a person does with their feet, and sidling is what a crab does.
-      let fwd = held.f - held.b, side = 0;
+      /* The stick and the keyboard feed the same numbers, and the stick works the way the left stick of a game
+         works: it walks in the direction you push it, sideways included. It used to turn instead, and turning
+         is exactly what you cannot do when you are already wedged into a corner — there was no way out but to
+         let go, turn, and start again. Pushed sideways you now step sideways, and out. Turning is the drag,
+         which is the whole screen and always available. */
+      let fwd = stick.y, side = stick.x, turning = 0;
       if (keys.has("w") || keys.has("ArrowUp")) fwd += 1;
       if (keys.has("s") || keys.has("ArrowDown")) fwd -= 1;
       if (keys.has("a")) side -= 1;
       if (keys.has("d")) side += 1;
-      const turning = (held.l - held.r) + (keys.has("ArrowLeft") ? 1 : 0) - (keys.has("ArrowRight") ? 1 : 0);
-      if (turning) { yaw += turning * 88 * dt; idle = 0; }
+      if (keys.has("ArrowLeft")) turning += 1;
+      if (keys.has("ArrowRight")) turning -= 1;
+      fwd = clamp(fwd, -1, 1); turning = clamp(turning, -1, 1);
+      if (turning) { yaw += turning * 112 * dt; idle = 0; }
+      // the glide after a look-drag: it settles in about half a second and never fights a finger still down
+      if (!dragging && spin) {
+        yaw += spin * dt;
+        spin *= Math.pow(.0022, dt);
+        if (Math.abs(spin) < 5) spin = 0;
+        idle = 0;
+      }
       const n = Math.hypot(fwd, side);
       if (n > 1) { fwd /= n; side /= n; }
       const s = Math.sin(yaw * RAD), c = Math.cos(yaw * RAD);
@@ -1399,10 +1626,14 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
             let px = at.x - s * d[0] + c * d[1], pz = at.z - c * d[0] - s * d[1];
             if (r) { px = clamp(px, r.R.x0 + .6, r.R.x1 - .6); pz = clamp(pz, r.R.z0 + .6, r.R.z1 - .6); }
             if (pass === 0 && onTopOfAMarker(px, pz)) continue;
+            // clamping her into a small room can pull her onto your toes; a conversation has a distance
+            if (Math.hypot(px - at.x, pz - at.z) < GUIDE_NEAR) continue;
             if (legal(px, pz) && clear(px, pz)) { guideTo.set(px, 0, pz); ok = true; break; }
           }
         }
-        if (!ok) guideTo.set(at.x - s * 2.2, 0, at.z - c * 2.2);        // nothing worked: stand in front of you
+        // Nothing worked — a corner, or a room too small to stand aside in. She waits by the door, which is
+        // where someone showing you a room actually stands, rather than planting herself in front of you.
+        if (!ok) { const sp = ROOMS[room].spawn; guideTo.set(sp[0], 0, sp[1]); }
       }
       guideAt.lerp(guideTo, Math.min(1, dt * 1.2));          // she walks over; she does not appear
     }
@@ -1417,6 +1648,10 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
       Math.sin(guideIdle * .55) * .006,
     );
     guideShadow.position.set(guideAt.x, .008, guideAt.z);
+    // And if you walk into her anyway, she is not drawn. A face at 40 cm is the one distance a figure built
+    // from boxes cannot survive, and standing inside someone is not a thing that happens in a clinic.
+    const gnear = Math.hypot(guideAt.x - camera.position.x, guideAt.z - camera.position.z);
+    guide.visible = guideShadow.visible = gnear > 1.5;
 
     // only the room you are in, plus what is genuinely visible through its doorways
     _pv.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
@@ -1457,7 +1692,7 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
       seen.add(id);
     };
     _guidePos.set(guideAt.x, 1.86, guideAt.z);
-    place("guide", now - guideSaid < 5200 ? "من راهنماییت می‌کنم" : "بپرس", "guide", _guidePos, 9);
+    if (guide.visible) place("guide", now - guideSaid < 5200 ? "من راهنماییت می‌کنم" : "بپرس", "guide", _guidePos, 9);
     for (const h of HOTSPOTS) if (shown.has(h.room)) place(h.key, h.title, "hot", h.pos, 7);
     for (const p of PORTALS) {
       if (!shown.has(p.a) && !shown.has(p.b)) continue;
@@ -1482,29 +1717,66 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
 
   // ── listeners
   if (!showcase) {
-    // the arrows: press and hold to keep going, let go to stop. They sit over the canvas as real buttons, so a
-    // press on one never reaches the drag-to-look handler below.
-    const stop = () => { held.f = held.b = held.l = held.r = 0; };
-    for (const b of host.querySelectorAll("[data-dir]")) {
-      const d = b.dataset.dir;
-      // The arrow takes ownership of the pointer the moment it is pressed. Without that the browser hands the
-      // gesture back the instant the finger drifts a pixel off the button — pointerleave, or a pointercancel it
-      // raises by itself — and the walk stops while the finger is still down. That is what "سخت حرکت میکنه"
-      // actually was: the press was being taken away, not the speed being wrong.
-      const go = (e) => {
-        held[d] = 1; idle = 0; b.classList.add("on");
-        if (e.pointerId !== undefined) { try { b.setPointerCapture(e.pointerId); } catch (err) {} }
+    /* ── the thumb stick ───────────────────────────────────────────────────────────────────────────────────────
+       Four 44 px arrows asked for a precision a thumb on a moving phone does not have, and they could only ever
+       mean "all the way" or "not at all": press, and you were already striding. One analog stick instead — nudge
+       it and you stroll, push it over and you walk — grabbed from anywhere in the bottom-left corner of the
+       screen rather than from the ring alone, so the thumb never has to find it.
+
+       The ring takes ownership of the pointer the moment it is touched. Without that the browser hands the
+       gesture back the instant the finger drifts off the element — pointerleave, or a pointercancel it raises by
+       itself — and the walk stops while the finger is still down. That, not the speed, is what made walking feel
+       like fighting. */
+    const ring = host.querySelector("[data-stick]");
+    const knob = ring && ring.querySelector("i");
+    const REACH = 46;                     // how far the knob travels, in CSS pixels
+    const DEAD = .13;                     // the slack a resting thumb needs before anything moves
+    let sid = null, cx0 = 0, cy0 = 0;
+    const knobTo = (dx, dy) => { if (knob) knob.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)`; };
+    const release = () => {
+      sid = null; stick.x = stick.y = 0; knobTo(0, 0);
+      if (ring) ring.classList.remove("on");
+    };
+    const aim = (p) => {
+      const dx = p.clientX - cx0, dy = p.clientY - cy0;
+      const d = Math.hypot(dx, dy) || 1;
+      const mag = Math.min(1, d / REACH);
+      knobTo(dx / d * mag * REACH, dy / d * mag * REACH);
+      // Past the dead zone, a gentle curve: the first half of the travel is for moving slowly, which is what a
+      // room wants, and the far end is for crossing the corridor.
+      const push = mag <= DEAD ? 0 : Math.pow((mag - DEAD) / (1 - DEAD), 1.35);
+      stick.x = dx / d * push; stick.y = -dy / d * push;
+      if (push) idle = 0;
+    };
+    if (ring) {
+      const grab = (e) => {
+        if (sid !== null) return;
+        sid = e.pointerId === undefined ? 1 : e.pointerId;
+        const b = ring.getBoundingClientRect();
+        cx0 = b.left + b.width / 2; cy0 = b.top + b.height / 2;
+        ring.classList.add("on");
+        if (e.pointerId !== undefined) { try { ring.setPointerCapture(e.pointerId); } catch (err) {} }
+        aim(ptOf(e));
         if (e.cancelable) e.preventDefault();
       };
-      const end = () => { held[d] = 0; b.classList.remove("on"); };
-      b.addEventListener("pointerdown", go);
-      b.addEventListener("pointerup", end);
-      b.addEventListener("pointercancel", end);
-      b.addEventListener("touchstart", go, { passive: false });
-      b.addEventListener("touchend", end);
-      b.addEventListener("contextmenu", (e) => e.preventDefault());
+      const drag = (e) => {
+        if (sid === null) return;
+        aim(ptOf(e));
+        if (e.cancelable) e.preventDefault();
+      };
+      ring.addEventListener("pointerdown", grab);
+      ring.addEventListener("pointermove", drag);
+      ring.addEventListener("pointerup", release);
+      ring.addEventListener("pointercancel", release);
+      if (!window.PointerEvent) {                   // a webview old enough to have no pointer events at all
+        ring.addEventListener("touchstart", grab, { passive: false });
+        ring.addEventListener("touchmove", drag, { passive: false });
+        ring.addEventListener("touchend", release);
+        ring.addEventListener("touchcancel", release);
+      }
+      ring.addEventListener("contextmenu", (e) => e.preventDefault());
     }
-    addEventListener("blur", stop);                 // a backgrounded tab must not keep walking
+    addEventListener("blur", release);               // a backgrounded tab must not keep walking
 
     canvas.addEventListener("pointerdown", onDown);
     addEventListener("pointermove", onMove, { passive: false });
@@ -1539,7 +1811,13 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     spaces: SPACE_KEYS.map(spaceInfo),
     show, startTour, fit,
     get room() { return room; },
+    // where the visitor is standing, for the walk tests: a corner that catches the walker is not something
+    // a screenshot can show, only a position that stops changing while the stick is still pushed
+    where() { return { x: +at.x.toFixed(3), z: +at.z.toFixed(3), yaw: Math.round(yaw), room }; },
     stopTour() { tour = null; walking = null; },
+    /* Handed to the page so that a sheet sliding up can take the thumb off the stick: a panel opening over a
+       finger that is still pushing would otherwise leave the visitor walking into the wall behind it. */
+    letGo() { stick.x = stick.y = 0; spin = 0; },
     pause() { stop = true; },
     resume() { if (stop) { stop = false; last = performance.now(); requestAnimationFrame(frame); } },
     dispose() {

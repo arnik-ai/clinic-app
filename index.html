@@ -512,34 +512,72 @@ textarea.input { resize: none; line-height: 1.7; }
 .c3spot.near b { background: rgba(184, 154, 104, .85); border-color: rgba(255, 255, 255, .42); }
 @media (prefers-reduced-motion: reduce) { .c3spot { transition: none; } }
 
-/* ── the thumb pad: bottom-left, physically ──────────────────────────────────────────────────────────────────── */
-/* Four arrows, in the bottom-LEFT corner physically: that is where a hand is, and RTL moves the text, not
-   anyone's thumb. A pad you push in any direction is a control people learn in games; an arrow is a control
-   nobody has to be taught, which is why the box that used to explain the pad could be deleted with it. */
-.c3pad {
-  position: absolute; left: 14px; bottom: calc(env(safe-area-inset-bottom, 0px) + 62px);
-  z-index: 5; display: grid; gap: 5px;
-  grid-template-columns: repeat(3, 44px); grid-template-rows: repeat(3, 44px);
-  direction: ltr;                       /* a left arrow must be on the left, whatever the page is doing */
+/* ── the thumb stick: bottom-left, physically ────────────────────────────────────────────────────────────────── */
+/* In the bottom-LEFT corner physically: that is where a hand is, and RTL moves the text, not anyone's thumb.
+
+   One analog stick, not four arrows. Four 44 px buttons asked a thumb on a moving phone for a precision it does
+   not have, and a button can only ever say "all the way" or "not at all" — so every step was a stride. Here, how
+   far you push is how fast you go.
+
+   The element is 128 px of pure hit area and the ring you can see is 104 px inside it, so a thumb that lands wide
+   of the ring still walks. The knob is `pointer-events: none`: the ring owns the gesture from the first touch to
+   the last, and nothing underneath can take it away mid-step. */
+.c3stick {
+  position: absolute; left: 10px; bottom: calc(env(safe-area-inset-bottom, 0px) + 58px);
+  z-index: 5; width: 128px; height: 128px;
+  display: grid; place-items: center;
+  direction: ltr;                       /* the knob moves with the thumb, whatever the page is doing */
+  touch-action: none; -webkit-tap-highlight-color: transparent; cursor: grab;
 }
-.c3pad button {
-  grid-area: 2 / 2; width: 44px; height: 44px; border-radius: 14px; cursor: pointer; padding: 0;
-  display: grid; place-items: center; color: #FFFBF3;
-  background: rgba(40, 33, 26, .42); border: 1px solid rgba(216, 197, 165, .4);
+.c3stick b {
+  position: relative; width: 104px; height: 104px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 42%, rgba(248, 245, 239, .17), rgba(32, 27, 22, .44) 74%);
+  border: 1px solid rgba(216, 197, 165, .42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 10px 26px rgba(28, 23, 18, .34);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  transition: border-color .15s ease;
+}
+/* a hairline track, so the travel the stick has is something you can see rather than something you discover */
+.c3stick b::after {
+  content: ""; position: absolute; inset: 14px; border-radius: 50%;
+  border: 1px dashed rgba(216, 197, 165, .26);
+}
+.c3stick i {
+  position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px;
+  border-radius: 50%; pointer-events: none;
+  background: linear-gradient(158deg, #F7F1E4, #D8C5A5 56%, #B89A68);
+  box-shadow: 0 7px 16px rgba(28, 23, 18, .45), inset 0 1px 0 rgba(255, 255, 255, .62);
+  transition: transform .17s cubic-bezier(.22, 1, .36, 1), box-shadow .15s ease;
+}
+/* while the thumb is down the knob tracks it 1:1 — a transition here would lag behind the finger */
+.c3stick.on i { transition: box-shadow .15s ease; box-shadow: 0 3px 10px rgba(28, 23, 18, .5), 0 0 0 8px rgba(184, 154, 104, .17); }
+.c3stick.on b { border-color: var(--c3-champagne); }
+@media (prefers-reduced-motion: reduce) { .c3stick i { transition: none; } }
+
+/* ── touch the floor, go there ───────────────────────────────────────────────────────────────────────────────── */
+/* The ring left behind by a tap that started a walk. Without it a tap and a mis-tap look identical. */
+.c3ping {
+  position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px;
+  border-radius: 50%; border: 2px solid rgba(216, 197, 165, .95); pointer-events: none;
+  box-shadow: 0 0 18px rgba(184, 154, 104, .55), inset 0 0 12px rgba(184, 154, 104, .35);
+  animation: c3ping .62s cubic-bezier(.22, 1, .36, 1) forwards;
+}
+@keyframes c3ping { from { transform: scale(.35); opacity: .95; } to { transform: scale(2.5); opacity: 0; } }
+
+/* The one line that has to be said out loud, because touching the floor to walk is not a thing anyone guesses.
+   It takes itself away after seven seconds; a hint that stays is a label. */
+.c3tip {
+  position: absolute; left: 50%; translate: -50% 0;
+  top: calc(env(safe-area-inset-top, 0px) + 96px); z-index: 5;
+  max-width: calc(100% - 40px); text-align: center; pointer-events: none;
+  font-size: 11.5px; line-height: 1.55; color: #F4ECDE;
+  padding: 7px 13px; border-radius: 999px;
+  background: rgba(32, 27, 22, .46); border: 1px solid rgba(216, 197, 165, .28);
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-  -webkit-tap-highlight-color: transparent; touch-action: none;
-  transition: background .12s ease, transform .12s ease;
+  animation: c3tipGo .5s ease 7s forwards;
 }
-.c3pad button[data-dir="f"] { grid-area: 1 / 2; }
-.c3pad button[data-dir="l"] { grid-area: 2 / 1; }
-.c3pad button[data-dir="r"] { grid-area: 2 / 3; }
-.c3pad button[data-dir="b"] { grid-area: 3 / 2; }
-.c3pad button.on { background: rgba(184, 154, 104, .85); border-color: var(--c3-champagne); transform: scale(.94); }
-.c3pad button svg {
-  width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 2.2;
-  stroke-linecap: round; stroke-linejoin: round;
-}
-@media (prefers-reduced-motion: reduce) { .c3pad button { transition: none; } }
+@keyframes c3tipGo { to { opacity: 0; visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) { .c3ping { animation-duration: .01s; } }
 
 /* ── the nav that is always there ────────────────────────────────────────────────────────────────────────────── */
 .c3nav {
@@ -567,7 +605,7 @@ textarea.input { resize: none; line-height: 1.7; }
 }
 .c3nav .c3book svg { width: 17px; height: 17px; stroke-width: 2.3; }
 
-/* the thumb pad and the nav must not fight: the pad sits above the nav's own row */
+/* the thumb stick and the nav must not fight: the stick sits above the nav's own row */
 .c3-host.walking .c3nav { opacity: .55; }
 
 /* ── the room chips ──────────────────────────────────────────────────────────────────────────────────────────── */
@@ -579,7 +617,7 @@ textarea.input { resize: none; line-height: 1.7; }
 }
 .c3chips::-webkit-scrollbar { display: none; }
 .c3-host.rooms .c3chips { display: flex; }
-.c3-host.rooms .c3nav, .c3-host.rooms .c3pad { opacity: 0; pointer-events: none; }
+.c3-host.rooms .c3nav, .c3-host.rooms .c3stick, .c3-host.rooms .c3tip { opacity: 0; pointer-events: none; }
 .c3chips button {
   flex: 0 0 auto; cursor: pointer; font: inherit; font-size: 12.5px;
   display: flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 999px;
@@ -645,17 +683,45 @@ textarea.input { resize: none; line-height: 1.7; }
 }
 
 /* ── the advisor who meets you in each room ──────────────────────────────────────────────────────────────────── */
+/* She arrives as a bubble and opens into a conversation only when someone wants one.
+
+   The panel used to open to its full height on every room change, over the thumb stick and half the room with
+   it: the visitor could neither see where they were going nor reach the control that would take them there.
+   Two states now — `mini`, which is one line, four chips and nothing else, sitting ABOVE the stick; and open,
+   which is the conversation, and which takes the stick away while it lasts. */
 .c3bot {
   position: absolute; inset-inline: 14px; bottom: calc(env(safe-area-inset-bottom, 0px) + 76px);
-  z-index: 7; max-height: 44%; display: flex; flex-direction: column;
+  z-index: 7; max-height: 56%; display: flex; flex-direction: column;
   background: var(--c3-glass); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
   border: 1px solid var(--c3-hair); border-radius: 18px; box-shadow: var(--c3-shadow);
   transform: translateY(16px); opacity: 0; pointer-events: none;
-  transition: transform .28s cubic-bezier(.22, 1, .36, 1), opacity .28s ease;
+  transition: transform .28s cubic-bezier(.22, 1, .36, 1), opacity .28s ease,
+              bottom .3s cubic-bezier(.22, 1, .36, 1), max-height .3s cubic-bezier(.22, 1, .36, 1);
 }
 .c3bot.on { transform: translateY(0); opacity: 1; pointer-events: auto; }
 @media (prefers-reduced-motion: reduce) { .c3bot { transition: opacity .2s ease; } }
 .c3bot.small { max-height: none; }
+
+/* The bubble: above the stick, never over it. The class is `c3small`, not `mini` — `mini` is one of the house
+   component classes and its `.mini button { flex: 1 }` stretched the close button right across the head. */
+.c3bot.c3small {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 198px);
+  max-height: 146px; cursor: pointer;
+  background: rgba(248, 245, 239, .9); box-shadow: 0 12px 30px rgba(42, 35, 28, .26);
+}
+.c3bot.c3small .c3botask, .c3bot.c3small .c3botfoot { display: none; }
+/* Two lines of her and nothing else. Every pixel this takes is a pixel of the room it is sitting on top of. */
+.c3bot.c3small .c3bothead { padding: 7px 11px 4px; }
+.c3bot.c3small .c3botlog { max-height: 48px; overflow: hidden; scrollbar-width: none; }
+.c3bot.c3small .c3botlog::-webkit-scrollbar { display: none; }
+.c3bot.c3small .c3msg { padding: 6px 11px; line-height: 1.65; }
+.c3bot.c3small .c3botchips { padding: 7px 11px 10px; }
+.c3bothint { display: none; color: var(--c3-gold) !important; font-weight: 600; }
+.c3bot.c3small .c3bothead small:not(.c3bothint) { display: none; }
+.c3bot.c3small .c3bothint { display: block; }
+/* nobody walks and types at once, and a control you cannot see is worse than one that is not there */
+.c3-host.asking .c3stick, .c3-host.asking .c3tip { opacity: 0; pointer-events: none; }
+.c3stick { transition: opacity .22s ease; }
 
 .c3bothead { display: flex; align-items: center; gap: 10px; padding: 9px 12px 7px; }
 .c3botav {
@@ -1253,7 +1319,7 @@ textarea.input { resize: none; line-height: 1.7; }
 .w-open:active { transform: scale(.985); }
 </style>
 
-<div class="ribbon">نسخه‌ی آزمایشی ۴ · اطلاعات نمونه</div>
+<div class="ribbon">نسخه‌ی آزمایشی ۵ · اطلاعات نمونه</div>
 <div class="app" id="app"><div class="hint" style="text-align:center;padding:40px 0">در حال باز شدن…</div></div>
 <div id="mainbar"></div>
 <div id="overlay"></div>
@@ -2170,12 +2236,10 @@ const walkShell = () => `<canvas id="c3cv"></canvas><i class="c3vig"></i>
     <div class="c3where"><span class="c3eyebrow">${WALK3D.title}</span><b id="c3name">پذیرش بزرگ</b><small id="c3line">در حال باز شدن…</small></div>
     <button class="c3ib" type="button" data-c3="rooms" aria-label="فهرست اتاق‌ها">${C3I.grid}</button>
   </header>
-  <div class="c3pad" id="c3pad">
-    <button type="button" data-dir="f" aria-label="جلو"><svg viewBox="0 0 24 24"><path d="M12 19V6"/><path d="m6 12 6-6 6 6"/></svg></button>
-    <button type="button" data-dir="l" aria-label="چرخش به چپ"><svg viewBox="0 0 24 24"><path d="M19 12H6"/><path d="m12 6-6 6 6 6"/></svg></button>
-    <button type="button" data-dir="r" aria-label="چرخش به راست"><svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="m12 6 6 6-6 6"/></svg></button>
-    <button type="button" data-dir="b" aria-label="عقب"><svg viewBox="0 0 24 24"><path d="M12 5v13"/><path d="m6 12 6 6 6-6"/></svg></button>
+  <div class="c3stick" id="c3stick" data-stick role="application" aria-label="اهرم حرکت: به هر طرف بکشید">
+    <b></b><i></i>
   </div>
+  <div class="c3tip" id="c3tip">هر جای کف را لمس کنید، همان‌جا می‌روید · با اهرم به هر طرف راه بروید · با کشیدن صفحه بچرخید</div>
   <nav class="c3nav" id="c3nav">
     <button type="button" data-c3="go-home">${C3I.home}خانه</button>
     <button type="button" data-c3="rooms">${C3I.walk}اتاق‌ها</button>
@@ -2186,7 +2250,8 @@ const walkShell = () => `<canvas id="c3cv"></canvas><i class="c3vig"></i>
   </nav>
   <div class="c3chips" id="c3chips"></div>
   <div class="c3bot" id="c3bot"></div>
-  <div class="c3sheet" id="c3sheet"></div>
+  <div class="c3sheet" id="c3sheet"></div>
+
   <div class="c3load" id="c3load"><i class="c3ring"></i>در حال ساختن کلینیک…<small style="opacity:.6;font-size:11px">سنگ، مرمر و نور، همین‌جا در گوشی شما</small></div>
   <div class="c3welcome" id="c3welcome">
     <span class="c3wmark">${C3I.spark}</span>
@@ -2272,7 +2337,7 @@ async function startWalk() {
     onHotspot: (hs) => {
       haptic("light");
       // she is the advisor's face: pressing her brings the answers back, even after they were sent away
-      if (hs.opens === "advisor") { walkDismissed = false; advisorEnter(walkRoom); const b = $("#c3bot"); if (b) b.classList.add("on"); return; }
+      if (hs.opens === "advisor") { walkDismissed = false; advisorEnter(walkRoom); advisorOpen(); return; }
       walkOpen(hs);
     },
     onReady: () => {
@@ -2284,6 +2349,9 @@ async function startWalk() {
     },
     onStat: (st) => { const f = $("#c3fps"); if (f) f.textContent = `${st.ms}ms · dpr ${st.dpr} · ${st.rooms}r · ${st.calls}c · ${(st.tris / 1000).toFixed(0)}k`; },
   });
+  // the walk tests read the camera from here; a corner that catches the walker is not something a screenshot
+  // can show, only a position that stops changing while the stick is still pushed
+  if (location.search.includes("fps")) window.__walk = walk;
 }
 
 function walkNope(msg) {
@@ -2306,6 +2374,8 @@ function closeWalk() {
 const svcLine = (s) => `<li><div><b>${s.t}</b> — ${s.free ? "رایگان" : priceText(s) + " تومان"}<div class="hint" style="font-size:11.5px">${s.sub}</div></div></li>`;
 
 function walkOpen(hs) {
+  // a panel sliding up over a thumb that is still pushing the stick would leave them walking into the wall behind it
+  if (walk && walk.letGo) walk.letGo();
   const R = WALK3D.rooms[hs.room] || {};
   const p = R.panel || { title: hs.title, sub: "", body: "", items: [], note: "" };
   if (hs.opens === "booking") return walkGo("book");
@@ -2343,9 +2413,14 @@ function advisorEnter(key) {
   const R = WALK3D.rooms[key];
   if (!R || !R.greet) return;
   const box = $("#c3bot"); if (!box) return;
+  // Small, until someone wants to talk. The old panel opened to its full height on every room change and sat
+  // over the thumb stick and half the room with it: you could not see where you were going, and you could not
+  // reach the control that would take you there.
+  box.className = "c3bot c3small";
+  const wh = $("#walk"); if (wh) wh.classList.remove("asking");
   box.innerHTML = `<div class="c3bothead">
       <span class="c3botav">${C3I.her}</span>
-      <div><b>آوا · راهنمای کلینیک</b><small>از روی اسناد خود کلینیک</small></div>
+      <div><b>آوا · راهنمای کلینیک</b><small>از روی اسناد خود کلینیک</small><small class="c3bothint">بزنید و بپرسید</small></div>
       <button class="c3botx" type="button" data-c3="botoff" aria-label="بستن مشاور">${C3I.x}</button>
     </div>
     <div class="c3botlog" id="c3botlog"><div class="c3msg bot">${R.greet}</div></div>
@@ -2355,7 +2430,21 @@ function advisorEnter(key) {
       <button type="button" data-c3="ask" aria-label="فرستادن">${C3I.send}</button>
     </div>
     <div class="c3botfoot">جواب‌ها از تعرفه و راهنمای خود کلینیک است، نه تشخیص پزشکی.</div>`;
-  setTimeout(() => box.classList.add("on"), 420);          // let the room arrive first
+  setTimeout(() => { const x = $("#c3bot"); if (x) x.classList.add("on"); }, 420);   // let the room arrive first
+}
+
+/* Open her out of the bubble into the conversation. While it is open the thumb stick goes: nobody walks and
+   types at once, and a control you cannot see is worse than one that is not there. */
+function advisorOpen() {
+  const box = $("#c3bot"); if (!box) return;
+  box.classList.remove("c3small"); box.classList.add("on");
+  const h = $("#walk"); if (h) h.classList.add("asking");
+  if (walk && walk.letGo) walk.letGo();
+}
+function advisorShrink() {
+  const box = $("#c3bot"); if (!box || box.classList.contains("c3small")) return;
+  box.classList.add("c3small");
+  const h = $("#walk"); if (h) h.classList.remove("asking");
 }
 
 const botLog = (html) => {
@@ -2367,6 +2456,7 @@ const botLog = (html) => {
 function advisorAsk(q) {
   q = String(q || "").trim();
   if (!q) return;
+  advisorOpen();
   const log = $("#c3botlog"); if (!log) return;
   botLog(`<div class="c3msg me">${esc(q)}</div>`);
   const inp = $("#c3botin"); if (inp) inp.value = "";
@@ -2409,7 +2499,15 @@ document.addEventListener("click", (e) => {
   const host = $("#walk");
   if (!host || !host.classList.contains("on")) return;
   const sheet = $("#c3sheet");
-  if (e.target && e.target.id === "c3cv" && sheet && sheet.classList.contains("on")) { sheet.classList.remove("on"); return; }
+  if (e.target && e.target.id === "c3cv") {
+    if (sheet && sheet.classList.contains("on")) { sheet.classList.remove("on"); return; }
+    advisorShrink();                                   // the room is what a tap on the room is about
+  }
+  // the whole bubble is the button that opens the conversation — only the ✕ on it is not
+  const bub = e.target.closest(".c3bot.c3small");
+  if (bub && !e.target.closest("[data-c3=botoff]") && !e.target.closest("button[data-ask]")) {
+    haptic("light"); return advisorOpen();
+  }
   const el = e.target.closest("button[data-c3],button[data-ask],#c3chips button");
   if (!el) return;
   const d = el.dataset;

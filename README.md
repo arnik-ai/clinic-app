@@ -7,6 +7,51 @@ with reminders, cancellation and the aftercare timeline (day 0, day 2 check-in, 
 list with FAQ.
 Sample data only. PREVIEW = true: bookings and payments send nothing yet.
 
+## Walking it, and looking at it (v5, 2026-11-12)
+
+Two complaints, and one turned out to be the other. Moving around on a phone was hard — and the reason was not
+the controls at all: the advisor panel opened to its full height on **every** room change and sat straight over
+the thumb pad. The visitor could not see where they were going and could not reach the control that would take
+them there.
+
+- **The advisor is a bubble now.** One line, four chips, sitting above the controls; it opens into the full
+  conversation only when someone taps it, a chip, or her marker, and while it is open the stick is taken away.
+  Its class is `c3small`, not `mini`: `mini` is a house component class, and its `.mini button { flex: 1 }` was
+  stretching the close button right across the head.
+- **One analog thumb stick instead of four arrows.** A 44 px button can only say "all the way" or "not at all";
+  the stick says how fast. 128 px of hit area around a 104 px ring, so a thumb that lands wide still walks.
+- **It moves the way a game moves, and corners let go of you.** The stick walks in the direction it is pushed,
+  sideways included, the way the left stick of any game does — it used to turn instead, which is exactly what
+  you cannot do once you are wedged into a corner. The move is resolved in 6 cm slices; a slice that cannot go
+  diagonally still goes along whichever axis is free, re-testing the second after the first has moved so a
+  corner is never cut; and a slice blocked on both at once takes a short step along the wall it is pressed
+  against. The walker is 0.34 m wide rather than 0.26, so the camera stops a third of a metre off the plaster
+  instead of putting its near plane into it. Measured: 6.6 m straight through a doorway without catching once,
+  and sideways always walks you out of a corner.
+- **Touch the floor and you walk there.** The ray is met with the floor plane, and the line from here to there
+  is stepped along and stopped at the last point that is genuinely legal — half a metre short of whatever
+  stopped it. One thumb, no aiming. The ray has to be normalised before its slope is read; unnormalised, every
+  tap below the horizon measured as 0.02 down and was thrown away as a tap at the sky.
+- **The look glides** a little after the finger lifts instead of stopping dead.
+
+And the room you arrive in is composed now rather than merely entered:
+
+- **Arrive by the door and look across the room on its diagonal**, aimed at the area-weighted centre of the
+  furniture footprints — which every piece already declares for its contact shadow. Facing a wall square-on
+  from two metres is what every treatment room used to do.
+- **Daylight.** The entrance is glazed: champagne mullions, a bright unlit plane behind them, and a pool of it
+  lying on the travertine inside. A clinic with no window anywhere has nowhere for its light to come from.
+- **Back-lit stone in the reception counter**; a halo on every cove and downlight (one additive Points object
+  per room, inside the room group, so the portal cull takes the halos away with the room); lit niches on the
+  walls that were blank; sheen on the upholstery; deeper baked corner shading (min 0.54, corner fade 1.4).
+- The treatment beds moved against the far wall, and the pool lights cut from 18–22 to 12–13 and lifted nearer
+  the ceiling: at 22 they burnt a white hole in the floor directly beneath themselves.
+- The guide keeps 2.05 m, stands well to the side, waits by the door when a room is too small to stand aside
+  in, and is not drawn at all within 1.5 m.
+
+Still 60 fps at dpr 1.5 on the same machine. Reception is the heaviest room, at 50 draw calls and 11 k
+triangles; a treatment room is 12–14 calls and 2 k.
+
 ## The walkable clinic (v4, 2026-11-08)
 
 The headline of the app is now a clinic you walk through in first person — not a 360° photograph like the hotel's
