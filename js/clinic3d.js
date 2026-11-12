@@ -52,65 +52,72 @@ const EYE = 1.62;          // eye height: a standing adult, never bobbing
 const RADIUS = 0.34;
 const DOOR_H = 2.2;        // every doorway opening is this tall; the wall above it is a header
 
-/* x, z are the room's CENTRE; w runs along x and d along z. `light` is the per-room rig (see lightRoom). */
+/* x, z are the room's CENTRE; w runs along x and d along z. `light` is the per-room rig (see lightRoom).
+
+   `tint` is the room's own colour, and it is the only place one is written down: the chip in the room list, the
+   markers standing in that room and the panel it opens all read it from here. Eleven identical pale pills told
+   nobody which room was which — the whole palette of this clinic is one warm family, which is right for the
+   stone and wrong for a list. These are the colours a clinic actually uses — champagne, rose, mauve, peach,
+   periwinkle, blush, coral, amber — never green, and never on more than a 30 px chip, so the room stays the
+   picture. */
 export const ROOMS = {
   reception: {
-    nameFa: "پذیرش بزرگ", nameEn: "Grand Reception", lineFa: "سنگ تراورتن، مرمر و نور طلایی", icon: "pinI",
+    nameFa: "پذیرش بزرگ", nameEn: "Grand Reception", lineFa: "سنگ تراورتن، مرمر و نور طلایی", icon: "pinI", tint: "#E8CB91",
     x: 0, z: 5.5, w: 9, d: 7, h: 4.0, spawn: [-0.8, 8.3], yaw: 315,
     floor: "polished", wall: "wall", light: { key: 1.52, hemi: 0.62, a: [0, 3.6, 3.4, 14, 0xFFE2BC], b: [0, 3.6, 7.6, 10, 0xFFEDD6] },
   },
   lounge: {
-    nameFa: "لانژ انتظار VIP", nameEn: "VIP Waiting Lounge", lineFa: "مبل‌های نرم و میز سنگی", icon: "heartS",
+    nameFa: "لانژ انتظار VIP", nameEn: "VIP Waiting Lounge", lineFa: "مبل‌های نرم و میز سنگی", icon: "heartS", tint: "#DCA8A1",
     x: -7.5, z: 4.5, w: 6, d: 5, h: 3.2, spawn: [-5.2, 4.5], yaw: 90,
     floor: "stone", wall: "wallWarm", light: { key: 1.2, hemi: 0.58, a: [-7.5, 2.6, 3.2, 15, 0xFFE2BC], b: [-7.5, 2.6, 6, 10, 0xFFEDD6] },
   },
   gallery: {
-    nameFa: "گالری درمان‌ها", nameEn: "Treatment Gallery", lineFa: "قبل و بعد، با اجازه‌ی مراجعه‌کننده", icon: "tagO",
+    nameFa: "گالری درمان‌ها", nameEn: "Treatment Gallery", lineFa: "قبل و بعد، با اجازه‌ی مراجعه‌کننده", icon: "tagO", tint: "#C9A7D4",
     x: 7.25, z: 4.5, w: 5.5, d: 5, h: 3.2, spawn: [5.2, 4.5], yaw: 270,
     floor: "stone", wall: "wall", light: { key: 1.0, hemi: 0.52, a: [7.25, 2.7, 3.0, 16, 0xFFE8CC], b: [7.25, 2.7, 6.2, 14, 0xFFE8CC] },
   },
   corridor: {
-    nameFa: "راهرو", nameEn: "Corridor", lineFa: "به اتاق‌های درمان", icon: "chev",
+    nameFa: "راهرو", nameEn: "Corridor", lineFa: "به اتاق‌های درمان", icon: "chev", tint: "#CBBCA6",
     x: 0, z: -6, w: 2.6, d: 16, h: 3.0, spawn: [0, 1.2], yaw: 0,
     floor: "stone", wall: "wall", light: { key: 0.75, hemi: 0.50, a: [0, 2.6, -2, 11, 0xFFE6C6], b: [0, 2.6, -11, 7, 0xFFEDD6] },
   },
   booking: {
-    nameFa: "نوبت و تماس", nameEn: "Appointment & Contact", lineFa: "همین‌جا وقت بگیرید", icon: "calO",
+    nameFa: "نوبت و تماس", nameEn: "Appointment & Contact", lineFa: "همین‌جا وقت بگیرید", icon: "calO", tint: "#EFC768",
     x: 3.55, z: 0.6, w: 4.5, d: 2.8, h: 3.0, spawn: [2.1, 0.6], yaw: 270,
     floor: "stone", wall: "wallWarm", light: { key: 1.0, hemi: 0.54, a: [3.55, 2.5, 0.6, 14, 0xFFE8CC], b: [5.4, 2.5, 0.6, 8, 0xFFEDD6] },
   },
   derm: {
-    nameFa: "مشاوره‌ی پوست", nameEn: "Dermatology Consultation", lineFa: "میز دکتر و نمایشگر پوست", icon: "consultS",
+    nameFa: "مشاوره‌ی پوست", nameEn: "Dermatology Consultation", lineFa: "میز دکتر و نمایشگر پوست", icon: "consultS", tint: "#E8B07A",
     x: -3.55, z: -3, w: 4.5, d: 4, h: 3.0, spawn: [-1.9, -3], yaw: 90,
     floor: "stone", wall: "wall", light: { key: 0.80, hemi: 0.50, a: [-3.55, 2.74, -3, 12, 0xFFF2E2], b: [-5.2, 2.5, -4.2, 5, 0xFFE2BC] },
   },
   inject: {
-    nameFa: "مشاوره‌ی تزریق", nameEn: "Injectable Consultation", lineFa: "فضایی آرام و خصوصی", icon: "syringe",
+    nameFa: "مشاوره‌ی تزریق", nameEn: "Injectable Consultation", lineFa: "فضایی آرام و خصوصی", icon: "syringe", tint: "#C3A6E2",
     x: 3.55, z: -3, w: 4.5, d: 4, h: 3.0, spawn: [1.9, -3], yaw: 270,
     floor: "stone", wall: "wallWarm", light: { key: 0.78, hemi: 0.49, a: [3.55, 2.74, -3, 12, 0xFFF2E2], b: [5.2, 2.5, -1.8, 5, 0xFFE2BC] },
   },
   analysis: {
-    nameFa: "آنالیز پیشرفته‌ی پوست", nameEn: "Advanced Skin Analysis", lineFa: "دستگاه آنالیز و نمایشگر بزرگ", icon: "spark",
+    nameFa: "آنالیز پیشرفته‌ی پوست", nameEn: "Advanced Skin Analysis", lineFa: "دستگاه آنالیز و نمایشگر بزرگ", icon: "spark", tint: "#9FB6D9",
     x: -3.55, z: -7.2, w: 4.5, d: 4, h: 3.0, spawn: [-1.9, -7.2], yaw: 90,
     floor: "stone", wall: "wallWarm", light: { key: 0.76, hemi: 0.48, a: [-3.55, 2.74, -7.2, 13, 0xFFF2E2], b: [-5.2, 2.5, -8.4, 5, 0xFFE2BC] },
   },
   facial: {
-    nameFa: "فیشال و جوان‌سازی", nameEn: "Facial & Rejuvenation", lineFa: "تخت درمان و نور ملایم", icon: "cleanI",
+    nameFa: "فیشال و جوان‌سازی", nameEn: "Facial & Rejuvenation", lineFa: "تخت درمان و نور ملایم", icon: "cleanI", tint: "#F0B6C7",
     x: 3.55, z: -7.2, w: 4.5, d: 4, h: 3.0, spawn: [1.9, -7.2], yaw: 270,
     floor: "stone", wall: "wall", light: { key: 0.74, hemi: 0.48, a: [3.55, 2.74, -7.2, 13, 0xFFF2E2], b: [5.2, 2.5, -6, 5, 0xFFE2BC] },
   },
   laser: {
-    nameFa: "اتاق لیزر", nameEn: "Laser Treatment", lineFa: "دستگاه لیزر و تخت درمان", icon: "laserI",
+    nameFa: "اتاق لیزر", nameEn: "Laser Treatment", lineFa: "دستگاه لیزر و تخت درمان", icon: "laserI", tint: "#E89B8B",
     x: -3.55, z: -11.7, w: 4.5, d: 4.6, h: 3.0, spawn: [-1.9, -11.7], yaw: 90,
     floor: "stone", wall: "wall", light: { key: 0.74, hemi: 0.47, a: [-3.55, 2.74, -11.7, 13, 0xFFF2E2], b: [-5.2, 2.5, -13, 5, 0xFFE2BC] },
   },
   hair: {
-    nameFa: "احیای مو", nameEn: "Hair Restoration", lineFa: "آنالیز پوست سر و مشاوره", icon: "mesoI",
+    nameFa: "احیای مو", nameEn: "Hair Restoration", lineFa: "آنالیز پوست سر و مشاوره", icon: "mesoI", tint: "#D9BC8B",
     x: 3.55, z: -11.7, w: 4.5, d: 4.6, h: 3.0, spawn: [1.9, -11.7], yaw: 270,
     floor: "stone", wall: "wallWarm", light: { key: 0.78, hemi: 0.49, a: [3.55, 2.74, -11.7, 13, 0xFFF2E2], b: [5.2, 2.5, -10.4, 5, 0xFFE2BC] },
   },
   doctor: {
-    nameFa: "دفتر دکتر", nameEn: "Doctor's Office", lineFa: "دکترهای کلینیک", icon: "doctorI",
+    nameFa: "دفتر دکتر", nameEn: "Doctor's Office", lineFa: "دکترهای کلینیک", icon: "doctorI", tint: "#A9BBD8",
     x: 0, z: -16, w: 5, d: 4, h: 3.0, spawn: [0, -14.6], yaw: 0,
     floor: "stone", wall: "wallWarm", light: { key: 0.9, hemi: 0.52, a: [0, 2.5, -16, 16, 0xFFE8CC], b: [0, 2.5, -17.4, 9, 0xFFEDD6] },
   },
@@ -1132,7 +1139,8 @@ const clipRect = (a, b) => {
 /* ── the walk ──────────────────────────────────────────────────────────────────────────────────────────────────
    On a phone there is no WASD and no mouse. Drag anywhere to look, push the thumb pad bottom-left to walk, tap a
    marker to open it, tap a doorway label to walk through. A keyboard, if there is one, also works. */
-export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showcase = false, at: startAt } = {}) {
+export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, onStuck, onTour,
+                                      showcase = false, at: startAt } = {}) {
   const host = canvas.parentElement || document.body;
 
   // ── renderer
@@ -1350,6 +1358,10 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
   let walking = null;                        // an automatic walk: { fx, fz, tx, tz, t, dur, after }
   let tour = null;                           // the guided walk: a list of room keys
   let idle = 0;
+  // Pushing and going nowhere. Somebody who plays games turns and walks out of a corner without noticing they
+  // did it; somebody who does not will push harder and conclude the app is broken. After a second and a half
+  // of that, the page is told, and it offers them the way out.
+  let stuckFor = 0, stuckSaid = false;
 
   const at2 = (e) => (e.touches ? e.touches[0] : e);
   const fit = () => {
@@ -1462,7 +1474,7 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     setTimeout(() => i.remove(), 640);
   };
   const tapped = (e) => {
-    if (tour) { tour = null; walking = null; return; }  // a tap during the guided walk takes the wheel back
+    if (tour) { endTour(); walking = null; return; }    // a tap during the guided walk takes the wheel back
     const p = ptOf(e);
     if (p) tapWalk(p.clientX, p.clientY);
   };
@@ -1522,11 +1534,41 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     guideSaid = performance.now();
     if (onRoom) onRoom(spaceInfo(k));
   };
-  const startTour = () => { tour = SPACE_KEYS.slice(); nextTourStop(); };
+  /* The clinic showing itself. Someone who does not want to drive should not have to: this walks every room
+     in order, pausing in each, and the first touch anywhere hands control back. */
+  const startTour = () => {
+    const i = SPACE_KEYS.indexOf(room);
+    tour = SPACE_KEYS.slice(i + 1).concat(SPACE_KEYS.slice(0, i + 1));
+    if (onTour) onTour(true);
+    nextTourStop();
+  };
+  const endTour = () => { if (tour || stuckSaid) { tour = null; if (onTour) onTour(false); } };
   const nextTourStop = () => {
-    if (!tour || !tour.length) { tour = null; return; }
+    if (!tour || !tour.length) { tour = null; if (onTour) onTour(false); return; }
     const k = tour.shift();
     show(k);
+  };
+  /* One room along the tour order, in either direction. Two buttons that cannot fail is what the room list is
+     for people who would rather not read a list. */
+  const hop = (d) => {
+    const i = SPACE_KEYS.indexOf(room);
+    const from = i < 0 ? (d > 0 ? -1 : 0) : i;
+    show(SPACE_KEYS[(from + d + SPACE_KEYS.length) % SPACE_KEYS.length]);
+  };
+  /* Out of whatever you walked into, back to where the room is worth standing. The automatic walk does not
+     collide, so this glides out of a corner the stick cannot. */
+  const recentre = () => {
+    const s = ROOMS[room]; if (!s) return;
+    const c = rect(s);
+    const cx = clamp(s.x, c.x0 + .9, c.x1 - .9), cz = clamp(s.z, c.z0 + .9, c.z1 - .9);
+    stuckFor = 0;
+    if (stuckSaid) { stuckSaid = false; if (onStuck) onStuck(false); }
+    for (let i = 0; i <= 12; i++) {
+      const t = 1 - i / 12;
+      const px = s.spawn[0] + (cx - s.spawn[0]) * t, pz = s.spawn[1] + (cz - s.spawn[1]) * t;
+      if (legal(px, pz)) return walkTo(px, pz, null, true);
+    }
+    walkTo(s.spawn[0], s.spawn[1], null, true);
   };
 
   // ── the loop
@@ -1590,12 +1632,22 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
       const wx = (-s * fwd + c * side) * WALK, wz = (-c * fwd - s * side) * WALK;
       vx += (wx - vx) * Math.min(1, dt * 13); vz += (wz - vz) * Math.min(1, dt * 13);
       if (Math.abs(vx) > .002 || Math.abs(vz) > .002) {
+        const wasX = at.x, wasZ = at.z;
         step(vx * dt, vz * dt);
         throughDoor(dt, vx * dt, vz * dt);
         const here = roomAt(at.x, at.z);
         if (here) setRoom(here);
         idle = 0;
-      } else { idle += dt; }
+        // wanting to move and not moving: that is being stuck, and it is the only way to tell from in here
+        if (Math.hypot(at.x - wasX, at.z - wasZ) < Math.hypot(vx, vz) * dt * .25) stuckFor += dt;
+        else if (stuckFor) { stuckFor = 0; if (stuckSaid) { stuckSaid = false; if (onStuck) onStuck(false); } }
+        if (stuckFor > 1.5 && !stuckSaid) { stuckSaid = true; if (onStuck) onStuck(true); }
+      } else {
+        idle += dt;
+        // Letting go of the stick is not getting unstuck — and it is exactly what you do to reach the button
+        // being offered. The offer stands until they take it, or until they actually move.
+        stuckFor = 0;
+      }
     }
 
     camera.position.set(at.x, EYE, at.z);
@@ -1693,7 +1745,12 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     };
     _guidePos.set(guideAt.x, 1.86, guideAt.z);
     if (guide.visible) place("guide", now - guideSaid < 5200 ? "من راهنماییت می‌کنم" : "بپرس", "guide", _guidePos, 9);
-    for (const h of HOTSPOTS) if (shown.has(h.room)) place(h.key, h.title, "hot", h.pos, 7);
+    for (const h of HOTSPOTS) if (shown.has(h.room)) {
+      place(h.key, h.title, "hot", h.pos, 7);
+      // the marker takes the colour of the room it stands in, so a glance says which room you are looking into
+      const m = marks.get(h.key);
+      if (m && !m.dataset.tint) { m.dataset.tint = "1"; m.style.setProperty("--t", ROOMS[h.room].tint || "#E8CB91"); }
+    }
     for (const p of PORTALS) {
       if (!shown.has(p.a) && !shown.has(p.b)) continue;
       place("door:" + p.a + ">" + p.b, p.labelFa, "door", p.centre, 6.5);
@@ -1792,7 +1849,7 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
     if (e.type === "keydown") {
       keys.add(k);
       if (k === "e" || k === "Enter") { const h = HOTSPOTS.find((x) => x.room === room && Math.hypot(x.pos.x - at.x, x.pos.z - at.z) < 2.6); if (h && onHotspot) onHotspot(h); }
-      if (k === "Escape" && tour) { tour = null; walking = null; }
+      if (k === "Escape" && tour) { endTour(); walking = null; }
     } else keys.delete(k);
   };
   if (!showcase) { addEventListener("keydown", onKey); addEventListener("keyup", onKey); }
@@ -1809,12 +1866,15 @@ export function startClinic(canvas, { onRoom, onHotspot, onReady, onStat, showca
 
   return {
     spaces: SPACE_KEYS.map(spaceInfo),
-    show, startTour, fit,
+    show, startTour, fit, recentre,
+    next: () => hop(1),
+    prev: () => hop(-1),
     get room() { return room; },
+    get touring() { return !!tour; },
     // where the visitor is standing, for the walk tests: a corner that catches the walker is not something
     // a screenshot can show, only a position that stops changing while the stick is still pushed
     where() { return { x: +at.x.toFixed(3), z: +at.z.toFixed(3), yaw: Math.round(yaw), room }; },
-    stopTour() { tour = null; walking = null; },
+    stopTour() { endTour(); walking = null; },
     /* Handed to the page so that a sheet sliding up can take the thumb off the stick: a panel opening over a
        finger that is still pushing would otherwise leave the visitor walking into the wall behind it. */
     letGo() { stick.x = stick.y = 0; spin = 0; },

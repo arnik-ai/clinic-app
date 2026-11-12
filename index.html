@@ -458,6 +458,18 @@ textarea.input { resize: none; line-height: 1.7; }
 .c3where b { display: block; font-size: 17px; font-weight: 700; line-height: 1.25; }
 .c3where small { display: block; font-size: 12px; opacity: .84; margin-top: 2px; }
 
+/* the one wide button up here: the clinic showing itself, which is the whole app for anyone who would rather
+   not drive. It says what it does in words, because a ▶ on its own is a guess. */
+.c3ib.wide {
+  width: auto; gap: 6px; padding: 0 13px; display: flex; align-items: center;
+  font: inherit; font-size: 12px; font-weight: 600;
+  background: rgba(184, 154, 104, .9); border-color: rgba(255, 253, 249, .5); color: #241E17;
+}
+.c3ib.wide svg { width: 15px; height: 15px; }
+.c3ib.wide span { white-space: nowrap; }
+.c3-host.touring .c3ib.wide { background: rgba(40, 33, 26, .7); color: #FFF; border-color: rgba(216, 197, 165, .5); }
+.c3ib.on { background: var(--c3-gold); color: #241E17; border-color: var(--c3-champagne); }
+
 .c3ib {
   flex-shrink: 0; width: 40px; height: 40px; border-radius: 13px;
   display: grid; place-items: center; cursor: pointer;
@@ -481,15 +493,16 @@ textarea.input { resize: none; line-height: 1.7; }
   background: none; color: #FFF; font: inherit; font-size: 12.5px;
   transition: opacity .22s ease;
 }
+/* --t is the colour of the room the marker stands in, set when it is placed. */
 .c3spot i {
   width: 26px; height: 26px; flex-shrink: 0; border-radius: 50%;
-  border: 1.5px solid var(--c3-champagne); background: rgba(40, 33, 26, .3);
+  border: 1.5px solid var(--t, var(--c3-champagne)); background: rgba(40, 33, 26, .34);
   -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
   position: relative;
 }
 .c3spot i::after {
   content: ""; position: absolute; inset: 7px; border-radius: 50%;
-  background: var(--c3-champagne);
+  background: var(--t, var(--c3-champagne));
 }
 .c3spot b {
   font-weight: 500; white-space: nowrap; padding: 5px 11px; border-radius: 999px;
@@ -525,7 +538,7 @@ textarea.input { resize: none; line-height: 1.7; }
 .c3stick {
   position: absolute; left: 10px; bottom: calc(env(safe-area-inset-bottom, 0px) + 58px);
   z-index: 5; width: 128px; height: 128px;
-  display: grid; place-items: center;
+  display: none; place-items: center;
   direction: ltr;                       /* the knob moves with the thumb, whatever the page is doing */
   touch-action: none; -webkit-tap-highlight-color: transparent; cursor: grab;
 }
@@ -553,6 +566,8 @@ textarea.input { resize: none; line-height: 1.7; }
 .c3stick.on i { transition: box-shadow .15s ease; box-shadow: 0 3px 10px rgba(28, 23, 18, .5), 0 0 0 8px rgba(184, 154, 104, .17); }
 .c3stick.on b { border-color: var(--c3-champagne); }
 @media (prefers-reduced-motion: reduce) { .c3stick i { transition: none; } }
+/* off until somebody asks for it — this rule comes after the block above on purpose, so it wins */
+.c3-host.freewalk .c3stick { display: grid; }
 
 /* ── touch the floor, go there ───────────────────────────────────────────────────────────────────────────────── */
 /* The ring left behind by a tap that started a walk. Without it a tap and a mis-tap look identical. */
@@ -568,7 +583,7 @@ textarea.input { resize: none; line-height: 1.7; }
    It takes itself away after seven seconds; a hint that stays is a label. */
 .c3tip {
   position: absolute; left: 50%; translate: -50% 0;
-  top: calc(env(safe-area-inset-top, 0px) + 96px); z-index: 5;
+  top: calc(env(safe-area-inset-top, 0px) + 100px); z-index: 5;
   max-width: calc(100% - 40px); text-align: center; pointer-events: none;
   font-size: 11.5px; line-height: 1.55; color: #F4ECDE;
   padding: 7px 13px; border-radius: 999px;
@@ -580,23 +595,41 @@ textarea.input { resize: none; line-height: 1.7; }
 @media (prefers-reduced-motion: reduce) { .c3ping { animation-duration: .01s; } }
 
 /* ── the nav that is always there ────────────────────────────────────────────────────────────────────────────── */
+/* Each section has its own colour, because six white glyphs in a row are six of the same thing — and the
+   clinic's whole palette is deliberately one warm family, which is right for the stone and useless for a list.
+   The colour is only ever a 30 px chip behind a glyph, so the room is still the picture and the bar is still
+   one bar. Champagne, mauve, peach, steel and blush: what a clinic uses, and never green. */
 .c3nav {
   position: absolute; inset-inline: 0; bottom: 0; z-index: 5;
   display: flex; gap: 4px; justify-content: center;
   padding: 10px 12px calc(env(safe-area-inset-bottom, 0px) + 10px);
-  background: linear-gradient(to top, rgba(40, 33, 26, .5), transparent);
+  background: linear-gradient(to top, rgba(26, 21, 17, .82), rgba(26, 21, 17, .42) 56%, transparent);
   pointer-events: none;
 }
 .c3nav > * { pointer-events: auto; }
 .c3nav button {
+  --t: #E8CB91;
   flex: 0 1 auto; min-width: 54px; border: 0; cursor: pointer;
-  background: none; color: rgba(255, 255, 255, .82); font: inherit; font-size: 10.5px;
-  display: grid; justify-items: center; gap: 3px; padding: 6px 4px; border-radius: 12px;
+  background: none; color: rgba(255, 255, 255, .95); font: inherit; font-size: 10.5px; font-weight: 600;
+  display: grid; justify-items: center; gap: 4px; padding: 5px 4px; border-radius: 12px;
+  text-shadow: 0 1px 7px rgba(24, 19, 15, .75);
 }
-.c3nav button svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2.1;
-  stroke-linecap: round; stroke-linejoin: round; }
-.c3nav button.on { color: var(--c3-champagne); }
+.c3nav button[data-c3="rooms"]   { --t: #C9A7D4; }
+.c3nav button[data-c3="prices"]  { --t: #E8B07A; }
+.c3nav button[data-c3="doctors"] { --t: #A9BBD8; }
+.c3nav button[data-c3="gallery"] { --t: #F0B6C7; }
+.c3nav button svg {
+  width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round;
+  color: var(--t); padding: 7px; box-sizing: content-box; border-radius: 50%;
+  background: rgba(26, 21, 17, .55);
+  box-shadow: inset 0 0 0 1.5px currentColor, 0 4px 12px rgba(24, 19, 15, .4);
+  transition: background .15s ease, color .15s ease;
+}
+.c3nav button.on svg, .c3nav button:active svg { background: var(--t); color: #241E17; }
+.c3nav button.on { color: var(--t); }
 .c3nav button:active { transform: scale(.95); }
+@media (prefers-reduced-motion: reduce) { .c3nav button svg { transition: none; } }
 /* the booking button is never a sibling among equals */
 .c3nav .c3book {
   background: var(--c3-gold); color: #241E17; font-weight: 700; font-size: 12px;
@@ -609,22 +642,78 @@ textarea.input { resize: none; line-height: 1.7; }
 .c3-host.walking .c3nav { opacity: .55; }
 
 /* ── the room chips ──────────────────────────────────────────────────────────────────────────────────────────── */
+/* ── getting about ──────────────────────────────────────────────────────────────────────────────────────────
+   The room list used to be behind a button, and walking was a thumb stick. That is a control scheme for
+   someone who plays games; the people this clinic is for are not going to drive a first-person camera, and
+   they said so. So the list is simply here, always, with an arrow at each end for anyone who would rather
+   press next than read — and the stick is a switch that starts off. */
+.c3drive {
+  position: absolute; inset-inline: 0; z-index: 6;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 58px);
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  background: linear-gradient(to top, rgba(24, 20, 16, .78), rgba(24, 20, 16, .3) 70%, transparent);
+  pointer-events: none;
+}
+.c3drive > * { pointer-events: auto; }
+.c3-host.freewalk .c3drive { opacity: 0; pointer-events: none; }
+.c3drive { transition: opacity .2s ease; }
+
+/* the two buttons that cannot fail */
+.c3hop {
+  flex-shrink: 0; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; padding: 0;
+  display: grid; place-items: center; color: #FFF;
+  background: rgba(40, 33, 26, .78); border: 1px solid rgba(216, 197, 165, .45);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow: 0 6px 16px rgba(24, 19, 15, .4);
+}
+.c3hop svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4;
+  stroke-linecap: round; stroke-linejoin: round; }
+.c3hop:active { transform: scale(.93); background: var(--c3-gold); color: #241E17; }
+
 .c3chips {
-  position: absolute; inset-inline: 0; bottom: 0; z-index: 6;
-  display: none; gap: 7px; overflow-x: auto; scrollbar-width: none;
-  padding: 14px 14px calc(env(safe-area-inset-bottom, 0px) + 14px);
-  background: linear-gradient(to top, rgba(32, 27, 22, .92) 40%, transparent);
+  flex: 1; min-width: 0; z-index: 6;
+  display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none;
+  padding: 2px 2px 3px;
 }
 .c3chips::-webkit-scrollbar { display: none; }
-.c3-host.rooms .c3chips { display: flex; }
-.c3-host.rooms .c3nav, .c3-host.rooms .c3stick, .c3-host.rooms .c3tip { opacity: 0; pointer-events: none; }
-.c3chips button {
-  flex: 0 0 auto; cursor: pointer; font: inherit; font-size: 12.5px;
-  display: flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, .22); background: rgba(255, 255, 255, .1); color: #FFF;
+
+/* ── pushing at a wall and going nowhere ─────────────────────────────────────────────────────────────────────
+   Somebody who plays games turns and walks out of a corner without noticing they did it. Somebody who does
+   not will push harder and decide the app is broken. After a second and a half, this says what to press. */
+.c3unstuck {
+  position: absolute; left: 50%; translate: -50% 0; z-index: 8;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 118px);
+  display: none; align-items: center; gap: 8px; cursor: pointer;
+  font: inherit; font-size: 13px; font-weight: 700; padding: 12px 18px; border-radius: 999px;
+  background: var(--c3-gold); color: #241E17; border: 1px solid #FFFDF9;
+  box-shadow: 0 10px 26px rgba(24, 19, 15, .5);
 }
-.c3chips button svg { width: 16px; height: 16px; }
-.c3chips button.on { background: var(--c3-champagne); border-color: var(--c3-champagne); color: #241E17; font-weight: 600; }
+/* the animation belongs on the state that is actually on screen, and it ends somewhere definite: declared on
+   the hidden base it left the button sitting at the 0% keyframe, painted at opacity 0 and pressable by nobody */
+.c3unstuck.on { display: flex; opacity: 1; animation: c3pop .28s cubic-bezier(.22, 1, .36, 1) both; }
+.c3unstuck svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2.3;
+  stroke-linecap: round; stroke-linejoin: round; }
+@keyframes c3pop { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+/* one thing on the screen at a time when something has gone wrong */
+.c3-host.stuck .c3bot { opacity: 0; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .c3unstuck { animation: none; } }
+/* Each room in its own colour (ROOMS[…].tint), so the list is eleven rooms and not eleven pills. */
+.c3chips button {
+  --t: #E8CB91;
+  flex: 0 0 auto; cursor: pointer; font: inherit; font-size: 12.5px; font-weight: 600;
+  display: flex; align-items: center; gap: 7px; padding: 9px 14px 9px 11px; border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .16); background: rgba(44, 36, 29, .9); color: #FFF;
+}
+.c3chips button svg {
+  width: 16px; height: 16px; color: var(--t);
+  padding: 5px; box-sizing: content-box; border-radius: 50%;
+  background: rgba(255, 255, 255, .08); box-shadow: inset 0 0 0 1.4px currentColor;
+}
+.c3chips button.on {
+  background: linear-gradient(135deg, var(--t), #FBF3E4); border-color: #FFF; color: #241E17;
+  box-shadow: 0 6px 18px rgba(24, 19, 15, .45);
+}
+.c3chips button.on svg { color: #241E17; background: rgba(255, 255, 255, .5); }
 
 /* ── a panel a marker opens ──────────────────────────────────────────────────────────────────────────────────── */
 .c3sheet {
@@ -705,10 +794,12 @@ textarea.input { resize: none; line-height: 1.7; }
 /* The bubble: above the stick, never over it. The class is `c3small`, not `mini` — `mini` is one of the house
    component classes and its `.mini button { flex: 1 }` stretched the close button right across the head. */
 .c3bot.c3small {
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 198px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 122px);
   max-height: 146px; cursor: pointer;
   background: rgba(248, 245, 239, .9); box-shadow: 0 12px 30px rgba(42, 35, 28, .26);
 }
+/* with the stick out, the bubble has to clear it instead of the room strip */
+.c3-host.freewalk .c3bot.c3small { bottom: calc(env(safe-area-inset-bottom, 0px) + 198px); }
 .c3bot.c3small .c3botask, .c3bot.c3small .c3botfoot { display: none; }
 /* Two lines of her and nothing else. Every pixel this takes is a pixel of the room it is sitting on top of. */
 .c3bot.c3small .c3bothead { padding: 7px 11px 4px; }
@@ -794,40 +885,6 @@ textarea.input { resize: none; line-height: 1.7; }
 .c3botfoot {
   font-size: 10px; line-height: 1.5; color: #8A7E70; text-align: center; padding: 0 12px 9px;
 }
-
-/* ── the way in ──────────────────────────────────────────────────────────────────────────────────────────────── */
-.c3welcome {
-  position: absolute; inset: 0; z-index: 10; display: grid; align-content: center; justify-items: center;
-  gap: 14px; padding: 32px 26px calc(env(safe-area-inset-bottom, 0px) + 32px); text-align: center;
-  background:
-    radial-gradient(90% 60% at 50% 32%, rgba(248, 245, 239, .2), transparent 70%),
-    linear-gradient(170deg, #2A241C, #15120E);
-  color: var(--c3-ivory);
-  transition: opacity .45s ease;
-}
-.c3welcome.gone { opacity: 0; pointer-events: none; }
-.c3wmark {
-  width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center;
-  border: 1px solid var(--c3-hair); color: var(--c3-gold); margin-bottom: 4px;
-}
-.c3wmark svg { width: 30px; height: 30px; }
-.c3welcome .c3eyebrow { color: var(--c3-champagne); }
-.c3welcome h1 { font-size: 25px; line-height: 1.5; font-weight: 700; margin: 0; max-width: 17ch; }
-.c3welcome h1 em { font-style: normal; color: var(--c3-champagne); }
-.c3welcome p { font-size: 13.5px; line-height: 1.9; color: rgba(248, 245, 239, .76); margin: 0; max-width: 30ch; }
-.c3wbtns { display: grid; gap: 9px; width: 100%; max-width: 320px; margin-top: 10px; }
-.c3wbtns button {
-  width: 100%; padding: 15px; border-radius: 15px; cursor: pointer; font: inherit; font-size: 14.5px;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: var(--c3-gold); color: #241E17; border: 0; font-weight: 700;
-}
-.c3wbtns button.ghost {
-  background: rgba(248, 245, 239, .08); color: var(--c3-ivory);
-  border: 1px solid rgba(216, 197, 165, .36); font-weight: 500;
-}
-.c3wbtns button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2;
-  stroke-linecap: round; stroke-linejoin: round; }
-.c3wfoot { font-size: 10.5px; color: rgba(248, 245, 239, .5); line-height: 1.7; max-width: 34ch; margin-top: 6px; }
 
 /* ── bringing the clinic up, and the hint it shows once ──────────────────────────────────────────────────────── */
 .c3load {
@@ -2227,6 +2284,11 @@ const C3I = {
   her: '<svg viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="3.6"/><path d="M8.4 6.2c0-2.4 1.6-3.7 3.6-3.7s3.6 1.3 3.6 3.7"/><path d="M5 20.5c0-3.5 3.1-5.8 7-5.8s7 2.3 7 5.8"/></svg>',
   src: '<svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>',
   spark: '<svg viewBox="0 0 24 24"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg>',
+  play: '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></svg>',
+  pause: '<svg viewBox="0 0 24 24"><path d="M8.5 4.5v15M15.5 4.5v15"/></svg>',
+  prev: '<svg viewBox="0 0 24 24"><path d="m14.5 5-7 7 7 7"/></svg>',
+  next: '<svg viewBox="0 0 24 24"><path d="m9.5 5 7 7-7 7"/></svg>',
+  back: '<svg viewBox="0 0 24 24"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 4v4.4h4.4"/></svg>',
 };
 
 const walkShell = () => `<canvas id="c3cv"></canvas><i class="c3vig"></i>
@@ -2234,37 +2296,34 @@ const walkShell = () => `<canvas id="c3cv"></canvas><i class="c3vig"></i>
   <header class="c3top">
     <button class="c3ib" type="button" data-c3="close" aria-label="بستن">${C3I.x}</button>
     <div class="c3where"><span class="c3eyebrow">${WALK3D.title}</span><b id="c3name">پذیرش بزرگ</b><small id="c3line">در حال باز شدن…</small></div>
-    <button class="c3ib" type="button" data-c3="rooms" aria-label="فهرست اتاق‌ها">${C3I.grid}</button>
+    <button class="c3ib wide" type="button" data-c3="autotour" id="c3tourb">${C3I.play}<span>خودش بگردد</span></button>
+    <button class="c3ib" type="button" data-c3="freewalk" id="c3freeb" aria-label="راه رفتن آزاد">${C3I.walk}</button>
   </header>
   <div class="c3stick" id="c3stick" data-stick role="application" aria-label="اهرم حرکت: به هر طرف بکشید">
     <b></b><i></i>
   </div>
-  <div class="c3tip" id="c3tip">هر جای کف را لمس کنید، همان‌جا می‌روید · با اهرم به هر طرف راه بروید · با کشیدن صفحه بچرخید</div>
+  <div class="c3tip" id="c3tip">روی اسم اتاق بزنید تا ببریمتان · یا هر جای کف را لمس کنید · با کشیدن صفحه نگاه کنید</div>
   <nav class="c3nav" id="c3nav">
     <button type="button" data-c3="go-home">${C3I.home}خانه</button>
-    <button type="button" data-c3="rooms">${C3I.walk}اتاق‌ها</button>
     <button type="button" data-c3="prices">${C3I.svc}خدمات</button>
     <button type="button" data-c3="doctors">${C3I.doc}دکترها</button>
     <button type="button" data-c3="gallery">${C3I.gal}گالری</button>
     <button class="c3book" type="button" data-c3="book">${C3I.cal}نوبت</button>
   </nav>
-  <div class="c3chips" id="c3chips"></div>
+  <div class="c3drive" id="c3drive">
+    <button class="c3hop" type="button" data-c3="prev" aria-label="اتاق قبلی">${C3I.prev}</button>
+    <div class="c3chips" id="c3chips"></div>
+    <button class="c3hop" type="button" data-c3="next" aria-label="اتاق بعدی">${C3I.next}</button>
+  </div>
+  <button class="c3unstuck" type="button" id="c3unstuck" data-c3="unstuck">${C3I.back} گیر کردی؟ برگرد وسط اتاق</button>
   <div class="c3bot" id="c3bot"></div>
   <div class="c3sheet" id="c3sheet"></div>
 
-  <div class="c3load" id="c3load"><i class="c3ring"></i>در حال ساختن کلینیک…<small style="opacity:.6;font-size:11px">سنگ، مرمر و نور، همین‌جا در گوشی شما</small></div>
-  <div class="c3welcome" id="c3welcome">
-    <span class="c3wmark">${C3I.spark}</span>
-    <span class="c3eyebrow">${esc(CLINIC.name)}</span>
-    <h1>به استانداردِ تازه‌ای از <em>زیبایی</em> خوش آمدید</h1>
-    <p>قدم به قدم در کلینیک راه بروید، اتاق‌ها را ببینید، و هر جا سؤالی داشتید از مشاور همان اتاق بپرسید.</p>
-    <div class="c3wbtns">
-      <button type="button" data-c3="enter">${C3I.walk} ورود به کلینیک مجازی</button>
-      <button class="ghost" type="button" data-c3="prices">${C3I.svc} دیدن خدمات</button>
-      <button class="ghost" type="button" data-c3="book">${C3I.cal} گرفتن نوبت</button>
-    </div>
-    <p class="c3wfoot">این یک کلینیک نمونه است. اطلاعات، عکس‌ها و اسم دکترها نمونه‌اند تا کلینیک اطلاعات خودش را بدهد.</p>
-  </div>`;
+  <div class="c3load" id="c3load"><i class="c3ring"></i>در حال ساختن کلینیک…<small style="opacity:.6;font-size:11px">سنگ، مرمر و نور، همین‌جا در گوشی شما</small></div>`;
+/* There used to be a welcome screen here — a mark, a headline and three buttons — between tapping the header
+   and standing in the clinic. It said nothing the clinic does not say better by simply being there, and it put
+   a second tap in front of the one thing the whole app is for. The loading screen stays, because something has
+   to be on the screen while eleven rooms are built; it takes itself away the moment they are. */
 
 /* ── the living header ────────────────────────────────────────────────────────────────────────────────────────
    The clinic IS the top of the home page, the way a hero photograph is the top of a website — only it is the real
@@ -2344,10 +2403,22 @@ async function startWalk() {
       const load = $("#c3load");
       if (load) { load.classList.add("gone"); setTimeout(() => load.remove(), 600); }
       const chips = $("#c3chips");
+      // every room carries its own colour (ROOMS[…].tint in js/clinic3d.js); the chip is where it shows
       if (chips) chips.innerHTML = walk.spaces.filter((s) => s.key !== "corridor")
-        .map((s) => `<button type="button" data-s="${s.key}">${ICON[s.icon] || ""}${s.nameFa}</button>`).join("");
+        .map((s) => `<button type="button" data-s="${s.key}" style="--t:${s.tint || "#E8CB91"}">${ICON[s.icon] || ""}${s.nameFa}</button>`).join("");
     },
     onStat: (st) => { const f = $("#c3fps"); if (f) f.textContent = `${st.ms}ms · dpr ${st.dpr} · ${st.rooms}r · ${st.calls}c · ${(st.tris / 1000).toFixed(0)}k`; },
+    // pushing at a wall and going nowhere: offer the way out rather than let them decide it is broken
+    onStuck: (on) => {
+      const u = $("#c3unstuck"); if (u) u.classList.toggle("on", on);
+      const h = $("#walk"); if (h) h.classList.toggle("stuck", on);
+      if (on) haptic("light");
+    },
+    onTour: (on) => {
+      const h = $("#walk"); if (h) h.classList.toggle("touring", on);
+      const t = $("#c3tourb");
+      if (t) t.innerHTML = (on ? C3I.pause : C3I.play) + `<span>${on ? "توقف" : "خودش بگردد"}</span>`;
+    },
   });
   // the walk tests read the camera from here; a corner that catches the walker is not something a screenshot
   // can show, only a position that stops changing while the stick is still pushed
@@ -2364,7 +2435,7 @@ function walkNope(msg) {
 function closeWalk() {
   const h = $("#walk"); if (!h) return;
   if (walk) { walk.dispose(); walk = null; }
-  h.classList.remove("on", "rooms"); h.innerHTML = "";
+  h.classList.remove("on", "freewalk", "touring", "asking"); h.innerHTML = "";
   document.body.style.overflow = "";
   if (heroShow && route() === "home") { heroShow.resume(); heroShow.fit(); }
   if (IN_TG) { try { tg.enableVerticalSwipes && tg.enableVerticalSwipes(); } catch (e) {} }
@@ -2513,15 +2584,31 @@ document.addEventListener("click", (e) => {
   const d = el.dataset;
   if (d.ask) { haptic("light"); return advisorAsk(d.ask); }
   if (d.goto) { haptic("ok"); return walkGo(d.goto); }
-  if (d.s && walk) { haptic("light"); host.classList.remove("rooms"); closeSheet3(); return walk.show(d.s); }
+  if (d.s && walk) { haptic("light"); closeSheet3(); if (walk.touring) walk.stopTour(); return walk.show(d.s); }
   switch (d.c3) {
     case "close": haptic("light"); return closeWalk();
-    case "enter": {
-      haptic("ok");
-      const w = $("#c3welcome"); if (w) { w.classList.add("gone"); setTimeout(() => w.remove(), 500); }
+    case "prev": haptic("light"); closeSheet3(); return walk && walk.prev();
+    case "next": haptic("light"); closeSheet3(); return walk && walk.next();
+    case "autotour": {
+      haptic("ok"); closeSheet3();
+      if (!walk) return;
+      return walk.touring ? walk.stopTour() : walk.startTour();
+    }
+    case "freewalk": {
+      /* The stick is for people who play games. Everyone else moves by tapping a room, tapping the floor, or
+         letting the clinic walk itself — so free walking is a switch, and it starts off. */
+      haptic("light");
+      const on = host.classList.toggle("freewalk");
+      const f = $("#c3freeb"); if (f) f.classList.toggle("on", on);
+      if (!on && walk && walk.letGo) walk.letGo();
+      toast(on ? "راه رفتن آزاد روشن شد؛ با اهرم گوشه حرکت کنید." : "راه رفتن آزاد خاموش شد؛ روی اسم اتاق یا روی کف بزنید.");
       return;
     }
-    case "rooms": haptic("light"); closeSheet3(); return host.classList.toggle("rooms");
+    case "unstuck": {
+      haptic("ok");
+      const u = $("#c3unstuck"); if (u) u.classList.remove("on");
+      return walk && walk.recentre();
+    }
     case "sheetclose": haptic("light"); return closeSheet3();
     case "botoff": { walkDismissed = true; const b = $("#c3bot"); if (b) b.classList.remove("on"); return; }
     case "ask": return advisorAsk($("#c3botin") ? $("#c3botin").value : "");
@@ -2530,12 +2617,12 @@ document.addEventListener("click", (e) => {
     case "prices": haptic("light"); return walkGo("prices");
     case "go-home": haptic("light"); return walkGo("home");
     case "doctors": {
-      haptic("light"); host.classList.remove("rooms");
+      haptic("light");
       if (walk && walk.room !== "doctor") walk.show("doctor");
       return walkOpen({ room: "doctor", title: "دکترهای کلینیک", opens: "doctors" });
     }
     case "gallery": {
-      haptic("light"); host.classList.remove("rooms");
+      haptic("light");
       if (walk && walk.room !== "gallery") walk.show("gallery");
       return walkOpen({ room: "gallery", title: "گالری درمان‌ها", opens: "info" });
     }

@@ -7,6 +7,39 @@ with reminders, cancellation and the aftercare timeline (day 0, day 2 check-in, 
 list with FAQ.
 Sample data only. PREVIEW = true: bookings and payments send nothing yet.
 
+## Guided first (v5.1, 2026-11-12)
+
+The owner put it plainly: a thumb stick is a control for somebody who plays Xbox, and the people this clinic is
+for will not drive a first-person camera. They get wedged between rooms and conclude the thing is broken. He is
+right, and it is the kind of thing no amount of making the stick nicer would have fixed — the default was wrong.
+
+So the clinic is now walked without driving, and free walking is a switch that starts off.
+
+- **No welcome screen.** There was a mark, a headline and three buttons between tapping the header and standing
+  in the clinic. It said nothing the clinic does not say better by being there, and it put a second tap in
+  front of the one thing the whole app is for. Measured: standing in reception 1.3 s after the tap.
+- **The room list is simply on the screen**, always, with an arrow at each end for anybody who would rather
+  press next than read a list. Tap a name and you are walked there.
+- **"خودش بگردد"** in the top bar walks every room in order, pausing in each, like a film. One touch anywhere
+  hands control back. For someone who does not want to drive at all, this is the whole experience.
+- **Touch the floor and you walk there** (v5), which is the other control that needs no explaining.
+- **The stick is behind a switch**, off by default; turning it on puts the room strip away, and turning it off
+  brings it back.
+- **"گیر کردی؟ برگرد وسط اتاق".** A second and a half of pushing at something and not moving, and the engine
+  says so (`onStuck`); the page offers the button, and `recentre()` glides out — an automatic walk does not
+  collide, which is exactly why it can leave a corner the stick cannot. Letting go of the stick does not
+  dismiss the offer: letting go is what you do to reach the button.
+
+And a colour per room, because the palette of this clinic is deliberately one warm family — right for the stone,
+useless for a list of eleven rooms. `ROOMS[…].tint` in `js/clinic3d.js` is the only place each is written down;
+the chip in the room strip, the markers standing in that room and the nav all read it from there. Champagne,
+rose, mauve, peach, periwinkle, blush, coral, amber. Never green, and never more than a 30 px chip.
+
+Driven in a real browser end to end: arrives with no box in the way, 11 colour-coded rooms on screen, next and
+previous, tap-a-room, the tour walking itself through 7 rooms unattended and stopping on one touch, the stick
+appearing only when switched on, and the rescue appearing after 1.5 s of pushing and moving the visitor 4.2 m
+clear. 60 fps, no console errors.
+
 ## Walking it, and looking at it (v5, 2026-11-12)
 
 Two complaints, and one turned out to be the other. Moving around on a phone was hard — and the reason was not
